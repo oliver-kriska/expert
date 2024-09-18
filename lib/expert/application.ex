@@ -7,10 +7,19 @@ defmodule Expert.Application do
 
   @impl true
   def start(_type, _args) do
-    children = [
-      # Starts a worker by calling: Expert.Worker.start_link(arg)
-      # {Expert.Worker, arg}
-    ]
+    case System.cmd("epmd", ["-daemon"], stderr_to_stdout: true) do
+      {_, 0} ->
+        :ok
+
+      {output, code} ->
+        IO.warn("Failed to start epmd! Exited with code=#{code} and output=#{output}")
+
+        raise "Failed to start epmd!"
+    end
+
+    Node.start(:"expert-#{System.system_time()}", :shortnames)
+
+    children = [Expert.LSPSupervisor]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options

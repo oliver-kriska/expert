@@ -18,6 +18,9 @@ erl_crash.dump
 
 # Also ignore archive artifacts (built via "mix archive.build").
 *.ez
+.expert-lsp/
+
+burrito_out/
 
 # Ignore package tarball (built via "mix hex.build").
 expert-*.tar

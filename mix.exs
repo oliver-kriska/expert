@@ -7,6 +7,9 @@ defmodule Expert.MixProject do
       version: "0.1.0",
       elixir: "~> 1.17",
       start_permanent: Mix.env() == :prod,
+      elixirc_paths: elixirc_paths(Mix.env()),
+      releases: releases(),
+      default_release: :expert,
       deps: deps()
     ]
   end
@@ -19,11 +22,32 @@ defmodule Expert.MixProject do
     ]
   end
 
+  def releases do
+    [
+      plain: [],
+      expert: [
+        steps: [:assemble, &Burrito.wrap/1],
+        burrito: [
+          targets: [
+            darwin_arm64: [os: :darwin, cpu: :aarch64],
+            darwin_amd64: [os: :darwin, cpu: :x86_64],
+            linux_arm64: [os: :linux, cpu: :aarch64],
+            linux_amd64: [os: :linux, cpu: :x86_64],
+            windows_amd64: [os: :windows, cpu: :x86_64]
+          ]
+        ]
+      ]
+    ]
+  end
+
+  defp elixirc_paths(:test), do: ["lib", "test/support"]
+  defp elixirc_paths(_), do: ["lib"]
+
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      # {:dep_from_hexpm, "~> 0.3.0"},
-      # {:dep_from_git, git: "https://github.com/elixir-lang/my_dep.git", tag: "0.1.0"}
+      {:gen_lsp, "~> 0.10"},
+      {:burrito, "~> 1.0", only: [:dev, :prod]}
     ]
   end
 end
