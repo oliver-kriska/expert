@@ -26,7 +26,7 @@ defmodule Expert.MixProject do
     [
       plain: [],
       expert: [
-        steps: [:assemble, &Burrito.wrap/1],
+        steps: [:assemble, &Expert.Release.assemble/1, &Burrito.wrap/1],
         burrito: [
           targets: [
             darwin_arm64: [os: :darwin, cpu: :aarch64],
@@ -46,8 +46,11 @@ defmodule Expert.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:gen_lsp, "~> 0.10"},
-      {:burrito, "~> 1.0", only: [:dev, :prod]}
+      {:gen_lsp,
+       github: "elixir-tools/gen_lsp", branch: "change-schematic-function", override: true},
+      # {:gen_lsp, "~> 0.10"},
+      {:burrito, "~> 1.0", only: [:dev, :prod]},
+      {:namespace, path: "../namespace", only: [:dev]}
     ]
   end
 end

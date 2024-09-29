@@ -1,32 +1,37 @@
-default: deps compile build-local
-
-choose:
-  just --choose
-
-deps:
+deps project:
+  #!/usr/bin/env bash
+  cd {{project}}
   mix deps.get
 
-compile:
+compile project:
+  #!/usr/bin/env bash
+  cd {{project}}
   mix compile
 
+build:
+  #!/usr/bin/env bash
+  cd engine
+  mix build
+
 start:
+  #!/usr/bin/env bash
+  cd expert
   bin/start --port 9000
 
-test:
+test project:
+  #!/usr/bin/env bash
+  cd {{project}}
   mix test
 
-format:
-  mix format
-
-lint: 
+format project:
   #!/usr/bin/env bash
-  set -euxo pipefail
-
-  mix format --check-formatted
+  cd {{project}}
+  mix format
 
 [unix]
 build-local:
   #!/usr/bin/env bash
+  cd expert
   case "{{os()}}-{{arch()}}" in
     "linux-arm" | "linux-aarch64")
       target=linux_arm64;;
@@ -49,10 +54,9 @@ build-local:
   EXPERT_RELEASE_MODE=burrito BURRITO_TARGET="windows_amd64" MIX_ENV=prod mix release
 
 build-all:
+  cd expert
   EXPERT_RELEASE_MODE=burrito MIX_ENV=prod mix release
 
 build-plain:
+  cd expert
   MIX_ENV=prod mix release plain
-
-bump-spitfire:
-  mix deps.update spitfire

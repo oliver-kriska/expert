@@ -1,5 +1,0 @@
-#!/usr/bin/env bash
-
-cd "$(dirname "$0")"/.. || exit 1
-
-mix run --no-halt -e "Application.ensure_all_started(:expert)" -- "$@"
