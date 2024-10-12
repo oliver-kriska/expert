@@ -34,11 +34,7 @@ defmodule Engine.DocumentSymbol do
           ast
       end
 
-    for %DocumentSymbol{} = ds <- List.wrap(walker(ast, nil)) do
-      {:ok, dumped} = Schematic.dump(DocumentSymbol.schema(), ds)
-
-      dumped
-    end
+    List.wrap(walker(ast, nil))
   end
 
   defp walker([{{:__literal__, _, [:do]}, {_, _, _exprs} = ast}], mod) do

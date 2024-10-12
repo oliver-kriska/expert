@@ -8,7 +8,12 @@ defmodule Engine.MixProject do
       elixir: "~> 1.17",
       start_permanent: Mix.env() == :prod,
       aliases: [
-        build: ["cmd rm -rf _build/#{Mix.env()}", "compile", "namespace _build/#{Mix.env()}"]
+        namespace: "namespace --apps",
+        build: [
+          "cmd rm -rf _build/#{Mix.env()}",
+          "compile",
+          "namespace --apps --directory _build/#{Mix.env()}"
+        ]
       ],
       deps: deps()
     ]

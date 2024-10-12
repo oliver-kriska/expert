@@ -110,16 +110,8 @@ defmodule Expert do
 
     symbols =
       Expert.Runtime.execute! lsp.assigns.runtime do
-        # we have to call the namespaced module name
-        XPert.DocumentSymbol.fetch(doc)
+        Engine.DocumentSymbol.fetch(doc)
       end
-      |> Enum.map(fn ds ->
-        # we also have to serialize and deserialize to send structs between nodes that
-        # might be namespaced
-
-        {:ok, unified} = Schematic.unify(GenLSP.Structures.DocumentSymbol.schema(), ds)
-        unified
-      end)
 
     # which then will get serialized again on the way out
     # we could potentially namespace our app too, but i think that
@@ -145,13 +137,13 @@ defmodule Expert do
     {:noreply, lsp}
   end
 
-  def handle_info({:runtime_ready, name, runtime_pid}, lsp) do
+  def handle_info({:runtime_ready, _name, runtime_pid}, lsp) do
     Runtime.compile(runtime_pid)
 
     {:noreply, assign(lsp, ready: true, runtime: runtime_pid)}
   end
 
-  def handle_info({:compiler_result, name, result}, lsp) do
+  def handle_info({:compiler_result, _name, result}, lsp) do
     case result do
       {status, diagnostics} when status in [:ok, :noop] ->
         per_file =

@@ -3,20 +3,39 @@ deps project:
   cd {{project}}
   mix deps.get
 
-compile project:
+build project:
   #!/usr/bin/env bash
+  set -euo pipefail
+
   cd {{project}}
+  mix_env="${MIX_ENV:-dev}"
+  build_dir="_build/$mix_env"
+  safe_dir="_build/$mix_env-safe"
+  # create our safekeeping area
+  mkdir -p "$safe_dir"
+  # delete what is currently in the build dir
+  rm -rf "$build_dir"
+  # move our build artifacts from safekeeping to the build area
+  cp -a "$safe_dir/." "$build_dir/"
+  # compile the safe kept code, respects incremental compilation
   mix compile
+  # prep the safe area for new code
+  rm -rf "$safe_dir/"
+  # copy new code in the safe area
+  cp -a "$build_dir/." "$safe_dir/"
+  # namespace the new code
+  mix namespace --directory "$build_dir"
 
-build:
-  #!/usr/bin/env bash
-  cd engine
-  mix build
-
-start:
+start *opts="--port 9000": (build "engine") (build "expert")
   #!/usr/bin/env bash
   cd expert
-  bin/start --port 9000
+
+  # no compile is important so it doesn't mess up the namespacing
+  EXPERT_ENGINE_PATH="../engine/_build/${MIX_ENV:-dev}/" mix run \
+      --no-compile \
+      --no-halt \
+      -e "Application.ensure_all_started(:expert)" \
+      -- {{opts}}
 
 test project:
   #!/usr/bin/env bash
@@ -29,7 +48,7 @@ format project:
   mix format
 
 [unix]
-build-local:
+release-local:
   #!/usr/bin/env bash
   cd expert
   case "{{os()}}-{{arch()}}" in
@@ -49,14 +68,14 @@ build-local:
   EXPERT_RELEASE_MODE=burrito BURRITO_TARGET="$target" MIX_ENV=prod mix release
 
 [windows]
-build-local:
+release-local:
   # idk actually how to set env vars like this on windows, might crash
   EXPERT_RELEASE_MODE=burrito BURRITO_TARGET="windows_amd64" MIX_ENV=prod mix release
 
-build-all:
+release-all:
   cd expert
   EXPERT_RELEASE_MODE=burrito MIX_ENV=prod mix release
 
-build-plain:
+release-plain:
   cd expert
   MIX_ENV=prod mix release plain

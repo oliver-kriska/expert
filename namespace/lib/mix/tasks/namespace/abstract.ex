@@ -38,7 +38,7 @@ defmodule Mix.Tasks.Namespace.Abstract do
     {:attribute, anno, :__impl__, rewrite(attrs)}
   end
 
-  defp do_rewrite({:function, anno, name, arity, clauses} = full) do
+  defp do_rewrite({:function, anno, name, arity, clauses}) do
     {:function, anno, name, arity, rewrite(clauses)}
   end
 
@@ -90,7 +90,7 @@ defmodule Mix.Tasks.Namespace.Abstract do
   # 8.2  Atomic Literals
 
   # only rewrite atoms, since they might be modules
-  defp do_rewrite({:atom, anno, literal}) do
+  defp do_rewrite({:atom, anno, literal}) when literal != :expert do
     {:atom, anno, rewrite_module(literal)}
   end
 
@@ -151,11 +151,11 @@ defmodule Mix.Tasks.Namespace.Abstract do
     {:catch, anno, rewrite(expression)}
   end
 
-  defp do_rewrite({:fun, anno, {:function, name, arity}} = full) do
+  defp do_rewrite({:fun, anno, {:function, name, arity}}) do
     {:fun, anno, {:function, rewrite(name), arity}}
   end
 
-  defp do_rewrite({:fun, anno, {:function, module, name, arity}} = full) do
+  defp do_rewrite({:fun, anno, {:function, module, name, arity}}) do
     {:fun, anno, {:function, rewrite(module), rewrite(name), arity}}
   end
 
@@ -163,11 +163,11 @@ defmodule Mix.Tasks.Namespace.Abstract do
     {:fun, anno, {:clauses, rewrite(clauses)}}
   end
 
-  defp do_rewrite({:named_fun, anno, name, clauses} = full) do
+  defp do_rewrite({:named_fun, anno, name, clauses}) do
     {:named_fun, anno, rewrite(name), rewrite(clauses)}
   end
 
-  defp do_rewrite({:call, anno, {:remote, remote_anno, module, fn_name}, args} = full) do
+  defp do_rewrite({:call, anno, {:remote, remote_anno, module, fn_name}, args}) do
     {:call, anno, {:remote, remote_anno, rewrite(module), fn_name}, rewrite(args)}
   end
 

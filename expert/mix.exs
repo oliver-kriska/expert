@@ -9,6 +9,7 @@ defmodule Expert.MixProject do
       start_permanent: Mix.env() == :prod,
       elixirc_paths: elixirc_paths(Mix.env()),
       releases: releases(),
+      aliases: aliases(),
       default_release: :expert,
       deps: deps()
     ]
@@ -42,6 +43,12 @@ defmodule Expert.MixProject do
 
   defp elixirc_paths(:test), do: ["lib", "test/support"]
   defp elixirc_paths(_), do: ["lib"]
+
+  defp aliases() do
+    [
+      namespace: "namespace"
+    ]
+  end
 
   # Run "mix help deps" to learn about dependencies.
   defp deps do

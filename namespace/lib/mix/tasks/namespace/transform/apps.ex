@@ -4,19 +4,20 @@ defmodule Mix.Tasks.Namespace.Transform.Apps do
   """
   alias Mix.Tasks.Namespace
   alias Mix.Tasks.Namespace.Transform
+  import Kernel, except: [apply: 2]
 
-  def apply_to_all(base_directory) do
+  def apply_to_all(base_directory, namespace_app) do
     base_directory
     |> find_app_files()
     |> tap(fn app_files ->
       Mix.Shell.IO.info("Rewriting #{length(app_files)} app files")
     end)
-    |> Enum.each(&apply/1)
+    |> Enum.each(fn f -> apply(f, namespace_app) end)
   end
 
-  def apply(file_path) do
+  def apply(file_path, namespace_app) do
     with {:ok, app_definition} <- Transform.Erlang.path_to_term(file_path),
-         {:ok, converted} <- convert(app_definition),
+         {:ok, converted} <- convert(app_definition, namespace_app),
          :ok <- File.write(file_path, converted) do
       app_name =
         file_path
@@ -24,15 +25,17 @@ defmodule Mix.Tasks.Namespace.Transform.Apps do
         |> Path.rootname()
         |> String.to_atom()
 
-      namespaced_app_name = Namespace.Module.apply(app_name)
-      new_filename = "#{namespaced_app_name}.app"
+      if namespace_app do
+        namespaced_app_name = Namespace.Module.apply(app_name)
+        new_filename = "#{namespaced_app_name}.app"
 
-      new_file_path =
-        file_path
-        |> Path.dirname()
-        |> Path.join(new_filename)
+        new_file_path =
+          file_path
+          |> Path.dirname()
+          |> Path.join(new_filename)
 
-      File.rename!(file_path, new_file_path)
+        File.rename!(file_path, new_file_path)
+      end
     end
   end
 
@@ -44,36 +47,47 @@ defmodule Mix.Tasks.Namespace.Transform.Apps do
     |> Path.wildcard()
   end
 
-  defp convert(app_definition) do
+  defp convert(app_definition, namespace_app) do
     erlang_terms =
       app_definition
-      |> visit()
+      |> visit(namespace_app)
       |> Transform.Erlang.term_to_string()
 
     {:ok, erlang_terms}
   end
 
-  defp visit({:application, app_name, keys}) do
-    {:application, Namespace.Module.apply(app_name), Enum.map(keys, &visit/1)}
+  defp visit({:application, app_name, keys}, namespace_app) do
+    app =
+      if namespace_app do
+        Namespace.Module.apply(app_name)
+      else
+        app_name
+      end
+
+    {:application, app, Enum.map(keys, fn k -> visit(k, namespace_app) end)}
   end
 
-  defp visit({:applications, app_list}) do
-    {:applications, Enum.map(app_list, &Namespace.Module.apply/1)}
+  defp visit({:applications, app_list} = original, namespace_app) do
+    if namespace_app do
+      {:applications, Enum.map(app_list, &Namespace.Module.apply/1)}
+    else
+      original
+    end
   end
 
-  defp visit({:modules, module_list}) do
+  defp visit({:modules, module_list}, _) do
     {:modules, Enum.map(module_list, &Namespace.Module.apply/1)}
   end
 
-  defp visit({:description, desc}) do
+  defp visit({:description, desc}, _) do
     {:description, desc ++ ~c" namespaced by expert."}
   end
 
-  defp visit({:mod, {module_name, args}}) do
+  defp visit({:mod, {module_name, args}}, _) do
     {:mod, {Namespace.Module.apply(module_name), args}}
   end
 
-  defp visit(key_value) do
+  defp visit(key_value, _) do
     key_value
   end
 end

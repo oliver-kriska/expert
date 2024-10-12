@@ -2,7 +2,6 @@ defmodule Expert.Runtime do
   @moduledoc false
   use GenServer
 
-  @env Mix.env()
   defguardp is_ready(state) when is_map_key(state, :node)
 
   def start_link(opts) do
@@ -130,9 +129,6 @@ defmodule Expert.Runtime do
           |> Path.join("cmd")
           |> Path.absname()
 
-        engine_path =
-          System.get_env("EXPERT_ENGINE_PATH", to_string(dir)) |> Path.expand()
-
         env =
           [
             {~c"LSP", ~c"expert"},
@@ -144,6 +140,9 @@ defmodule Expert.Runtime do
             {~c"RELEASE_SYS_CONFIG", false},
             {~c"PATH", String.to_charlist(new_path)}
           ]
+
+        engine_path =
+          System.get_env("EXPERT_ENGINE_PATH", to_string(dir)) |> Path.expand()
 
         consolidated =
           Path.wildcard(Path.join(engine_path, "lib/*/{consolidated}"))
@@ -157,11 +156,6 @@ defmodule Expert.Runtime do
 
         args =
           [elixir_exe] ++
-            if @env == :test do
-              ["--erl", "-kernel prevent_overlapping_partitions false"]
-            else
-              []
-            end ++
             engine_path_args ++
             [
               "--no-halt",
@@ -250,7 +244,7 @@ defmodule Expert.Runtime do
       |> Keyword.put(:from, self())
 
     with {:badrpc, _error} <-
-           :rpc.call(node, XPert.Worker, :enqueue_compiler, [opts]) do
+           :rpc.call(node, Engine.Worker, :enqueue_compiler, [opts]) do
       :error
     end
 

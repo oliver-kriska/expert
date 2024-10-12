@@ -2,10 +2,4 @@
 
 cd "$(dirname "$0")"/.. || exit 1
 
-(
-  cd ../engine || exit
-
-  mix build
-)
-
-EXPERT_ENGINE_PATH="../engine/_build/${MIX_ENV:-dev}/" mix run --no-halt -e "Application.ensure_all_started(:expert)" -- "$@"
+EXPERT_ENGINE_PATH="../engine/_build/${MIX_ENV:-dev}/" mix run --no-compile --no-halt -e "Application.ensure_all_started(:expert)" -- "$@"

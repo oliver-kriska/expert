@@ -19,7 +19,8 @@ defmodule Mix.Tasks.Namespace do
   # by this task. Plugin discovery uses this task, which happens after
   # namespacing.
   @extra_apps %{
-    "engine" => "Engine"
+    "engine" => "Engine",
+    "expert" => "Expert"
   }
 
   defp deps_apps() do
@@ -30,18 +31,29 @@ defmodule Mix.Tasks.Namespace do
 
   require Logger
 
-  def run([base_directory]) do
+  def run(argv) do
+    {options, _rest} =
+      OptionParser.parse!(argv,
+        strict: [directory: :string, apps: :boolean]
+      )
+
+    base_directory = options[:directory]
     Process.put(:deps_apps, deps_apps())
-    Transform.Apps.apply_to_all(base_directory)
+
+    Transform.Apps.apply_to_all(base_directory, options[:apps])
+
     Transform.Beams.apply_to_all(base_directory)
+    # Transform.Configs.apply_to_all(base_directory)
     # consolidated
 
-    # Transform.Beams.apply(base_directory)
     Transform.Scripts.apply_to_all(base_directory)
     # The boot file transform just turns script files into boot files
     # so it must come after the script file transform
     Transform.Boots.apply_to_all(base_directory)
-    Transform.AppDirectories.apply_to_all(base_directory)
+
+    if options[:apps] do
+      Transform.AppDirectories.apply_to_all(base_directory)
+    end
   end
 
   def app_names() do

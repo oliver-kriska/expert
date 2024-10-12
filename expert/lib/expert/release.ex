@@ -10,7 +10,14 @@ defmodule Expert.Release do
         ]
       )
 
-    source = Path.join([engine_path, "_build/prod"])
+    {_, 0} =
+      System.cmd("mix", ["namespace"],
+        env: [
+          {"MIX_ENV", to_string(Mix.env())}
+        ]
+      )
+
+    source = Path.join([engine_path, "_build/#{Mix.env()}"])
 
     dest =
       Path.join([
