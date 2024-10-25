@@ -1,4 +1,4 @@
-defmodule Mix.Tasks.Namespace.Transform.Erlang do
+defmodule Namespace.Erlang do
   @moduledoc """
   Utilities for reading and writing erlang terms from and to text
   """

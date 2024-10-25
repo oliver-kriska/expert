@@ -1,20 +1,21 @@
-defmodule Mix.Tasks.Namespace.Module do
-  alias Mix.Tasks.Namespace
-
+defmodule Namespace.Module do
   @namespace_prefix "XP"
 
-  def apply(module_name) do
+  def run(module_name, opts) do
+    apps = Keyword.fetch!(opts, :apps)
+    roots = Keyword.fetch!(opts, :roots)
+
     cond do
       prefixed?(module_name) ->
         module_name
 
-      module_name in Namespace.app_names() ->
+      opts[:do_apps] && module_name in apps ->
         :"xp_#{module_name}"
 
       true ->
         module_name
         |> Atom.to_string()
-        |> apply_namespace()
+        |> apply_namespace(roots)
     end
   end
 
@@ -40,8 +41,8 @@ defmodule Mix.Tasks.Namespace.Module do
   def prefixed?(_),
     do: false
 
-  defp apply_namespace("Elixir." <> rest) do
-    Namespace.root_modules()
+  defp apply_namespace("Elixir." <> rest, roots) do
+    roots
     |> Enum.map(fn module -> module |> Module.split() |> List.first() end)
     |> Enum.reduce_while(rest, fn root_module, module ->
       if has_root_module?(root_module, module) do
@@ -59,7 +60,7 @@ defmodule Mix.Tasks.Namespace.Module do
     |> Module.concat()
   end
 
-  defp apply_namespace(erlang_module) do
+  defp apply_namespace(erlang_module, _) do
     String.to_atom(erlang_module)
   end
 
@@ -67,10 +68,6 @@ defmodule Mix.Tasks.Namespace.Module do
 
   defp has_root_module?(root_module, candidate) do
     String.contains?(candidate, append_trailing_period(root_module))
-  end
-
-  defp namespace("Engine") do
-    "#{@namespace_prefix}ert"
   end
 
   defp namespace(orig) do
