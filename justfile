@@ -3,7 +3,14 @@ deps project:
   cd {{project}}
   mix deps.get
 
-build project:
+run project +ARGS:
+  #!/usr/bin/env bash
+  set -euo pipefail
+  cd {{project}}
+  eval "{{ ARGS }}"
+
+
+compile project:
   #!/usr/bin/env bash
   set -euo pipefail
 
@@ -23,10 +30,21 @@ build project:
   rm -rf "$safe_dir/"
   # copy new code in the safe area
   cp -a "$build_dir/." "$safe_dir/"
-  # namespace the new code
-  mix namespace --directory "$build_dir"
 
-start *opts="--port 9000": (build "engine") (build "expert")
+build project *args: (compile project)
+  #!/usr/bin/env bash
+  set -euo pipefail
+  mix_env="${MIX_ENV:-dev}"
+  build_dir="_build/$mix_env"
+
+  cd {{project}}
+
+  # namespace the new code
+  mix namespace --directory "$build_dir" {{args}}
+
+start *opts="--port 9000": \
+  (build "engine" "--include-app engine --include-root Engine --exclude-app namespace --apps") \
+  (build "expert" "--include-app expert --exclude-root Expert --exclude-app burrito --exclude-app namespace --exclude-root Jason --include-root Engine")
   #!/usr/bin/env bash
   cd expert
 
@@ -48,7 +66,9 @@ format project:
   mix format
 
 [unix]
-release-local:
+release-local: \
+  (build "engine" "--include-app engine --include-root Engine --exclude-app namespace --apps") \
+  (build "expert" "--include-app expert --exclude-root Expert --exclude-app burrito --exclude-app namespace --exclude-root Jason --include-root Engine")
   #!/usr/bin/env bash
   cd expert
   case "{{os()}}-{{arch()}}" in
@@ -65,7 +85,7 @@ release-local:
       exit 1;;
   esac
 
-  EXPERT_RELEASE_MODE=burrito BURRITO_TARGET="$target" MIX_ENV=prod mix release
+  EXPERT_RELEASE_MODE=burrito BURRITO_TARGET="$target" MIX_ENV=prod mix release --no-compile
 
 [windows]
 release-local:
