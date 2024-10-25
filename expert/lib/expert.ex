@@ -145,7 +145,7 @@ defmodule Expert do
 
   def handle_info({:compiler_result, _name, result}, lsp) do
     case result do
-      {status, diagnostics} when status in [:ok, :noop] ->
+      {status, diagnostics} when status not in [:ok, :noop] ->
         per_file =
           for d <- diagnostics, reduce: Map.new() do
             acc ->
