@@ -19,7 +19,7 @@ defmodule Mix.Tasks.Namespace do
       OptionParser.parse!(argv,
         strict: [
           directory: :string,
-          apps: :boolean,
+          dot_apps: :boolean,
           include_app: :keep,
           include_root: :keep,
           exclude_app: :keep,
@@ -27,28 +27,25 @@ defmodule Mix.Tasks.Namespace do
         ]
       )
 
-    base_directory = options[:directory]
+    base_directory = Keyword.fetch!(options, :directory)
 
     include_apps = Keyword.get_values(options, :include_app) |> Enum.map(&String.to_atom/1)
     include_roots = Keyword.get_values(options, :include_root) |> Enum.map(&Module.concat([&1]))
     exclude_apps = Keyword.get_values(options, :exclude_app) |> Enum.map(&String.to_atom/1)
     exclude_roots = Keyword.get_values(options, :exclude_root) |> Enum.map(&Module.concat([&1]))
 
+    apps = Enum.uniq(Mix.Project.deps_apps() ++ include_apps) -- exclude_apps
 
-    apps = (Mix.Project.deps_apps() ++ include_apps) -- exclude_apps
-
-    roots_from_apps = apps |> root_modules_for_apps() |> Map.values() |> List.flatten() |> Enum.uniq()
+    roots_from_apps =
+      apps |> root_modules_for_apps() |> Map.values() |> List.flatten() |> Enum.uniq()
 
     roots = (roots_from_apps ++ include_roots) -- exclude_roots
 
-
     opts = [apps: apps, roots: roots, do_apps: options[:apps]]
 
-    Namespace.Transform.Apps.run_all(base_directory, options[:apps], opts)
+    Namespace.Transform.Apps.run_all(base_directory, opts)
 
-    Namespace.Transform.Beams.run_all(base_directory, options[:apps], opts)
-    # Transform.Configs.run_all(base_directory)
-    # consolidated
+    Namespace.Transform.Beams.run_all(base_directory, opts)
 
     if options[:apps] do
       Namespace.Transform.AppDirectories.run_all(base_directory, opts)

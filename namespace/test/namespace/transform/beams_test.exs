@@ -1,5 +1,7 @@
 defmodule Namespace.Transform.BeamsTest do
   use ExUnit.Case, async: true
+  import ExUnit.CaptureIO
+
   @moduletag tmp_dir: true
   setup %{tmp_dir: dir} do
     apps = [:some_app, :bar]
@@ -20,7 +22,15 @@ defmodule Namespace.Transform.BeamsTest do
       Path.join(path, "Elixir.SomeApp.beam")
     )
 
-    Namespace.Transform.Beams.run_all(dir, true, apps: apps, roots: roots)
+    {_, io} =
+      with_io(fn ->
+        Namespace.Transform.Beams.run_all(dir, do_apps: true, apps: apps, roots: roots)
+      end)
+
+    assert io =~ "Rewriting .beam files"
+    assert io =~ "Found 1 app beam files"
+    assert io =~ "Applying namespace:"
+    assert io =~ "done"
 
     assert File.exists?(Path.join(path, "Elixir.XPSomeApp.beam"))
 
@@ -42,7 +52,7 @@ defmodule Namespace.Transform.BeamsTest do
              {:clause, 24, [], [],
               [
                 {:call, 25, {:atom, 25, :another}, []},
-                {:call, 26, {:remote, 26, {:atom, 26, XPert}, {:atom, 26, :thing}}, []}
+                {:call, 26, {:remote, 26, {:atom, 26, XPEngine}, {:atom, 26, :thing}}, []}
               ]}
            ]
 

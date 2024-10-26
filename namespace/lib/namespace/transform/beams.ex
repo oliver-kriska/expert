@@ -3,7 +3,7 @@ defmodule Namespace.Transform.Beams do
   A transformer that finds and replaces any instance of a module in a .beam file
   """
 
-  def run_all(base_directory, do_apps, opts) do
+  def run_all(base_directory, opts) do
     Mix.Shell.IO.info("Rewriting .beam files")
     consolidated_beams = find_consolidated_beams(base_directory)
     app_beams = find_app_beams(base_directory, opts[:apps])
@@ -18,19 +18,20 @@ defmodule Namespace.Transform.Beams do
 
     all_beams
     |> Task.async_stream(fn beam ->
-      apply_and_update_progress(beam, me, do_apps, opts)
+      apply_and_update_progress(beam, me, opts)
     end)
     |> Stream.run()
 
     block_until_done(0, total_files)
   end
 
-  defp apply_and_update_progress(beam_file, caller, do_apps, opts) do
-    run(beam_file, do_apps, opts)
+  defp apply_and_update_progress(beam_file, caller, opts) do
+    run(beam_file, opts)
     send(caller, :progress)
   end
 
-  def run(path, do_apps, opts) do
+  def run(path, opts) do
+    do_apps = opts[:do_apps]
     erlang_path = String.to_charlist(path)
 
     Process.put(:do_apps, do_apps)

@@ -26,7 +26,7 @@ defmodule Namespace.AbstractTest do
              {:clause, 6, [], [],
               [
                 {:call, 7, {:atom, 7, :another}, []},
-                {:call, 8, {:remote, 8, {:atom, 8, XPert}, {:atom, 8, :thing}}, []}
+                {:call, 8, {:remote, 8, {:atom, 8, XPEngine}, {:atom, 8, :thing}}, []}
               ]}
            ]
 
@@ -43,10 +43,9 @@ defmodule Namespace.AbstractTest do
                         [
                           {:block, 0,
                            [
-                             {:call, 13, {:remote, 13, {:atom, 13, :xp_baz}, {:atom, 13, :run}},
-                              []},
+                             {:call, 13, {:remote, 13, {:atom, 13, :baz}, {:atom, 13, :run}}, []},
                              {:call, 14, {:remote, 14, {:atom, 14, XPBar.Foo}, {:atom, 14, :run}},
-                              [{:atom, 14, :xp_baz}]}
+                              [{:atom, 14, :baz}]}
                            ]}
                         ]}
                      ]}}

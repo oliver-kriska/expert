@@ -43,6 +43,7 @@ defmodule Namespace.Module do
 
   defp apply_namespace("Elixir." <> rest, roots) do
     roots
+    |> Enum.filter(fn module -> Macro.classify_atom(module) == :alias end)
     |> Enum.map(fn module -> module |> Module.split() |> List.first() end)
     |> Enum.reduce_while(rest, fn root_module, module ->
       if has_root_module?(root_module, module) do
@@ -60,8 +61,14 @@ defmodule Namespace.Module do
     |> Module.concat()
   end
 
-  defp apply_namespace(erlang_module, _) do
-    String.to_atom(erlang_module)
+  defp apply_namespace(erlang_module, roots) do
+    erlang_module = String.to_atom(erlang_module)
+
+    if erlang_module in roots do
+      :"xp_#{erlang_module}"
+    else
+      erlang_module
+    end
   end
 
   defp has_root_module?(root_module, root_module), do: true

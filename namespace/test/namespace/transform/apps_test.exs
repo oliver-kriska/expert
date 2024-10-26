@@ -1,5 +1,6 @@
 defmodule Namespace.Transform.AppsTest do
   use ExUnit.Case, async: true
+  import ExUnit.CaptureIO
 
   @app """
   {application,some_app,
@@ -25,7 +26,12 @@ defmodule Namespace.Transform.AppsTest do
   end
 
   test "namespaces .app files", %{tmp_dir: dir, apps: apps, roots: roots} do
-    Namespace.Transform.Apps.run_all(dir, true, apps: apps, roots: roots)
+    {_, io} =
+      with_io(fn ->
+        Namespace.Transform.Apps.run_all(dir, do_apps: true, apps: apps, roots: roots)
+      end)
+
+    assert io =~ "Rewriting 1 app files"
 
     assert """
            {application,xp_some_app,
@@ -45,7 +51,12 @@ defmodule Namespace.Transform.AppsTest do
     apps: apps,
     roots: roots
   } do
-    Namespace.Transform.Apps.run_all(dir, false, apps: apps, roots: roots)
+    {_, io} =
+      with_io(fn ->
+        Namespace.Transform.Apps.run_all(dir, do_apps: false, apps: apps, roots: roots)
+      end)
+
+    assert io =~ "Rewriting 1 app files"
 
     assert """
            {application,some_app,

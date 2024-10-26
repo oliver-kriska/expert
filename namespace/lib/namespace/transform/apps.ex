@@ -1,9 +1,9 @@
 defmodule Namespace.Transform.Apps do
   @moduledoc """
-  Applies namespacing to all modules defined in .app files
+  Namespaces modules and app names inside .app files.
   """
 
-  def run_all(base_directory, namespace_app, opts) do
+  def run_all(base_directory, opts) do
     app_files_glob = Enum.join(opts[:apps], ",")
 
     base_directory
@@ -12,10 +12,12 @@ defmodule Namespace.Transform.Apps do
     |> tap(fn app_files ->
       Mix.Shell.IO.info("Rewriting #{length(app_files)} app files")
     end)
-    |> Enum.each(fn f -> run(f, namespace_app, opts) end)
+    |> Enum.each(fn f -> run(f, opts) end)
   end
 
-  def run(file_path, namespace_app, opts) do
+  def run(file_path, opts) do
+    namespace_app = opts[:do_apps]
+
     with {:ok, app_definition} <- Namespace.Erlang.path_to_term(file_path),
          {:ok, converted} <- convert(app_definition, namespace_app, opts),
          :ok <- File.write(file_path, converted) do

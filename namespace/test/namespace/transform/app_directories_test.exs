@@ -13,7 +13,7 @@ defmodule Namespace.Transform.AppDirectoriesTest do
     File.mkdir_p!(Path.join(dir, "lib/foo/ebin"))
     File.mkdir_p!(Path.join(dir, "lib/bob/ebin"))
 
-    Namespace.Transform.AppDirectories.run_all(dir, apps: apps, roots: roots)
+    Namespace.Transform.AppDirectories.run_all(dir, do_apps: true, apps: apps, roots: roots)
 
     refute File.exists?(Path.join(dir, "lib/bar/ebin/"))
     assert File.exists?(Path.join(dir, "lib/xp_bar/ebin/"))

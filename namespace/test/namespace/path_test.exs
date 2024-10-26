@@ -9,6 +9,11 @@ defmodule Namespace.PathTest do
 
   test "namespaces charlist path", %{apps: apps, roots: roots} do
     assert ~c"hello/xp_foo/ebin" ==
-             Namespace.Path.run(~c"hello/foo/ebin", apps: apps, roots: roots)
+             Namespace.Path.run(~c"hello/foo/ebin", do_apps: true, apps: apps, roots: roots)
+  end
+
+  test "doesn't namespace if do_apps is false", %{apps: apps, roots: roots} do
+    assert ~c"hello/foo/ebin" ==
+             Namespace.Path.run(~c"hello/foo/ebin", do_apps: false, apps: apps, roots: roots)
   end
 end
