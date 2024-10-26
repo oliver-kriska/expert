@@ -58,13 +58,13 @@ defmodule Mix.Tasks.Namespace do
 
     roots = (roots_from_apps ++ include_roots) -- exclude_roots
 
-    opts = [apps: apps, roots: roots, do_apps: options[:apps]]
+    opts = [apps: apps, roots: roots, do_apps: options[:dot_apps]]
 
     Namespace.Transform.Apps.run_all(base_directory, opts)
 
     Namespace.Transform.Beams.run_all(base_directory, opts)
 
-    if options[:apps] do
+    if options[:dot_apps] do
       Namespace.Transform.AppDirectories.run_all(base_directory, opts)
     end
   end

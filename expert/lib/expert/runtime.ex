@@ -193,7 +193,7 @@ defmodule Expert.Runtime do
 
           case connect(node, port, 120) do
             true ->
-              {:ok, _} = :rpc.call(node, Application, :ensure_all_started, [:xp_engine])
+              {:ok, _} = :rpc.call(node, Application, :ensure_all_started, [:engine])
 
               send(me, {:node, node})
 
