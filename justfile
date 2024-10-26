@@ -1,3 +1,9 @@
+mix_env := env('MIX_ENV', 'dev')
+build_dir := "_build" / mix_env
+safe_dir := "_build" / mix_env + "safe"
+
+apps := "expert engine namespace"
+
 deps project:
   #!/usr/bin/env bash
   cd {{project}}
@@ -9,56 +15,57 @@ run project +ARGS:
   cd {{project}}
   eval "{{ ARGS }}"
 
-
 compile project:
   #!/usr/bin/env bash
   set -euo pipefail
 
   cd {{project}}
-  mix_env="${MIX_ENV:-dev}"
-  build_dir="_build/$mix_env"
-  safe_dir="_build/$mix_env-safe"
   # create our safekeeping area
-  mkdir -p "$safe_dir"
+  mkdir -p {{safe_dir}}
   # delete what is currently in the build dir
-  rm -rf "$build_dir"
+  rm -rf {{ build_dir }} 
   # move our build artifacts from safekeeping to the build area
-  cp -a "$safe_dir/." "$build_dir/"
+  cp -a "{{ safe_dir }}/." "{{ build_dir }}/"
   # compile the safe kept code, respects incremental compilation
   mix compile
   # prep the safe area for new code
-  rm -rf "$safe_dir/"
+  rm -rf "{{ safe_dir }}/"
   # copy new code in the safe area
-  cp -a "$build_dir/." "$safe_dir/"
+  cp -a "{{ build_dir }}/." "{{ safe_dir }}/"
 
 build project *args: (compile project)
   #!/usr/bin/env bash
   set -euo pipefail
-  mix_env="${MIX_ENV:-dev}"
-  build_dir="_build/$mix_env"
 
   cd {{project}}
 
   # namespace the new code
-  mix namespace --directory "$build_dir" {{args}}
+  mix namespace --directory "{{ build_dir }}" {{args}}
 
-start *opts="--port 9000": \
-  (build "engine" "--include-app engine --include-root Engine --exclude-app namespace --apps") \
-  (build "expert" "--include-app expert --exclude-root Expert --exclude-app burrito --exclude-app namespace --exclude-root Jason --include-root Engine")
+build-engine: (build "engine" "--include-app engine --include-root Engine --exclude-app namespace --dot-apps")
+build-expert: (build "expert" "--include-app expert --exclude-root Expert --exclude-app burrito --exclude-app namespace --exclude-root Jason --include-root Engine")
+
+start *opts="--port 9000": build-engine build-expert
   #!/usr/bin/env bash
   cd expert
 
   # no compile is important so it doesn't mess up the namespacing
-  EXPERT_ENGINE_PATH="../engine/_build/${MIX_ENV:-dev}/" mix run \
+  EXPERT_ENGINE_PATH="../engine/_build/{{ mix_env }}/" mix run \
       --no-compile \
       --no-halt \
       -e "Application.ensure_all_started(:expert)" \
       -- {{opts}}
 
-test project:
+test:
   #!/usr/bin/env bash
-  cd {{project}}
-  mix test
+
+  for project in {{ apps }}; do
+  (
+    cd "$project"
+
+    mix test
+  )
+  done
 
 format project:
   #!/usr/bin/env bash
@@ -66,9 +73,7 @@ format project:
   mix format
 
 [unix]
-release-local: \
-  (build "engine" "--include-app engine --include-root Engine --exclude-app namespace --apps") \
-  (build "expert" "--include-app expert --exclude-root Expert --exclude-app burrito --exclude-app namespace --exclude-root Jason --include-root Engine")
+release-local: build-engine build-expert
   #!/usr/bin/env bash
   cd expert
   case "{{os()}}-{{arch()}}" in
@@ -88,14 +93,14 @@ release-local: \
   EXPERT_RELEASE_MODE=burrito BURRITO_TARGET="$target" MIX_ENV=prod mix release --no-compile
 
 [windows]
-release-local:
+release-local: build-engine build-expert
   # idk actually how to set env vars like this on windows, might crash
-  EXPERT_RELEASE_MODE=burrito BURRITO_TARGET="windows_amd64" MIX_ENV=prod mix release
+  EXPERT_RELEASE_MODE=burrito BURRITO_TARGET="windows_amd64" MIX_ENV=prod mix release --no-compile
 
-release-all:
+release-all: build-engine build-expert
   cd expert
-  EXPERT_RELEASE_MODE=burrito MIX_ENV=prod mix release
+  EXPERT_RELEASE_MODE=burrito MIX_ENV=prod mix release --no-compile
 
-release-plain:
+release-plain: build-engine build-expert
   cd expert
-  MIX_ENV=prod mix release plain
+  MIX_ENV=prod mix release plain --no-compile
