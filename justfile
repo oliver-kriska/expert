@@ -1,6 +1,19 @@
 mix_env := env('MIX_ENV', 'dev')
 build_dir := "_build" / mix_env
 safe_dir := "_build" / mix_env + "safe"
+os := if os() == "macos" { "darwin" } else { os() }
+arch := if arch() =~ "(arm|aarch64)" {
+  "arm64"
+} else if arch() =~ "(x86|x86_64)" {
+  "amd64"
+} else {
+  "unsupported"
+}
+local_target := if os =~ "(darwin|linux|windows)" {
+  os + "_" + arch
+} else {
+  "unsupported"
+}
 
 apps := "expert engine namespace"
 
@@ -15,7 +28,7 @@ run project +ARGS:
   cd {{project}}
   eval "{{ ARGS }}"
 
-compile project:
+compile project: (deps project)
   #!/usr/bin/env bash
   set -euo pipefail
 
@@ -56,41 +69,32 @@ start *opts="--port 9000": build-engine build-expert
       -e "Application.ensure_all_started(:expert)" \
       -- {{opts}}
 
-test:
+mix cmd *project: 
   #!/usr/bin/env bash
 
-  for project in {{ apps }}; do
-  (
-    cd "$project"
+  if [ -n "{{ project }}" ]; then
+    cd {{project}}
+    mix {{cmd}}
+  else
+    for project in {{ apps }}; do
+    (
+      cd "$project"
 
-    mix test
-  )
-  done
-
-format project:
-  #!/usr/bin/env bash
-  cd {{project}}
-  mix format
+      mix {{ cmd }}
+    )
+    done
+  fi
 
 [unix]
 release-local: build-engine build-expert
   #!/usr/bin/env bash
   cd expert
-  case "{{os()}}-{{arch()}}" in
-    "linux-arm" | "linux-aarch64")
-      target=linux_arm64;;
-    "linux-x86" | "linux-x86_64")
-      target=linux_amd64;;
-    "macos-arm" | "macos-aarch64")
-      target=darwin_arm64;;
-    "macos-x86" | "macos-x86_64")
-      target=darwin_amd64;;
-    *)
-      echo "unsupported OS/Arch combination"
-      exit 1;;
-  esac
 
-  EXPERT_RELEASE_MODE=burrito BURRITO_TARGET="$target" MIX_ENV=prod mix release --no-compile
+  if [ "{{local_target}}" == "unsupported" ]; then
+    echo "unsupported OS/Arch combination: {{local_target}}"
+    exit 1
+  fi
+  EXPERT_RELEASE_MODE=burrito BURRITO_TARGET="{{local_target}}" MIX_ENV=prod mix release --no-compile
 
 [windows]
 release-local: build-engine build-expert
