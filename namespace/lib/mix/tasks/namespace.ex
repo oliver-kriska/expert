@@ -1,14 +1,31 @@
 defmodule Mix.Tasks.Namespace do
   @moduledoc """
-  This task is used after a release is assembled, and investigates the remote_control
-  app for its dependencies, at which point it applies transformers to various parts of the
-  app.
+  This task will apply namespacing to a set of .beam and .app files in the given directory.
 
-  Transformers take a path, find their relevant files and apply transforms to them. For example,
-  the Beams transformer will find any instances of modules in .beam files, and will apply namepaces
-  to them if the module is one of the modules defined in a dependency.
+  Primarily works on a list of application and a list of "module roots".
 
-  This task takes a single argument, which is the full path to the release.
+  A module root is the first segment of an Elixir module, e.g., "Foo" in "Foo.Bar.Baz".
+
+  The initial list of apps and roots (before additional inclusions and exclusions) are derived from
+  fetching the projects deps via `Mix.Project.deps_apps/0`. From there, each dependency's modules are
+  fetched via `:application.get_key(dep_app, :modules)`.
+
+  ## Options
+
+  * `--directory` - The active working directory (required)
+  * `--[no-]dot-apps` - Whether to namespace application names and .app files at all. Useful to disable if you dont need to start the project like a normal application. Defaults to false.
+  * `--include-app` - Adds the given application to the list of applications to namespace. 
+  * `--exclude-app` - Removes the given application from the list of applications to namespace. 
+  * `--include-root` - Adds the given module "root" to the list of "roots" to namespace. 
+  * `--exclude-root` - Removes the given module "root" from the list of "roots" to namespace. 
+
+
+  ## Usage
+
+  ```bash
+  mix namespace --directory _build/prod --include-app engine --include-root Engine --exclude-app namespace --dot-apps
+  mix namespace --directory _build/dev --include-app expert --exclude-root Expert --exclude-app burrito --exclude-app namespace --exclude-root Jason --include-root Engine
+  ```
   """
   use Mix.Task
 
