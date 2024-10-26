@@ -43,7 +43,7 @@ build project *args: (compile project)
   mix namespace --directory "{{ build_dir }}" {{args}}
 
 build-engine: (build "engine" "--include-app engine --include-root Engine --exclude-app namespace --dot-apps")
-build-expert: (build "expert" "--include-app expert --exclude-root Expert --exclude-app burrito --exclude-app namespace --exclude-root Jason --include-root Engine")
+build-expert: (build "expert" "--include-app expert --exclude-root Expert --exclude-app burrito --exclude-app req --exclude-app finch --exclude-app nimble_options --exclude-app nimble_pool --exclude-app namespace --exclude-root Jason --include-root Engine")
 
 start *opts="--port 9000": build-engine build-expert
   #!/usr/bin/env bash
@@ -98,9 +98,11 @@ release-local: build-engine build-expert
   EXPERT_RELEASE_MODE=burrito BURRITO_TARGET="windows_amd64" MIX_ENV=prod mix release --no-compile
 
 release-all: build-engine build-expert
+  #!/usr/bin/env bash
   cd expert
   EXPERT_RELEASE_MODE=burrito MIX_ENV=prod mix release --no-compile
 
 release-plain: build-engine build-expert
+  #!/usr/bin/env bash
   cd expert
   MIX_ENV=prod mix release plain --no-compile
