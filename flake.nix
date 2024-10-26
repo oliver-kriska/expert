@@ -21,21 +21,13 @@
 
       systems = ["aarch64-darwin" "x86_64-darwin" "x86_64-linux"];
 
-      perSystem = {pkgs, ...}: let
-        alias_7zz = pkgs.symlinkJoin {
-          name = "7zz-aliased";
-          paths = [pkgs._7zz];
-          postBuild = ''
-            ln -s ${pkgs._7zz}/bin/7zz $out/bin/7z
-          '';
-        };
-      in {
+      perSystem = {pkgs, ...}: {
         beamWorkspace = {
           enable = true;
           devShell = {
             packages = with pkgs; [
               zig
-              alias_7zz
+              _7zz
               just
             ];
             languageServers.elixir = false;
