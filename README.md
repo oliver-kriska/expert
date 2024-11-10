@@ -42,12 +42,13 @@ The full set of recipes can be found by running `just --list`.
 
 ```
 Available recipes:
-    compile project           # Compile the given project.
-    deps project              # Run mix deps.get for the given project
-    mix cmd *project          # Run a mix command in one or all projects
-    release-all               # Build releases for all target platforms
-    release-local             # Build a release for the local system
-    release-plain             # Build a plain release without burrito
-    run project +ARGS         # Run an arbitrary command inside the given project directory
-    start *opts="--port 9000" # Start the local development server
+    compile project             # Compile the given project.
+    deps project                # Run mix deps.get for the given project
+    mix cmd *project            # Run a mix command in one or all projects. Use `just test` to run tests.
+    release-all                 # Build releases for all target platforms
+    release-local               # Build a release for the local system
+    release-plain               # Build a plain release without burrito
+    run project +ARGS           # Run an arbitrary command inside the given project directory
+    start *opts="--port 9000"   # Start the local development server
+    test project="all" *args="" # Run tests in the given project
 ```

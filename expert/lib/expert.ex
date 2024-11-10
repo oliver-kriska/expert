@@ -37,7 +37,6 @@ defmodule Expert do
         },
         lsp
       ) do
-    System.get_env("EXPERT_ENGINE_PATH")
     parent = self()
     name = Path.basename(root_uri)
 
@@ -120,8 +119,16 @@ defmodule Expert do
     {:reply, symbols, lsp}
   end
 
-  def handle_request(_request, lsp) do
-    {:noreply, lsp}
+  def handle_request(%GenLSP.Requests.Shutdown{}, lsp) do
+    {:reply, nil, assign(lsp, exit_code: 0)}
+  end
+
+  def handle_request(request, lsp) do
+    {:reply,
+     %GenLSP.ErrorResponse{
+       code: GenLSP.Enumerations.ErrorCodes.method_not_found(),
+       message: "Method Not Found: #{request.method}"
+     }, lsp}
   end
 
   @impl true
@@ -138,6 +145,7 @@ defmodule Expert do
   end
 
   def handle_info({:runtime_ready, _name, runtime_pid}, lsp) do
+    GenLSP.log(lsp, "[Expert] Runtime is ready")
     Runtime.compile(runtime_pid)
 
     {:noreply, assign(lsp, ready: true, runtime: runtime_pid)}

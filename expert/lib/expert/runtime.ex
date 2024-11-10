@@ -1,6 +1,7 @@
 defmodule Expert.Runtime do
   @moduledoc false
   use GenServer
+  require Logger
 
   defguardp is_ready(state) when is_map_key(state, :node)
 
@@ -193,7 +194,9 @@ defmodule Expert.Runtime do
 
           case connect(node, port, 120) do
             true ->
-              {:ok, _} = :rpc.call(node, Application, :ensure_all_started, [:engine])
+              Logger.debug("Going to start the engine")
+
+              {:ok, _} = :rpc.call(node, Engine, :ensure_all_started, [])
 
               send(me, {:node, node})
 
