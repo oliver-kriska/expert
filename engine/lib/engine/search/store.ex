@@ -4,7 +4,7 @@ defmodule Engine.Search.Store do
   """
 
   alias Lexical.Project
-  alias Engine
+
   alias Engine.Api
   alias Engine.Search.Indexer.Entry
   alias Engine.Search.Store

@@ -1,5 +1,4 @@
 defmodule Engine.Compilation.Tracer do
-  alias Engine
   alias Engine.Build
   alias Engine.Module.Loader
 

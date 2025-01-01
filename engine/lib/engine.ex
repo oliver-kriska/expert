@@ -6,7 +6,7 @@ defmodule Engine do
   """
 
   alias Lexical.Project
-  alias Engine
+
   alias Engine.Api.Proxy
   alias Engine.CodeAction
   alias Engine.CodeIntelligence

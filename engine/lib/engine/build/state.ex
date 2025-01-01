@@ -2,7 +2,7 @@ defmodule Engine.Build.State do
   alias Elixir.Features
   alias Lexical.Document
   alias Lexical.Project
-  alias Engine
+
   alias Engine.Api.Messages
   alias Engine.Build
   alias Engine.Plugin

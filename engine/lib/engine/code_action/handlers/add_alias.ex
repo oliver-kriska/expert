@@ -7,7 +7,7 @@ defmodule Engine.CodeAction.Handlers.AddAlias do
   alias Lexical.Document.Position
   alias Lexical.Document.Range
   alias Lexical.Formats
-  alias Engine
+
   alias Engine.Analyzer
   alias Engine.CodeAction
   alias Engine.CodeIntelligence.Entity

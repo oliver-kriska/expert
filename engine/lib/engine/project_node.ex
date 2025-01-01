@@ -1,6 +1,6 @@
 defmodule Engine.ProjectNode do
   alias Lexical.Project
-  alias Engine
+
   require Logger
 
   defmodule State do

@@ -3,7 +3,7 @@ defmodule Engine.Completion do
   alias Lexical.Ast.Env
   alias Lexical.Document
   alias Lexical.Document.Position
-  alias Engine
+
   alias Engine.CodeMod.Format
   alias Engine.Completion.Candidate
 

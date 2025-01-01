@@ -6,7 +6,7 @@ defmodule Engine.CodeIntelligence.Entity do
   alias Lexical.Document.Position
   alias Lexical.Document.Range
   alias Lexical.Formats
-  alias Engine
+
   alias Sourceror.Zipper
 
   require Logger

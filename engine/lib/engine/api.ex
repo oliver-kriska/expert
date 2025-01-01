@@ -5,7 +5,7 @@ defmodule Engine.Api do
   alias Lexical.Document.Position
   alias Lexical.Document.Range
   alias Lexical.Project
-  alias Engine
+
   alias Engine.CodeIntelligence
 
   require Logger

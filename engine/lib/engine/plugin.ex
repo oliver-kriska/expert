@@ -1,7 +1,7 @@
 defmodule Engine.Plugin do
   alias Lexical.Document
   alias Lexical.Project
-  alias Engine
+
   alias Engine.Api.Messages
   alias Engine.Plugin.Runner
 

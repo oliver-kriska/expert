@@ -1,5 +1,4 @@
 defmodule Engine.CodeIntelligence.Structs do
-  alias Engine
   alias Engine.Module.Loader
   alias Engine.Search.Indexer.Entry
   alias Engine.Search.Store

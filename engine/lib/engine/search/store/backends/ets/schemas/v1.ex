@@ -14,16 +14,16 @@ defmodule Engine.Search.Store.Backends.Ets.Schemas.V1 do
 
   use Schema, version: 1
 
-  defkey :by_id, [:id, :type, :subtype]
+  defkey(:by_id, [:id, :type, :subtype])
 
-  defkey :by_subject, [
+  defkey(:by_subject, [
     :subject,
     :type,
     :subtype,
     :path
-  ]
+  ])
 
-  defkey :by_path, [:path]
+  defkey(:by_path, [:path])
 
   def migrate(entries) do
     migrated =

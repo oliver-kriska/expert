@@ -72,7 +72,7 @@ defmodule Engine.Commands.Reindex do
 
   alias Lexical.Document
   alias Lexical.Project
-  alias Engine
+
   alias Engine.Api
   alias Engine.Search
 

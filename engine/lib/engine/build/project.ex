@@ -1,6 +1,6 @@
 defmodule Engine.Build.Project do
   alias Lexical.Project
-  alias Engine
+
   alias Engine.Build
   alias Engine.Build.Isolation
   alias Engine.Plugin
@@ -18,11 +18,11 @@ defmodule Engine.Build.Project do
       compile_fun = fn ->
         Mix.Task.clear()
 
-        with_progress building_label(project), fn ->
+        with_progress(building_label(project), fn ->
           result = compile_in_isolation()
           Mix.Task.run(:loadpaths)
           result
-        end
+        end)
       end
 
       case compile_fun.() do
@@ -72,32 +72,32 @@ defmodule Engine.Build.Project do
 
   defp prepare_for_project_build(true = _initial?) do
     if connected_to_internet?() do
-      with_progress "mix local.hex", fn ->
+      with_progress("mix local.hex", fn ->
         Mix.Task.run("local.hex", ~w(--force --if-missing))
-      end
+      end)
 
-      with_progress "mix local.rebar", fn ->
+      with_progress("mix local.rebar", fn ->
         Mix.Task.run("local.rebar", ~w(--force --if-missing))
-      end
+      end)
 
-      with_progress "mix deps.get", fn ->
+      with_progress("mix deps.get", fn ->
         Mix.Task.run("deps.get")
-      end
+      end)
     else
       Logger.warning("Could not connect to hex.pm, dependencies will not be fetched")
     end
 
-    with_progress "mix loadconfig", fn ->
+    with_progress("mix loadconfig", fn ->
       Mix.Task.run(:loadconfig)
-    end
+    end)
 
-    with_progress "mix deps.compile", fn ->
+    with_progress("mix deps.compile", fn ->
       Mix.Task.run("deps.safe_compile", ~w(--skip-umbrella-children))
-    end
+    end)
 
-    with_progress "loading plugins", fn ->
+    with_progress("loading plugins", fn ->
       Plugin.Discovery.run()
-    end
+    end)
   end
 
   defp connected_to_internet? do

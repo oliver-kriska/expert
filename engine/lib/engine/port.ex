@@ -4,7 +4,6 @@ defmodule Engine.Port do
   """
 
   alias Lexical.Project
-  alias Engine
 
   @type open_opt ::
           {:env, list()}

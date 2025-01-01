@@ -7,7 +7,7 @@ defmodule Engine.CodeMod.Aliases do
   alias Lexical.Document.Edit
   alias Lexical.Document.Position
   alias Lexical.Document.Range
-  alias Engine
+
   alias Sourceror.Zipper
 
   @doc """

@@ -1,6 +1,5 @@
 defmodule Engine.Mix do
   alias Lexical.Project
-  alias Engine
 
   def in_project(fun) do
     if Engine.project_node?() do

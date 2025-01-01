@@ -12,7 +12,7 @@ defmodule Engine.Search.Fuzzy do
   """
 
   alias Lexical.Project
-  alias Engine
+
   alias Engine.Search.Fuzzy.Scorer
   alias Engine.Search.Indexer.Entry
   import Record

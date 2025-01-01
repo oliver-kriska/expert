@@ -1,6 +1,6 @@
 defmodule Engine.Search.Store.Backends.Ets do
   alias Lexical.Project
-  alias Engine
+
   alias Engine.Search.Indexer.Entry
   alias Engine.Search.Store.Backend
   alias Engine.Search.Store.Backends.Ets.State

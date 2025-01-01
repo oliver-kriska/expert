@@ -39,7 +39,6 @@ defmodule Engine.ModuleMappings do
     end
   end
 
-  alias Engine
   alias Engine.Api.Messages
 
   use GenServer

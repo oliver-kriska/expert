@@ -2,7 +2,7 @@ defmodule Engine.Search.Indexer.Extractors.FunctionReference do
   alias Lexical.Ast
   alias Lexical.Document.Position
   alias Lexical.Document.Range
-  alias Engine
+
   alias Engine.Search.Indexer.Entry
   alias Engine.Search.Indexer.Extractors.FunctionDefinition
   alias Engine.Search.Indexer.Metadata

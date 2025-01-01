@@ -5,18 +5,18 @@ defmodule Engine.Search.Store.Backends.Ets.Schemas.V2 do
   require Entry
   use Schema, version: 2
 
-  defkey :by_id, [:id, :type, :subtype]
+  defkey(:by_id, [:id, :type, :subtype])
 
-  defkey :by_subject, [
+  defkey(:by_subject, [
     :subject,
     :type,
     :subtype,
     :path
-  ]
+  ])
 
-  defkey :by_path, [:path]
-  defkey :by_block_id, [:block_id, :path]
-  defkey :structure, [:path]
+  defkey(:by_path, [:path])
+  defkey(:by_block_id, [:block_id, :path])
+  defkey(:structure, [:path])
 
   def migrate(_) do
     {:ok, []}

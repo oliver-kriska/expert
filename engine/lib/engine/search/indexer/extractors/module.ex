@@ -7,7 +7,7 @@ defmodule Engine.Search.Indexer.Extractors.Module do
   alias Lexical.Document.Position
   alias Lexical.Document.Range
   alias Lexical.ProcessCache
-  alias Engine
+
   alias Engine.Search.Indexer.Entry
   alias Engine.Search.Indexer.Metadata
   alias Engine.Search.Indexer.Source.Block
