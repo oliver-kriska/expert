@@ -1,12 +1,12 @@
-defmodule Lexical.RemoteControl.Analyzer.Imports do
+defmodule Engine.Analyzer.Imports do
   alias Lexical.Ast.Analysis
   alias Lexical.Ast.Analysis.Import
   alias Lexical.Ast.Analysis.Scope
   alias Lexical.Document.Position
   alias Lexical.Document.Range
   alias Lexical.ProcessCache
-  alias Lexical.RemoteControl.Analyzer.Aliases
-  alias Lexical.RemoteControl.Module.Loader
+  alias Engine.Analyzer.Aliases
+  alias Engine.Module.Loader
 
   @spec at(Analysis.t(), Position.t()) :: [Scope.import_mfa()]
   def at(%Analysis{} = analysis, %Position{} = position) do

@@ -1,6 +1,6 @@
-defmodule Lexical.RemoteControl.Build.CaptureIO do
+defmodule Engine.Build.CaptureIO do
   # Shamelessly stolen from ExUnit's CaptureIO
-  alias Lexical.RemoteControl.Build
+  alias Engine.Build
 
   def capture_io(fun) when is_function(fun, 0) do
     capture_io(:stdio, [], fun)

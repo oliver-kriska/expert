@@ -1,14 +1,14 @@
-defmodule Lexical.RemoteControl.CodeIntelligence.References do
+defmodule Engine.CodeIntelligence.References do
   alias Lexical.Ast.Analysis
   alias Lexical.Document
   alias Lexical.Document.Location
   alias Lexical.Document.Position
-  alias Lexical.RemoteControl.Analyzer
-  alias Lexical.RemoteControl.CodeIntelligence.Entity
-  alias Lexical.RemoteControl.CodeIntelligence.Variable
-  alias Lexical.RemoteControl.Search.Indexer.Entry
-  alias Lexical.RemoteControl.Search.Store
-  alias Lexical.RemoteControl.Search.Subject
+  alias Engine.Analyzer
+  alias Engine.CodeIntelligence.Entity
+  alias Engine.CodeIntelligence.Variable
+  alias Engine.Search.Indexer.Entry
+  alias Engine.Search.Store
+  alias Engine.Search.Subject
 
   require Logger
 

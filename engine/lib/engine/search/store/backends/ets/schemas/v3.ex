@@ -1,6 +1,6 @@
-defmodule Lexical.RemoteControl.Search.Store.Backends.Ets.Schemas.V3 do
-  alias Lexical.RemoteControl.Search.Indexer.Entry
-  alias Lexical.RemoteControl.Search.Store.Backends.Ets.Schema
+defmodule Engine.Search.Store.Backends.Ets.Schemas.V3 do
+  alias Engine.Search.Indexer.Entry
+  alias Engine.Search.Store.Backends.Ets.Schema
 
   require Entry
   use Schema, version: 3

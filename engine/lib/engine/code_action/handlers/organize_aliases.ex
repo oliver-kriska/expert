@@ -1,11 +1,11 @@
-defmodule Lexical.RemoteControl.CodeAction.Handlers.OrganizeAliases do
+defmodule Engine.CodeAction.Handlers.OrganizeAliases do
   alias Lexical.Ast.Analysis
   alias Lexical.Ast.Analysis.Scope
   alias Lexical.Document
   alias Lexical.Document.Changes
   alias Lexical.Document.Range
-  alias Lexical.RemoteControl.CodeAction
-  alias Lexical.RemoteControl.CodeMod
+  alias Engine.CodeAction
+  alias Engine.CodeMod
 
   require Logger
 

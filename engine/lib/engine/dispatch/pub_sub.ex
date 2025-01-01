@@ -1,4 +1,4 @@
-defmodule Lexical.RemoteControl.Dispatch.PubSub do
+defmodule Engine.Dispatch.PubSub do
   @moduledoc """
   A pubsub event handler for a gen_event controller.
   """

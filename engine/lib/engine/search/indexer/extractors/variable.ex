@@ -1,8 +1,8 @@
-defmodule Lexical.RemoteControl.Search.Indexer.Extractors.Variable do
+defmodule Engine.Search.Indexer.Extractors.Variable do
   alias Lexical.Ast
-  alias Lexical.RemoteControl.Analyzer
-  alias Lexical.RemoteControl.Search.Indexer.Entry
-  alias Lexical.RemoteControl.Search.Indexer.Source.Reducer
+  alias Engine.Analyzer
+  alias Engine.Search.Indexer.Entry
+  alias Engine.Search.Indexer.Source.Reducer
 
   @defs [:def, :defmacro, :defp, :defmacrop]
 

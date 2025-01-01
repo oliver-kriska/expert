@@ -1,5 +1,5 @@
-defmodule Lexical.RemoteControl.Completion.Candidate do
-  alias Lexical.RemoteControl.Completion.Candidate.ArgumentNames
+defmodule Engine.Completion.Candidate do
+  alias Engine.Completion.Candidate.ArgumentNames
   require Logger
 
   defmodule Function do

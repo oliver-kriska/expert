@@ -1,10 +1,10 @@
-defmodule Lexical.RemoteControl.CodeIntelligence.Docs do
+defmodule Engine.CodeIntelligence.Docs do
   @moduledoc """
   Utilities for fetching documentation for a compiled module.
   """
 
-  alias Lexical.RemoteControl.CodeIntelligence.Docs.Entry
-  alias Lexical.RemoteControl.Modules
+  alias Engine.CodeIntelligence.Docs.Entry
+  alias Engine.Modules
 
   defstruct [:module, :doc, functions_and_macros: [], callbacks: [], types: []]
 

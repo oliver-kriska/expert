@@ -1,4 +1,4 @@
-defmodule Lexical.RemoteControl.CodeAction.Handlers.AddAlias do
+defmodule Engine.CodeAction.Handlers.AddAlias do
   alias Lexical.Ast
   alias Lexical.Ast.Analysis
   alias Lexical.Ast.Analysis.Alias
@@ -7,14 +7,14 @@ defmodule Lexical.RemoteControl.CodeAction.Handlers.AddAlias do
   alias Lexical.Document.Position
   alias Lexical.Document.Range
   alias Lexical.Formats
-  alias Lexical.RemoteControl
-  alias Lexical.RemoteControl.Analyzer
-  alias Lexical.RemoteControl.CodeAction
-  alias Lexical.RemoteControl.CodeIntelligence.Entity
-  alias Lexical.RemoteControl.CodeMod
-  alias Lexical.RemoteControl.Modules
-  alias Lexical.RemoteControl.Search.Fuzzy
-  alias Lexical.RemoteControl.Search.Indexer.Entry
+  alias Engine
+  alias Engine.Analyzer
+  alias Engine.CodeAction
+  alias Engine.CodeIntelligence.Entity
+  alias Engine.CodeMod
+  alias Engine.Modules
+  alias Engine.Search.Fuzzy
+  alias Engine.Search.Indexer.Entry
   alias Mix.Tasks.Namespace
   alias Sourceror.Zipper
 

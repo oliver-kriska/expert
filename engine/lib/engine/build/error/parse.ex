@@ -1,8 +1,8 @@
-defmodule Lexical.RemoteControl.Build.Error.Parse do
+defmodule Engine.Build.Error.Parse do
   alias Lexical.Document
   alias Lexical.Document.Range
   alias Lexical.Plugin.V1.Diagnostic.Result
-  alias Lexical.RemoteControl.Build.Error.Location
+  alias Engine.Build.Error.Location
 
   @elixir_source "Elixir"
 

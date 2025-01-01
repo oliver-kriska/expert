@@ -1,11 +1,11 @@
-defmodule Lexical.RemoteControl.Completion do
+defmodule Engine.Completion do
   alias Lexical.Ast.Analysis
   alias Lexical.Ast.Env
   alias Lexical.Document
   alias Lexical.Document.Position
-  alias Lexical.RemoteControl
-  alias Lexical.RemoteControl.CodeMod.Format
-  alias Lexical.RemoteControl.Completion.Candidate
+  alias Engine
+  alias Engine.CodeMod.Format
+  alias Engine.Completion.Candidate
 
   import Document.Line
 

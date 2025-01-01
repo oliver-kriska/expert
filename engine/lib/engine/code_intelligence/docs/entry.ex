@@ -1,4 +1,4 @@
-defmodule Lexical.RemoteControl.CodeIntelligence.Docs.Entry do
+defmodule Engine.CodeIntelligence.Docs.Entry do
   @moduledoc """
   A documentation entry for a named entity within a module.
   """

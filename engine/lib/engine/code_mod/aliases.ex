@@ -1,4 +1,4 @@
-defmodule Lexical.RemoteControl.CodeMod.Aliases do
+defmodule Engine.CodeMod.Aliases do
   alias Lexical.Ast
   alias Lexical.Ast.Analysis
   alias Lexical.Ast.Analysis.Alias
@@ -7,7 +7,7 @@ defmodule Lexical.RemoteControl.CodeMod.Aliases do
   alias Lexical.Document.Edit
   alias Lexical.Document.Position
   alias Lexical.Document.Range
-  alias Lexical.RemoteControl
+  alias Engine
   alias Sourceror.Zipper
 
   @doc """

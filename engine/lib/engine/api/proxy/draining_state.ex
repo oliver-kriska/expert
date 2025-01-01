@@ -1,7 +1,7 @@
-defmodule Lexical.RemoteControl.Api.Proxy.DrainingState do
-  alias Lexical.RemoteControl.Api.Proxy.BufferingState
-  alias Lexical.RemoteControl.Api.Proxy.ProxyingState
-  alias Lexical.RemoteControl.Api.Proxy.Records
+defmodule Engine.Api.Proxy.DrainingState do
+  alias Engine.Api.Proxy.BufferingState
+  alias Engine.Api.Proxy.ProxyingState
+  alias Engine.Api.Proxy.Records
 
   import Records
 

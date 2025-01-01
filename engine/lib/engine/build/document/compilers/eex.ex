@@ -1,12 +1,12 @@
-defmodule Lexical.RemoteControl.Build.Document.Compilers.EEx do
+defmodule Engine.Build.Document.Compilers.EEx do
   @moduledoc """
   A compiler for .eex files
   """
   alias Lexical.Document
   alias Lexical.Plugin.V1.Diagnostic.Result
-  alias Lexical.RemoteControl.Build
-  alias Lexical.RemoteControl.Build.Document.Compiler
-  alias Lexical.RemoteControl.Build.Document.Compilers
+  alias Engine.Build
+  alias Engine.Build.Document.Compiler
+  alias Engine.Build.Document.Compilers
 
   @behaviour Compiler
 

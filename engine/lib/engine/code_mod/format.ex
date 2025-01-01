@@ -1,10 +1,10 @@
-defmodule Lexical.RemoteControl.CodeMod.Format do
+defmodule Engine.CodeMod.Format do
   alias Lexical.Document
   alias Lexical.Document.Changes
   alias Lexical.Project
-  alias Lexical.RemoteControl
-  alias Lexical.RemoteControl.Build
-  alias Lexical.RemoteControl.CodeMod.Diff
+  alias Engine
+  alias Engine.Build
+  alias Engine.CodeMod.Diff
 
   require Logger
 

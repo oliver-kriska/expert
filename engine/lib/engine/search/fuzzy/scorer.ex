@@ -1,4 +1,4 @@
-defmodule Lexical.RemoteControl.Search.Fuzzy.Scorer do
+defmodule Engine.Search.Fuzzy.Scorer do
   @moduledoc """
   Scores a match based on heuristics.
 

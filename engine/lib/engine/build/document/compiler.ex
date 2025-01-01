@@ -1,4 +1,4 @@
-defmodule Lexical.RemoteControl.Build.Document.Compiler do
+defmodule Engine.Build.Document.Compiler do
   @moduledoc """
   A behaviour for document-level compilers
   """

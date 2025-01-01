@@ -1,8 +1,8 @@
-defmodule Lexical.RemoteControl.Search.Indexer.Extractors.StructDefinition do
+defmodule Engine.Search.Indexer.Extractors.StructDefinition do
   alias Lexical.Ast
-  alias Lexical.RemoteControl.Analyzer
-  alias Lexical.RemoteControl.Search.Indexer.Entry
-  alias Lexical.RemoteControl.Search.Indexer.Source.Reducer
+  alias Engine.Analyzer
+  alias Engine.Search.Indexer.Entry
+  alias Engine.Search.Indexer.Source.Reducer
 
   def extract({:defstruct, _, [_fields]} = definition, %Reducer{} = reducer) do
     document = reducer.analysis.document

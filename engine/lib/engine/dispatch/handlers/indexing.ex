@@ -1,9 +1,9 @@
-defmodule Lexical.RemoteControl.Dispatch.Handlers.Indexing do
+defmodule Engine.Dispatch.Handlers.Indexing do
   alias Lexical.Document
-  alias Lexical.RemoteControl.Api.Messages
-  alias Lexical.RemoteControl.Commands
-  alias Lexical.RemoteControl.Dispatch
-  alias Lexical.RemoteControl.Search
+  alias Engine.Api.Messages
+  alias Engine.Commands
+  alias Engine.Dispatch
+  alias Engine.Search
 
   require Logger
   import Messages

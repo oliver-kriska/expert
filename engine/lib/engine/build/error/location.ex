@@ -1,4 +1,4 @@
-defmodule Lexical.RemoteControl.Build.Error.Location do
+defmodule Engine.Build.Error.Location do
   alias Lexical.Document
   alias Lexical.Document.Position
   alias Lexical.Document.Range

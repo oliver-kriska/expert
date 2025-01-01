@@ -1,4 +1,4 @@
-defmodule Lexical.RemoteControl.Search.Indexer.Source.Reducer do
+defmodule Engine.Search.Indexer.Source.Reducer do
   @moduledoc """
   A module and struct that can reduce over elixir AST via Macro.prewalk/3
 
@@ -8,10 +8,10 @@ defmodule Lexical.RemoteControl.Search.Indexer.Source.Reducer do
 
   alias Lexical.Ast.Analysis
   alias Lexical.Document.Position
-  alias Lexical.RemoteControl.Search.Indexer.Entry
-  alias Lexical.RemoteControl.Search.Indexer.Extractors
-  alias Lexical.RemoteControl.Search.Indexer.Metadata
-  alias Lexical.RemoteControl.Search.Indexer.Source.Block
+  alias Engine.Search.Indexer.Entry
+  alias Engine.Search.Indexer.Extractors
+  alias Engine.Search.Indexer.Metadata
+  alias Engine.Search.Indexer.Source.Block
 
   defstruct [:analysis, :entries, :position, :blocks, :block_hierarchy, extractors: []]
 

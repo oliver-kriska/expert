@@ -1,4 +1,4 @@
-defmodule Lexical.RemoteControl.Dispatch.Handler do
+defmodule Engine.Dispatch.Handler do
   @moduledoc """
   Defines a handler that selectively receives events emitted from a remote control node.
 
@@ -7,8 +7,8 @@ defmodule Lexical.RemoteControl.Dispatch.Handler do
   Define a handler, specifying the events to be handled and implementing `on_event/2`:
 
       defmodule MyHandler do
-        alias Lexical.RemoteControl.Api.Messages
-        alias Lexical.RemoteControl.Dispatch.Handler
+        alias Engine.Api.Messages
+        alias Engine.Dispatch.Handler
 
         import Messages
 
@@ -23,7 +23,7 @@ defmodule Lexical.RemoteControl.Dispatch.Handler do
     Register the handler with dispatch:
 
     # The second argument here will be passed to the `init/1` callback
-    Lexical.RemoteControl.Dispatch.add_handler(MyHandler, init_arg)
+    Engine.Dispatch.add_handler(MyHandler, init_arg)
 
   """
   @type event :: tuple()

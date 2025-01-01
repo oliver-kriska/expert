@@ -1,4 +1,4 @@
-defmodule Lexical.RemoteControl.Build.Isolation do
+defmodule Engine.Build.Isolation do
   @moduledoc """
   Runs functions in an isolated, monitored process
   """

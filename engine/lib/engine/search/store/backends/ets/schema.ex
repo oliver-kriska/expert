@@ -1,4 +1,4 @@
-defmodule Lexical.RemoteControl.Search.Store.Backends.Ets.Schema do
+defmodule Engine.Search.Store.Backends.Ets.Schema do
   @moduledoc """
   A use-able module that allows ETS schemas to be created and migrated.
 
@@ -44,8 +44,8 @@ defmodule Lexical.RemoteControl.Search.Store.Backends.Ets.Schema do
   end
 
   alias Lexical.Project
-  alias Lexical.RemoteControl.Search.Indexer.Entry
-  alias Lexical.RemoteControl.Search.Store.Backends.Ets.Wal
+  alias Engine.Search.Indexer.Entry
+  alias Engine.Search.Store.Backends.Ets.Wal
 
   import Wal, only: :macros
 

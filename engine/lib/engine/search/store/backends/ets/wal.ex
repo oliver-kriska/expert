@@ -1,4 +1,4 @@
-defmodule Lexical.RemoteControl.Search.Store.Backends.Ets.Wal do
+defmodule Engine.Search.Store.Backends.Ets.Wal do
   @moduledoc """
   A (hopefully) simple write-ahead log
   """

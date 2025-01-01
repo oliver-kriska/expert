@@ -1,6 +1,6 @@
-defmodule Lexical.RemoteControl.Mix do
+defmodule Engine.Mix do
   alias Lexical.Project
-  alias Lexical.RemoteControl
+  alias Engine
 
   def in_project(fun) do
     if RemoteControl.project_node?() do

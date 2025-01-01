@@ -1,9 +1,9 @@
-defmodule Lexical.RemoteControl.Search.Store.Backends.Ets do
+defmodule Engine.Search.Store.Backends.Ets do
   alias Lexical.Project
-  alias Lexical.RemoteControl
-  alias Lexical.RemoteControl.Search.Indexer.Entry
-  alias Lexical.RemoteControl.Search.Store.Backend
-  alias Lexical.RemoteControl.Search.Store.Backends.Ets.State
+  alias Engine
+  alias Engine.Search.Indexer.Entry
+  alias Engine.Search.Store.Backend
+  alias Engine.Search.Store.Backends.Ets.State
 
   use GenServer
 

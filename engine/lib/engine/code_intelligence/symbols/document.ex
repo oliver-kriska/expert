@@ -1,7 +1,7 @@
-defmodule Lexical.RemoteControl.CodeIntelligence.Symbols.Document do
+defmodule Engine.CodeIntelligence.Symbols.Document do
   alias Lexical.Document
   alias Lexical.Formats
-  alias Lexical.RemoteControl.Search.Indexer.Entry
+  alias Engine.Search.Indexer.Entry
 
   defstruct [:name, :type, :range, :detail_range, :detail, :original_type, :subject, children: []]
 

@@ -1,13 +1,13 @@
-defmodule Lexical.RemoteControl.Analyzer do
+defmodule Engine.Analyzer do
   alias Lexical.Ast
   alias Lexical.Ast.Analysis
   alias Lexical.Ast.Analysis.Require
   alias Lexical.Ast.Analysis.Use
   alias Lexical.Document.Position
-  alias Lexical.RemoteControl.Analyzer.Aliases
-  alias Lexical.RemoteControl.Analyzer.Imports
-  alias Lexical.RemoteControl.Analyzer.Requires
-  alias Lexical.RemoteControl.Analyzer.Uses
+  alias Engine.Analyzer.Aliases
+  alias Engine.Analyzer.Imports
+  alias Engine.Analyzer.Requires
+  alias Engine.Analyzer.Uses
 
   require Logger
 

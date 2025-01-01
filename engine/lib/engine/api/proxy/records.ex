@@ -1,4 +1,4 @@
-defmodule Lexical.RemoteControl.Api.Proxy.Records do
+defmodule Engine.Api.Proxy.Records do
   alias Lexical.Formats
 
   import Record

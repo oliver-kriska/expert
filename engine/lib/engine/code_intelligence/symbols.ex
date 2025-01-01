@@ -1,11 +1,11 @@
-defmodule Lexical.RemoteControl.CodeIntelligence.Symbols do
+defmodule Engine.CodeIntelligence.Symbols do
   alias Lexical.Document
   alias Lexical.Document.Range
-  alias Lexical.RemoteControl.CodeIntelligence.Symbols
-  alias Lexical.RemoteControl.Search
-  alias Lexical.RemoteControl.Search.Indexer
-  alias Lexical.RemoteControl.Search.Indexer.Entry
-  alias Lexical.RemoteControl.Search.Indexer.Extractors
+  alias Engine.CodeIntelligence.Symbols
+  alias Engine.Search
+  alias Engine.Search.Indexer
+  alias Engine.Search.Indexer.Entry
+  alias Engine.Search.Indexer.Extractors
 
   @block_types [
     :ex_unit_describe,

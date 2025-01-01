@@ -1,14 +1,14 @@
-defmodule Lexical.RemoteControl.Search.Store do
+defmodule Engine.Search.Store do
   @moduledoc """
   A persistent store for search entries
   """
 
   alias Lexical.Project
-  alias Lexical.RemoteControl
-  alias Lexical.RemoteControl.Api
-  alias Lexical.RemoteControl.Search.Indexer.Entry
-  alias Lexical.RemoteControl.Search.Store
-  alias Lexical.RemoteControl.Search.Store.State
+  alias Engine
+  alias Engine.Api
+  alias Engine.Search.Indexer.Entry
+  alias Engine.Search.Store
+  alias Engine.Search.Store.State
 
   @type index_state :: :empty | :stale
   @type existing_entries :: [Entry.t()]
@@ -108,7 +108,7 @@ defmodule Lexical.RemoteControl.Search.Store do
   end
 
   defp normalize_init_args([create_index, refresh_index]) do
-    normalize_init_args([Lexical.RemoteControl.get_project(), create_index, refresh_index])
+    normalize_init_args([Engine.get_project(), create_index, refresh_index])
   end
 
   defp normalize_init_args([%Project{} = project, create_index, refresh_index]) do

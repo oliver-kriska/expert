@@ -1,4 +1,4 @@
-defmodule Lexical.RemoteControl.Analyzer.Uses do
+defmodule Engine.Analyzer.Uses do
   alias Lexical.Ast.Analysis
   alias Lexical.Ast.Analysis.Scope
   alias Lexical.Document.Position

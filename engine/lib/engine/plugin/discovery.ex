@@ -1,4 +1,4 @@
-defmodule Lexical.RemoteControl.Plugin.Discovery do
+defmodule Engine.Plugin.Discovery do
   @moduledoc """
   Discovers any plugins in any loaded applications
 
@@ -10,8 +10,8 @@ defmodule Lexical.RemoteControl.Plugin.Discovery do
   and the plugin will crash.
   """
 
-  alias Lexical.RemoteControl.Module.Loader
-  alias Lexical.RemoteControl.Plugin.Runner
+  alias Engine.Module.Loader
+  alias Engine.Plugin.Runner
   alias Mix.Tasks.Namespace
 
   require Logger

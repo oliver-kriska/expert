@@ -1,13 +1,13 @@
-defmodule Lexical.RemoteControl.Search.Indexer.Extractors.FunctionReference do
+defmodule Engine.Search.Indexer.Extractors.FunctionReference do
   alias Lexical.Ast
   alias Lexical.Document.Position
   alias Lexical.Document.Range
-  alias Lexical.RemoteControl
-  alias Lexical.RemoteControl.Search.Indexer.Entry
-  alias Lexical.RemoteControl.Search.Indexer.Extractors.FunctionDefinition
-  alias Lexical.RemoteControl.Search.Indexer.Metadata
-  alias Lexical.RemoteControl.Search.Indexer.Source.Reducer
-  alias Lexical.RemoteControl.Search.Subject
+  alias Engine
+  alias Engine.Search.Indexer.Entry
+  alias Engine.Search.Indexer.Extractors.FunctionDefinition
+  alias Engine.Search.Indexer.Metadata
+  alias Engine.Search.Indexer.Source.Reducer
+  alias Engine.Search.Subject
 
   require Logger
 

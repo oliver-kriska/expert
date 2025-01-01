@@ -1,11 +1,11 @@
-defmodule Lexical.RemoteControl.Build.Document.Compilers.HEEx do
+defmodule Engine.Build.Document.Compilers.HEEx do
   @moduledoc """
   A compiler for .heex files
   """
   alias Lexical.Document
   alias Lexical.Plugin.V1.Diagnostic.Result
-  alias Lexical.RemoteControl.Build.Document.Compiler
-  alias Lexical.RemoteControl.Build.Document.Compilers
+  alias Engine.Build.Document.Compiler
+  alias Engine.Build.Document.Compilers
   require Logger
 
   @behaviour Compiler

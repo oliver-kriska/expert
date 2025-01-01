@@ -1,7 +1,7 @@
-defmodule Lexical.RemoteControl.Progress do
-  alias Lexical.RemoteControl
+defmodule Engine.Progress do
+  alias Engine
 
-  import Lexical.RemoteControl.Api.Messages
+  import Engine.Api.Messages
 
   @type label :: String.t()
   @type message :: String.t()

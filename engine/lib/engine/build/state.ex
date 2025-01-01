@@ -1,11 +1,11 @@
-defmodule Lexical.RemoteControl.Build.State do
+defmodule Engine.Build.State do
   alias Elixir.Features
   alias Lexical.Document
   alias Lexical.Project
-  alias Lexical.RemoteControl
-  alias Lexical.RemoteControl.Api.Messages
-  alias Lexical.RemoteControl.Build
-  alias Lexical.RemoteControl.Plugin
+  alias Engine
+  alias Engine.Api.Messages
+  alias Engine.Build
+  alias Engine.Plugin
   alias Lexical.VM.Versions
 
   require Logger

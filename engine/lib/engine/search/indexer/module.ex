@@ -1,5 +1,5 @@
-defmodule Lexical.RemoteControl.Search.Indexer.Module do
-  alias Lexical.RemoteControl.Search.Indexer
+defmodule Engine.Search.Indexer.Module do
+  alias Engine.Search.Indexer
 
   def index(module) do
     with true <- indexable?(module),

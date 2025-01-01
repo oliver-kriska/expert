@@ -1,4 +1,4 @@
-defmodule Lexical.RemoteControl.Search.Store.Backends.Ets.State do
+defmodule Engine.Search.Store.Backends.Ets.State do
   @moduledoc """
   An ETS based search backend
 
@@ -6,10 +6,10 @@ defmodule Lexical.RemoteControl.Search.Store.Backends.Ets.State do
 
   """
   alias Lexical.Project
-  alias Lexical.RemoteControl.Search.Indexer.Entry
-  alias Lexical.RemoteControl.Search.Store.Backends.Ets.Schema
-  alias Lexical.RemoteControl.Search.Store.Backends.Ets.Schemas
-  alias Lexical.RemoteControl.Search.Store.Backends.Ets.Wal
+  alias Engine.Search.Indexer.Entry
+  alias Engine.Search.Store.Backends.Ets.Schema
+  alias Engine.Search.Store.Backends.Ets.Schemas
+  alias Engine.Search.Store.Backends.Ets.Wal
 
   @schema_order [
     Schemas.LegacyV0,

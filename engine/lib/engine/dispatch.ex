@@ -1,15 +1,15 @@
-defmodule Lexical.RemoteControl.Dispatch do
+defmodule Engine.Dispatch do
   @moduledoc """
   A global event dispatcher for lexical.
 
   Dispatch allows two recipients of its messages, processes and modules. A process must register
   itself via a call to `register_listener`, while a process must implement the
-  `Lexical.RemoteControl.Dispatch.Handler` behaviour and add the module to the @handlers module attribute.
+  `Engine.Dispatch.Handler` behaviour and add the module to the @handlers module attribute.
   """
-  alias Lexical.RemoteControl
-  alias Lexical.RemoteControl.Dispatch.Handlers
-  alias Lexical.RemoteControl.Dispatch.PubSub
-  import Lexical.RemoteControl.Api.Messages
+  alias Engine
+  alias Engine.Dispatch.Handlers
+  alias Engine.Dispatch.PubSub
+  import Engine.Api.Messages
 
   @handlers [PubSub, Handlers.Indexing]
 

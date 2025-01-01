@@ -1,9 +1,9 @@
-defmodule Lexical.RemoteControl.Search.Store.Backend do
+defmodule Engine.Search.Store.Backend do
   @moduledoc """
   A behaviour for search store backends
   """
   alias Lexical.Project
-  alias Lexical.RemoteControl.Search.Indexer.Entry
+  alias Engine.Search.Indexer.Entry
   @type version :: pos_integer()
 
   @type priv_state :: term()

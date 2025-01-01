@@ -1,8 +1,8 @@
-defmodule Lexical.RemoteControl.CodeIntelligence.Structs do
-  alias Lexical.RemoteControl
-  alias Lexical.RemoteControl.Module.Loader
-  alias Lexical.RemoteControl.Search.Indexer.Entry
-  alias Lexical.RemoteControl.Search.Store
+defmodule Engine.CodeIntelligence.Structs do
+  alias Engine
+  alias Engine.Module.Loader
+  alias Engine.Search.Indexer.Entry
+  alias Engine.Search.Store
 
   def for_project do
     if Mix.Project.get() do

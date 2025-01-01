@@ -1,6 +1,6 @@
-defmodule Lexical.RemoteControl.ProjectNodeSupervisor do
+defmodule Engine.ProjectNodeSupervisor do
   alias Lexical.Project
-  alias Lexical.RemoteControl.ProjectNode
+  alias Engine.ProjectNode
   use DynamicSupervisor
 
   @dialyzer {:no_return, start_link: 1}

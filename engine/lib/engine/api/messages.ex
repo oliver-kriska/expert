@@ -1,4 +1,4 @@
-defmodule Lexical.RemoteControl.Api.Messages do
+defmodule Engine.Api.Messages do
   alias Lexical.Project
 
   import Record

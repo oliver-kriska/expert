@@ -1,4 +1,4 @@
-defmodule Lexical.RemoteControl.CodeAction.Handlers.RemoveUnusedAlias do
+defmodule Engine.CodeAction.Handlers.RemoveUnusedAlias do
   @moduledoc """
   A code action that removes an unused alias
 
@@ -28,9 +28,9 @@ defmodule Lexical.RemoteControl.CodeAction.Handlers.RemoveUnusedAlias do
   alias Lexical.Document.Edit
   alias Lexical.Document.Position
   alias Lexical.Document.Range
-  alias Lexical.RemoteControl.Analyzer
-  alias Lexical.RemoteControl.CodeAction
-  alias Lexical.RemoteControl.CodeAction.Diagnostic
+  alias Engine.Analyzer
+  alias Engine.CodeAction
+  alias Engine.CodeAction.Diagnostic
   alias Sourceror.Zipper
 
   import Record

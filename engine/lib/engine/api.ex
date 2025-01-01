@@ -1,12 +1,12 @@
-defmodule Lexical.RemoteControl.Api do
+defmodule Engine.Api do
   alias Lexical.Ast.Analysis
   alias Lexical.Ast.Env
   alias Lexical.Document
   alias Lexical.Document.Position
   alias Lexical.Document.Range
   alias Lexical.Project
-  alias Lexical.RemoteControl
-  alias Lexical.RemoteControl.CodeIntelligence
+  alias Engine
+  alias Engine.CodeIntelligence
 
   require Logger
 

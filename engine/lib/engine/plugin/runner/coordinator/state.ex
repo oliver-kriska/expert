@@ -1,7 +1,7 @@
-defmodule Lexical.RemoteControl.Plugin.Runner.Coordinator.State do
+defmodule Engine.Plugin.Runner.Coordinator.State do
   @moduledoc false
 
-  alias Lexical.RemoteControl.Plugin.Runner
+  alias Engine.Plugin.Runner
 
   defstruct tasks: [], failures: %{}
 

@@ -1,10 +1,10 @@
-defmodule Lexical.RemoteControl.Commands.Reindex do
+defmodule Engine.Commands.Reindex do
   defmodule State do
     alias Lexical.Ast.Analysis
     alias Lexical.Document
     alias Lexical.ProcessCache
-    alias Lexical.RemoteControl.Search
-    alias Lexical.RemoteControl.Search.Indexer
+    alias Engine.Search
+    alias Engine.Search.Indexer
 
     require Logger
     require ProcessCache
@@ -72,9 +72,9 @@ defmodule Lexical.RemoteControl.Commands.Reindex do
 
   alias Lexical.Document
   alias Lexical.Project
-  alias Lexical.RemoteControl
-  alias Lexical.RemoteControl.Api
-  alias Lexical.RemoteControl.Search
+  alias Engine
+  alias Engine.Api
+  alias Engine.Search
 
   use GenServer
   import Api.Messages

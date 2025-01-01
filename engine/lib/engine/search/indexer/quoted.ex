@@ -1,7 +1,7 @@
-defmodule Lexical.RemoteControl.Search.Indexer.Quoted do
+defmodule Engine.Search.Indexer.Quoted do
   alias Lexical.Ast.Analysis
   alias Lexical.ProcessCache
-  alias Lexical.RemoteControl.Search.Indexer.Source.Reducer
+  alias Engine.Search.Indexer.Source.Reducer
 
   require ProcessCache
 

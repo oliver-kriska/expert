@@ -1,9 +1,9 @@
-defmodule Lexical.RemoteControl.CodeAction do
+defmodule Engine.CodeAction do
   alias Lexical.Document
   alias Lexical.Document.Changes
   alias Lexical.Document.Range
-  alias Lexical.RemoteControl.CodeAction.Diagnostic
-  alias Lexical.RemoteControl.CodeAction.Handlers
+  alias Engine.CodeAction.Diagnostic
+  alias Engine.CodeAction.Handlers
 
   defstruct [:title, :kind, :changes, :uri]
 

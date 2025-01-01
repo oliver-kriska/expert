@@ -1,4 +1,4 @@
-defmodule Lexical.RemoteControl.CodeAction.Diagnostic do
+defmodule Engine.CodeAction.Diagnostic do
   alias Lexical.Document.Range
 
   defstruct [:range, :message, :source]

@@ -1,4 +1,4 @@
-defmodule Lexical.RemoteControl.CodeIntelligence.Entity do
+defmodule Engine.CodeIntelligence.Entity do
   alias Future.Code, as: Code
   alias Lexical.Ast
   alias Lexical.Ast.Analysis
@@ -6,7 +6,7 @@ defmodule Lexical.RemoteControl.CodeIntelligence.Entity do
   alias Lexical.Document.Position
   alias Lexical.Document.Range
   alias Lexical.Formats
-  alias Lexical.RemoteControl
+  alias Engine
   alias Sourceror.Zipper
 
   require Logger

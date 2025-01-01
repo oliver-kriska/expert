@@ -1,4 +1,4 @@
-defmodule Lexical.RemoteControl.Search.Indexer.Entry do
+defmodule Engine.Search.Indexer.Entry do
   @type function_type :: :public | :private | :delegated | :usage
   @type protocol_type :: :implementation | :definition
 
@@ -51,7 +51,7 @@ defmodule Lexical.RemoteControl.Search.Indexer.Entry do
   @type date_type :: :calendar.datetime() | integer() | DateTime.t()
 
   alias Lexical.Identifier
-  alias Lexical.RemoteControl.Search.Indexer.Source.Block
+  alias Engine.Search.Indexer.Source.Block
   alias Lexical.StructAccess
 
   use StructAccess

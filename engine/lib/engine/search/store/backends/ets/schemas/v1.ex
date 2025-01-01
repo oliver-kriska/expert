@@ -1,4 +1,4 @@
-defmodule Lexical.RemoteControl.Search.Store.Backends.Ets.Schemas.V1 do
+defmodule Engine.Search.Store.Backends.Ets.Schemas.V1 do
   @moduledoc """
   This schema  uses a bit of data duplication in order to achieve good performance.
 
@@ -9,8 +9,8 @@ defmodule Lexical.RemoteControl.Search.Store.Backends.Ets.Schemas.V1 do
 
   """
 
-  alias Lexical.RemoteControl.Search.Indexer.Entry
-  alias Lexical.RemoteControl.Search.Store.Backends.Ets.Schema
+  alias Engine.Search.Indexer.Entry
+  alias Engine.Search.Store.Backends.Ets.Schema
 
   use Schema, version: 1
 

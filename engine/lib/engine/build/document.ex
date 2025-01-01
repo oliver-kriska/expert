@@ -1,8 +1,8 @@
-defmodule Lexical.RemoteControl.Build.Document do
+defmodule Engine.Build.Document do
   alias Lexical.Document
-  alias Lexical.RemoteControl.Build
-  alias Lexical.RemoteControl.Build.Document.Compilers
-  alias Lexical.RemoteControl.Build.Isolation
+  alias Engine.Build
+  alias Engine.Build.Document.Compilers
+  alias Engine.Build.Isolation
 
   @compilers [Compilers.Config, Compilers.Elixir, Compilers.EEx, Compilers.HEEx, Compilers.NoOp]
 

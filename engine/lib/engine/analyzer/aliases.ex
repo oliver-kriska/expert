@@ -1,4 +1,4 @@
-defmodule Lexical.RemoteControl.Analyzer.Aliases do
+defmodule Engine.Analyzer.Aliases do
   alias Lexical.Ast.Analysis
   alias Lexical.Ast.Analysis.Alias
   alias Lexical.Ast.Analysis.Scope

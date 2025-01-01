@@ -1,11 +1,11 @@
-defmodule Lexical.RemoteControl.Search.Indexer do
+defmodule Engine.Search.Indexer do
   alias Lexical.Identifier
   alias Lexical.ProcessCache
   alias Lexical.Project
-  alias Lexical.RemoteControl
-  alias Lexical.RemoteControl.Progress
-  alias Lexical.RemoteControl.Search.Indexer
-  alias Lexical.RemoteControl.Search.Indexer.Entry
+  alias Engine
+  alias Engine.Progress
+  alias Engine.Search.Indexer
+  alias Engine.Search.Indexer.Entry
 
   require ProcessCache
 

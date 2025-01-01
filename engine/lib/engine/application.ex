@@ -1,7 +1,7 @@
-defmodule Lexical.RemoteControl.Application do
+defmodule Engine.Application do
   @moduledoc false
 
-  alias Lexical.RemoteControl
+  alias Engine
 
   use Application
   require Logger
@@ -31,7 +31,7 @@ defmodule Lexical.RemoteControl.Application do
         []
       end
 
-    opts = [strategy: :one_for_one, name: Lexical.RemoteControl.Supervisor]
+    opts = [strategy: :one_for_one, name: Engine.Supervisor]
     Supervisor.start_link(children, opts)
   end
 end

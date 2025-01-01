@@ -1,4 +1,4 @@
-defmodule Lexical.RemoteControl.CodeIntelligence.Symbols.Workspace do
+defmodule Engine.CodeIntelligence.Symbols.Workspace do
   defmodule Link do
     defstruct [:uri, :range, :detail_range]
 
@@ -15,7 +15,7 @@ defmodule Lexical.RemoteControl.CodeIntelligence.Symbols.Workspace do
 
   alias Lexical.Document
   alias Lexical.Formats
-  alias Lexical.RemoteControl.Search.Indexer.Entry
+  alias Engine.Search.Indexer.Entry
 
   defstruct [:name, :type, :link, container_name: nil]
 

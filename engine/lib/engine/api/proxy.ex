@@ -1,4 +1,4 @@
-defmodule Lexical.RemoteControl.Api.Proxy do
+defmodule Engine.Api.Proxy do
   @moduledoc """
   A bimodal buffering proxy
 
@@ -32,14 +32,14 @@ defmodule Lexical.RemoteControl.Api.Proxy do
 
   alias Lexical.Document
   alias Lexical.Document.Changes
-  alias Lexical.RemoteControl
-  alias Lexical.RemoteControl.Api.Messages
-  alias Lexical.RemoteControl.Api.Proxy.BufferingState
-  alias Lexical.RemoteControl.Api.Proxy.DrainingState
-  alias Lexical.RemoteControl.Api.Proxy.ProxyingState
-  alias Lexical.RemoteControl.Api.Proxy.Records
-  alias Lexical.RemoteControl.CodeMod
-  alias Lexical.RemoteControl.Commands
+  alias Engine
+  alias Engine.Api.Messages
+  alias Engine.Api.Proxy.BufferingState
+  alias Engine.Api.Proxy.DrainingState
+  alias Engine.Api.Proxy.ProxyingState
+  alias Engine.Api.Proxy.Records
+  alias Engine.CodeMod
+  alias Engine.Commands
 
   import Messages
   import Record

@@ -1,4 +1,4 @@
-defmodule Lexical.RemoteControl.ModuleMappings do
+defmodule Engine.ModuleMappings do
   defmodule State do
     defstruct module_to_file: %{}, file_to_modules: %{}
 
@@ -39,8 +39,8 @@ defmodule Lexical.RemoteControl.ModuleMappings do
     end
   end
 
-  alias Lexical.RemoteControl
-  alias Lexical.RemoteControl.Api.Messages
+  alias Engine
+  alias Engine.Api.Messages
 
   use GenServer
 

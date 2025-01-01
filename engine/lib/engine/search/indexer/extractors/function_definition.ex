@@ -1,10 +1,10 @@
-defmodule Lexical.RemoteControl.Search.Indexer.Extractors.FunctionDefinition do
+defmodule Engine.Search.Indexer.Extractors.FunctionDefinition do
   alias Lexical.Ast
   alias Lexical.Ast.Analysis
-  alias Lexical.RemoteControl.Analyzer
-  alias Lexical.RemoteControl.Search.Indexer.Entry
-  alias Lexical.RemoteControl.Search.Indexer.Source.Reducer
-  alias Lexical.RemoteControl.Search.Subject
+  alias Engine.Analyzer
+  alias Engine.Search.Indexer.Entry
+  alias Engine.Search.Indexer.Source.Reducer
+  alias Engine.Search.Subject
 
   @function_definitions [:def, :defp]
 

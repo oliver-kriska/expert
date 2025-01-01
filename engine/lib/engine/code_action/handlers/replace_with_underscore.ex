@@ -1,10 +1,10 @@
-defmodule Lexical.RemoteControl.CodeAction.Handlers.ReplaceWithUnderscore do
+defmodule Engine.CodeAction.Handlers.ReplaceWithUnderscore do
   alias Lexical.Ast
   alias Lexical.Document
   alias Lexical.Document.Changes
   alias Lexical.Document.Range
-  alias Lexical.RemoteControl.CodeAction
-  alias Lexical.RemoteControl.CodeAction.Diagnostic
+  alias Engine.CodeAction
+  alias Engine.CodeAction.Diagnostic
   alias Sourceror.Zipper
 
   @behaviour CodeAction.Handler

@@ -1,13 +1,13 @@
-defmodule Lexical.RemoteControl.CodeAction.Handlers.ReplaceRemoteFunction do
+defmodule Engine.CodeAction.Handlers.ReplaceRemoteFunction do
   alias Lexical.Ast
   alias Lexical.Document
   alias Lexical.Document.Changes
   alias Lexical.Document.Edit
   alias Lexical.Document.Range
-  alias Lexical.RemoteControl
-  alias Lexical.RemoteControl.CodeAction
-  alias Lexical.RemoteControl.CodeAction.Diagnostic
-  alias Lexical.RemoteControl.Modules
+  alias Engine
+  alias Engine.CodeAction
+  alias Engine.CodeAction.Diagnostic
+  alias Engine.Modules
   alias Sourceror.Zipper
 
   @behaviour CodeAction.Handler

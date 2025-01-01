@@ -1,9 +1,9 @@
-defmodule Lexical.RemoteControl.Api.Proxy.BufferingState do
+defmodule Engine.Api.Proxy.BufferingState do
   alias Lexical.Document
-  alias Lexical.RemoteControl
-  alias Lexical.RemoteControl.Api
-  alias Lexical.RemoteControl.Build
-  alias Lexical.RemoteControl.Commands
+  alias Engine
+  alias Engine.Api
+  alias Engine.Build
+  alias Engine.Commands
 
   import Api.Messages
   import Api.Proxy.Records

@@ -1,4 +1,4 @@
-defmodule Lexical.RemoteControl.Build.CaptureServer do
+defmodule Engine.Build.CaptureServer do
   @moduledoc false
   @compile {:no_warn_undefined, Logger}
   @timeout :infinity

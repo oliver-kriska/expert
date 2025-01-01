@@ -1,9 +1,9 @@
-defmodule Lexical.RemoteControl.Build do
+defmodule Engine.Build do
   alias Lexical.Document
   alias Lexical.Project
-  alias Lexical.RemoteControl
-  alias Lexical.RemoteControl.Build.Document.Compilers.HEEx
-  alias Lexical.RemoteControl.Build.State
+  alias Engine
+  alias Engine.Build.Document.Compilers.HEEx
+  alias Engine.Build.State
   alias Lexical.VM.Versions
 
   require Logger

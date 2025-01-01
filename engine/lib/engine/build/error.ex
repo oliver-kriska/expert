@@ -1,8 +1,8 @@
-defmodule Lexical.RemoteControl.Build.Error do
+defmodule Engine.Build.Error do
   alias Lexical.Ast
   alias Lexical.Document
   alias Lexical.Plugin.V1.Diagnostic.Result
-  alias Lexical.RemoteControl.Build.Error.Location
+  alias Engine.Build.Error.Location
   alias Mix.Task.Compiler
 
   require Logger

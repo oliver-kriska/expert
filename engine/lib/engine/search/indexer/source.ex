@@ -1,7 +1,7 @@
-defmodule Lexical.RemoteControl.Search.Indexer.Source do
+defmodule Engine.Search.Indexer.Source do
   alias Lexical.Ast
   alias Lexical.Document
-  alias Lexical.RemoteControl.Search.Indexer
+  alias Engine.Search.Indexer
 
   require Logger
 

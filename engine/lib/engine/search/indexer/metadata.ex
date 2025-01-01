@@ -1,4 +1,4 @@
-defmodule Lexical.RemoteControl.Search.Indexer.Metadata do
+defmodule Engine.Search.Indexer.Metadata do
   @moduledoc """
   Utilities for extracting location information from AST metadata nodes.
   """

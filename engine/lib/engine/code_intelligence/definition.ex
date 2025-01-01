@@ -1,4 +1,4 @@
-defmodule Lexical.RemoteControl.CodeIntelligence.Definition do
+defmodule Engine.CodeIntelligence.Definition do
   alias ElixirSense.Providers.Location, as: ElixirSenseLocation
   alias Future.Code
   alias Lexical.Ast
@@ -7,9 +7,9 @@ defmodule Lexical.RemoteControl.CodeIntelligence.Definition do
   alias Lexical.Document.Location
   alias Lexical.Document.Position
   alias Lexical.Formats
-  alias Lexical.RemoteControl.CodeIntelligence.Entity
-  alias Lexical.RemoteControl.Search.Indexer.Entry
-  alias Lexical.RemoteControl.Search.Store
+  alias Engine.CodeIntelligence.Entity
+  alias Engine.Search.Indexer.Entry
+  alias Engine.Search.Store
   alias Lexical.Text
 
   require Logger

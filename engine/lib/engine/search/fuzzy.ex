@@ -1,4 +1,4 @@
-defmodule Lexical.RemoteControl.Search.Fuzzy do
+defmodule Engine.Search.Fuzzy do
   @moduledoc """
   A backend for fuzzy matching
 
@@ -12,9 +12,9 @@ defmodule Lexical.RemoteControl.Search.Fuzzy do
   """
 
   alias Lexical.Project
-  alias Lexical.RemoteControl
-  alias Lexical.RemoteControl.Search.Fuzzy.Scorer
-  alias Lexical.RemoteControl.Search.Indexer.Entry
+  alias Engine
+  alias Engine.Search.Fuzzy.Scorer
+  alias Engine.Search.Indexer.Entry
   import Record
 
   defstruct subject_to_values: %{},

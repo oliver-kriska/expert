@@ -1,5 +1,5 @@
-defmodule Lexical.RemoteControl.Api.Proxy.ProxyingState do
-  alias Lexical.RemoteControl.Api.Proxy.Records
+defmodule Engine.Api.Proxy.ProxyingState do
+  alias Engine.Api.Proxy.Records
 
   defstruct refs_to_from: %{}
 

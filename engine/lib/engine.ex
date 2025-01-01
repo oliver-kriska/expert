@@ -1,4 +1,4 @@
-defmodule Lexical.RemoteControl do
+defmodule Engine do
   @moduledoc """
   The remote control boots another elixir application in a separate VM, injects
   the remote control application into it and allows the language server to execute tasks in the
@@ -6,11 +6,11 @@ defmodule Lexical.RemoteControl do
   """
 
   alias Lexical.Project
-  alias Lexical.RemoteControl
-  alias Lexical.RemoteControl.Api.Proxy
-  alias Lexical.RemoteControl.CodeAction
-  alias Lexical.RemoteControl.CodeIntelligence
-  alias Lexical.RemoteControl.ProjectNode
+  alias Engine
+  alias Engine.Api.Proxy
+  alias Engine.CodeAction
+  alias Engine.CodeIntelligence
+  alias Engine.ProjectNode
 
   require Logger
 

@@ -1,14 +1,14 @@
-defmodule Lexical.RemoteControl.Search.Indexer.Extractors.ModuleAttribute do
+defmodule Engine.Search.Indexer.Extractors.ModuleAttribute do
   @moduledoc """
   Extracts module attribute definitions and references from AST
   """
 
   alias Lexical.Document.Position
   alias Lexical.Document.Range
-  alias Lexical.RemoteControl.Analyzer
-  alias Lexical.RemoteControl.Search.Indexer.Entry
-  alias Lexical.RemoteControl.Search.Indexer.Source.Reducer
-  alias Lexical.RemoteControl.Search.Subject
+  alias Engine.Analyzer
+  alias Engine.Search.Indexer.Entry
+  alias Engine.Search.Indexer.Source.Reducer
+  alias Engine.Search.Subject
 
   require Logger
 

@@ -1,13 +1,13 @@
-defmodule Lexical.RemoteControl.Search.Indexer.Extractors.ExUnit do
+defmodule Engine.Search.Indexer.Extractors.ExUnit do
   alias Lexical.Ast
   alias Lexical.Ast.Analysis
   alias Lexical.Document.Position
   alias Lexical.Document.Range
   alias Lexical.Formats
-  alias Lexical.RemoteControl.Analyzer
-  alias Lexical.RemoteControl.Search.Indexer.Entry
-  alias Lexical.RemoteControl.Search.Indexer.Metadata
-  alias Lexical.RemoteControl.Search.Indexer.Source.Reducer
+  alias Engine.Analyzer
+  alias Engine.Search.Indexer.Entry
+  alias Engine.Search.Indexer.Metadata
+  alias Engine.Search.Indexer.Source.Reducer
 
   require Logger
 

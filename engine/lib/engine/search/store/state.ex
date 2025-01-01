@@ -1,9 +1,9 @@
-defmodule Lexical.RemoteControl.Search.Store.State do
+defmodule Engine.Search.Store.State do
   alias Lexical.Project
-  alias Lexical.RemoteControl.Api.Messages
-  alias Lexical.RemoteControl.Dispatch
-  alias Lexical.RemoteControl.Search.Fuzzy
-  alias Lexical.RemoteControl.Search.Indexer.Entry
+  alias Engine.Api.Messages
+  alias Engine.Dispatch
+  alias Engine.Search.Fuzzy
+  alias Engine.Search.Indexer.Entry
 
   require Logger
   import Messages

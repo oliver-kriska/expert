@@ -1,9 +1,9 @@
-defmodule Lexical.RemoteControl.CodeIntelligence.Variable do
+defmodule Engine.CodeIntelligence.Variable do
   alias Lexical.Ast.Analysis
   alias Lexical.Document.Position
   alias Lexical.Document.Range
-  alias Lexical.RemoteControl.Search.Indexer
-  alias Lexical.RemoteControl.Search.Indexer.Entry
+  alias Engine.Search.Indexer
+  alias Engine.Search.Indexer.Entry
 
   require Logger
 

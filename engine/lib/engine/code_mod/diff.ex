@@ -1,4 +1,4 @@
-defmodule Lexical.RemoteControl.CodeMod.Diff do
+defmodule Engine.CodeMod.Diff do
   alias Lexical.CodeUnit
   alias Lexical.Document
   alias Lexical.Document.Edit

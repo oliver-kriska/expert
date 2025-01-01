@@ -1,10 +1,10 @@
-defmodule Lexical.RemoteControl.Port do
+defmodule Engine.Port do
   @moduledoc """
   Utilities for launching ports in the context of a project
   """
 
   alias Lexical.Project
-  alias Lexical.RemoteControl
+  alias Engine
 
   @type open_opt ::
           {:env, list()}

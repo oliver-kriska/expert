@@ -1,4 +1,4 @@
-defmodule Lexical.RemoteControl.Search.Indexer.Source.Block do
+defmodule Engine.Search.Indexer.Source.Block do
   @moduledoc """
   A struct that represents a block of source code
   """

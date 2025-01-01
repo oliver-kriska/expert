@@ -1,10 +1,10 @@
-defmodule Lexical.RemoteControl.Search.Indexer.Extractors.EctoSchema do
+defmodule Engine.Search.Indexer.Extractors.EctoSchema do
   alias Lexical.Ast
   alias Lexical.Document.Position
-  alias Lexical.RemoteControl.Analyzer
-  alias Lexical.RemoteControl.Search.Indexer.Entry
-  alias Lexical.RemoteControl.Search.Indexer.Metadata
-  alias Lexical.RemoteControl.Search.Indexer.Source.Reducer
+  alias Engine.Analyzer
+  alias Engine.Search.Indexer.Entry
+  alias Engine.Search.Indexer.Metadata
+  alias Engine.Search.Indexer.Source.Reducer
 
   def extract(
         {:schema, meta, [{:__block__, _, [_source]} | _]} = schema_block,

@@ -1,12 +1,12 @@
-defmodule Lexical.RemoteControl.Build.Document.Compilers.Config do
+defmodule Engine.Build.Document.Compilers.Config do
   @moduledoc """
   A compiler for elixir configuration
   """
   alias Elixir.Features
   alias Lexical.Document
   alias Lexical.Plugin.V1.Diagnostic
-  alias Lexical.RemoteControl.Build
-  alias Lexical.RemoteControl.Build.Error.Location
+  alias Engine.Build
+  alias Engine.Build.Error.Location
 
   @elixir_source "Elixir"
 

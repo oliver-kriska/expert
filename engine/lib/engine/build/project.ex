@@ -1,9 +1,9 @@
-defmodule Lexical.RemoteControl.Build.Project do
+defmodule Engine.Build.Project do
   alias Lexical.Project
-  alias Lexical.RemoteControl
-  alias Lexical.RemoteControl.Build
-  alias Lexical.RemoteControl.Build.Isolation
-  alias Lexical.RemoteControl.Plugin
+  alias Engine
+  alias Engine.Build
+  alias Engine.Build.Isolation
+  alias Engine.Plugin
   alias Mix.Task.Compiler.Diagnostic
 
   use RemoteControl.Progress

@@ -1,6 +1,6 @@
-defmodule Lexical.RemoteControl.ProjectNode do
+defmodule Engine.ProjectNode do
   alias Lexical.Project
-  alias Lexical.RemoteControl
+  alias Engine
   require Logger
 
   defmodule State do
@@ -105,7 +105,7 @@ defmodule Lexical.RemoteControl.ProjectNode do
   end
 
   alias Lexical.Document
-  alias Lexical.RemoteControl.ProjectNodeSupervisor
+  alias Engine.ProjectNodeSupervisor
   use GenServer
 
   def start(project, paths) do
