@@ -1,19 +1,37 @@
-defmodule Engine.Application do
-  # See https://hexdocs.pm/elixir/Application.html
-  # for more information on OTP Applications
+defmodule Lexical.RemoteControl.Application do
   @moduledoc false
 
+  alias Lexical.RemoteControl
+
   use Application
+  require Logger
 
   @impl true
   def start(_type, _args) do
-    children = [
-      Engine.Worker
-    ]
+    children =
+      if RemoteControl.project_node?() do
+        [
+          RemoteControl.Api.Proxy,
+          RemoteControl.Commands.Reindex,
+          RemoteControl.Module.Loader,
+          {RemoteControl.Dispatch, progress: true},
+          RemoteControl.ModuleMappings,
+          RemoteControl.Build,
+          RemoteControl.Build.CaptureServer,
+          RemoteControl.Plugin.Runner.Supervisor,
+          RemoteControl.Plugin.Runner.Coordinator,
+          RemoteControl.Search.Store.Backends.Ets,
+          {RemoteControl.Search.Store,
+           [
+             &RemoteControl.Search.Indexer.create_index/1,
+             &RemoteControl.Search.Indexer.update_index/2
+           ]}
+        ]
+      else
+        []
+      end
 
-    # See https://hexdocs.pm/elixir/Supervisor.html
-    # for other strategies and supported options
-    opts = [strategy: :one_for_one, name: Engine.Supervisor]
+    opts = [strategy: :one_for_one, name: Lexical.RemoteControl.Supervisor]
     Supervisor.start_link(children, opts)
   end
 end
