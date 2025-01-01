@@ -79,6 +79,6 @@ defmodule Engine.Dispatch do
   defp progress_pid do
     project = Engine.get_project()
     manager_node_name = Engine.manager_node_name(project)
-    :rpc.call(manager_node_name, Lexical.Server.Project.Progress, :whereis, [project])
+    :rpc.call(manager_node_name, Engine.Server.Project.Progress, :whereis, [project])
   end
 end

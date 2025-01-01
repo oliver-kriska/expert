@@ -1,8 +1,8 @@
 defmodule Engine.Plugin.Runner do
   @moduledoc false
 
-  alias Lexical.Document
-  alias Lexical.Project
+  alias Engine.Document
+  alias Engine.Project
   alias Engine.Module.Loader
   alias Engine.Plugin.Runner
 

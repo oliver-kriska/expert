@@ -23,6 +23,7 @@ defmodule Engine.MixProject do
   defp deps do
     [
       {:spitfire, "~> 0.1"},
+      {:sourceror, "~> 1.0"},
       # {:gen_lsp, "~> 0.10"},
       {:gen_lsp,
        github: "elixir-tools/gen_lsp", branch: "change-schematic-function", override: true},

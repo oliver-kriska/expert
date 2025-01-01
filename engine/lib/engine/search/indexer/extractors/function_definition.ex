@@ -1,6 +1,6 @@
 defmodule Engine.Search.Indexer.Extractors.FunctionDefinition do
-  alias Lexical.Ast
-  alias Lexical.Ast.Analysis
+  alias Engine.Ast
+  alias Engine.Ast.Analysis
   alias Engine.Analyzer
   alias Engine.Search.Indexer.Entry
   alias Engine.Search.Indexer.Source.Reducer

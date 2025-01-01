@@ -1,10 +1,10 @@
 defmodule Engine.Build do
-  alias Lexical.Document
-  alias Lexical.Project
+  alias Engine.Document
+  alias Engine.Project
 
   alias Engine.Build.Document.Compilers.HEEx
   alias Engine.Build.State
-  alias Lexical.VM.Versions
+  alias Engine.VM.Versions
 
   require Logger
   use GenServer

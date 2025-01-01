@@ -1,8 +1,8 @@
 defmodule Engine.Analyzer.Aliases do
-  alias Lexical.Ast.Analysis
-  alias Lexical.Ast.Analysis.Alias
-  alias Lexical.Ast.Analysis.Scope
-  alias Lexical.Document.Position
+  alias Engine.Ast.Analysis
+  alias Engine.Ast.Analysis.Alias
+  alias Engine.Ast.Analysis.Scope
+  alias Engine.Document.Position
 
   @spec at(Analysis.t(), Position.t()) :: %{atom() => module()}
   def at(%Analysis{} = analysis, %Position{} = position) do

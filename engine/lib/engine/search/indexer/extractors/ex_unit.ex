@@ -1,9 +1,9 @@
 defmodule Engine.Search.Indexer.Extractors.ExUnit do
-  alias Lexical.Ast
-  alias Lexical.Ast.Analysis
-  alias Lexical.Document.Position
-  alias Lexical.Document.Range
-  alias Lexical.Formats
+  alias Engine.Ast
+  alias Engine.Ast.Analysis
+  alias Engine.Document.Position
+  alias Engine.Document.Range
+  alias Engine.Formats
   alias Engine.Analyzer
   alias Engine.Search.Indexer.Entry
   alias Engine.Search.Indexer.Metadata

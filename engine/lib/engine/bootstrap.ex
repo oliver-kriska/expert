@@ -6,12 +6,12 @@ defmodule Engine.Bootstrap do
   the project's code paths, which are then added to the code paths from the language server. At this
   point, it's safe to start the project, as we should have all the code present to compile the system.
   """
-  alias Lexical.Project
+  alias Engine.Project
 
   require Logger
 
   def init(%Project{} = project, document_store_entropy, app_configs) do
-    Lexical.Document.Store.set_entropy(document_store_entropy)
+    Engine.Document.Store.set_entropy(document_store_entropy)
 
     Application.put_all_env(app_configs)
 

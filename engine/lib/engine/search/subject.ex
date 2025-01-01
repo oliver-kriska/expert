@@ -2,7 +2,7 @@ defmodule Engine.Search.Subject do
   @moduledoc """
   Functions for converting to a search entry's subject field
   """
-  alias Lexical.Formats
+  alias Engine.Formats
 
   def module(module) do
     module

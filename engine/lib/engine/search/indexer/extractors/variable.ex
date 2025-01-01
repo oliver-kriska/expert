@@ -1,5 +1,5 @@
 defmodule Engine.Search.Indexer.Extractors.Variable do
-  alias Lexical.Ast
+  alias Engine.Ast
   alias Engine.Analyzer
   alias Engine.Search.Indexer.Entry
   alias Engine.Search.Indexer.Source.Reducer

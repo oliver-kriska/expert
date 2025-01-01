@@ -1,7 +1,7 @@
 defmodule Engine.Build.Error do
-  alias Lexical.Ast
-  alias Lexical.Document
-  alias Lexical.Plugin.V1.Diagnostic.Result
+  alias Engine.Ast
+  alias Engine.Document
+  alias Engine.Plugin.V1.Diagnostic.Result
   alias Engine.Build.Error.Location
   alias Mix.Task.Compiler
 

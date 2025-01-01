@@ -1,10 +1,10 @@
 defmodule Engine.Api do
-  alias Lexical.Ast.Analysis
-  alias Lexical.Ast.Env
-  alias Lexical.Document
-  alias Lexical.Document.Position
-  alias Lexical.Document.Range
-  alias Lexical.Project
+  alias Engine.Ast.Analysis
+  alias Engine.Ast.Env
+  alias Engine.Document
+  alias Engine.Document.Position
+  alias Engine.Document.Range
+  alias Engine.Project
 
   alias Engine.CodeIntelligence
 

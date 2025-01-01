@@ -1,7 +1,7 @@
 defmodule Engine.CodeIntelligence.Variable do
-  alias Lexical.Ast.Analysis
-  alias Lexical.Document.Position
-  alias Lexical.Document.Range
+  alias Engine.Ast.Analysis
+  alias Engine.Document.Position
+  alias Engine.Document.Range
   alias Engine.Search.Indexer
   alias Engine.Search.Indexer.Entry
 

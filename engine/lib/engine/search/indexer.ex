@@ -1,7 +1,7 @@
 defmodule Engine.Search.Indexer do
-  alias Lexical.Identifier
-  alias Lexical.ProcessCache
-  alias Lexical.Project
+  alias Engine.Identifier
+  alias Engine.ProcessCache
+  alias Engine.Project
 
   alias Engine.Progress
   alias Engine.Search.Indexer

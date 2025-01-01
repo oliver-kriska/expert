@@ -2,8 +2,8 @@ defmodule Engine.Build.Document.Compiler do
   @moduledoc """
   A behaviour for document-level compilers
   """
-  alias Lexical.Document
-  alias Lexical.Plugin.V1.Diagnostic
+  alias Engine.Document
+  alias Engine.Plugin.V1.Diagnostic
 
   @type compile_response :: {:ok, [Diagnostic.Result.t()]} | {:error, [Diagnostic.Result.t()]}
 

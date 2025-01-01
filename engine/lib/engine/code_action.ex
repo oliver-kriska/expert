@@ -1,7 +1,7 @@
 defmodule Engine.CodeAction do
-  alias Lexical.Document
-  alias Lexical.Document.Changes
-  alias Lexical.Document.Range
+  alias Engine.Document
+  alias Engine.Document.Changes
+  alias Engine.Document.Range
   alias Engine.CodeAction.Diagnostic
   alias Engine.CodeAction.Handlers
 
@@ -22,7 +22,7 @@ defmodule Engine.CodeAction do
           title: String.t(),
           kind: code_action_kind,
           changes: Changes.t(),
-          uri: Lexical.uri()
+          uri: Engine.uri()
         }
 
   @handlers [
@@ -33,7 +33,7 @@ defmodule Engine.CodeAction do
     Handlers.RemoveUnusedAlias
   ]
 
-  @spec new(Lexical.uri(), String.t(), code_action_kind(), Changes.t()) :: t()
+  @spec new(Engine.uri(), String.t(), code_action_kind(), Changes.t()) :: t()
   def new(uri, title, kind, changes) do
     %__MODULE__{uri: uri, title: title, changes: changes, kind: kind}
   end

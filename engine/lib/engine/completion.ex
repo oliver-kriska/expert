@@ -1,8 +1,8 @@
 defmodule Engine.Completion do
-  alias Lexical.Ast.Analysis
-  alias Lexical.Ast.Env
-  alias Lexical.Document
-  alias Lexical.Document.Position
+  alias Engine.Ast.Analysis
+  alias Engine.Ast.Env
+  alias Engine.Document
+  alias Engine.Document.Position
 
   alias Engine.CodeMod.Format
   alias Engine.Completion.Candidate
@@ -58,7 +58,7 @@ defmodule Engine.Completion do
   def struct_fields(%Analysis{} = analysis, %Position{} = position) do
     container_struct_module =
       analysis
-      |> Lexical.Ast.cursor_path(position)
+      |> Engine.Ast.cursor_path(position)
       |> container_struct_module()
 
     with {:ok, struct_module} <-

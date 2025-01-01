@@ -1,16 +1,16 @@
 defmodule Engine.CodeIntelligence.Definition do
   alias ElixirSense.Providers.Location, as: ElixirSenseLocation
   alias Future.Code
-  alias Lexical.Ast
-  alias Lexical.Ast.Analysis
-  alias Lexical.Document
-  alias Lexical.Document.Location
-  alias Lexical.Document.Position
-  alias Lexical.Formats
+  alias Engine.Ast
+  alias Engine.Ast.Analysis
+  alias Engine.Document
+  alias Engine.Document.Location
+  alias Engine.Document.Position
+  alias Engine.Formats
   alias Engine.CodeIntelligence.Entity
   alias Engine.Search.Indexer.Entry
   alias Engine.Search.Store
-  alias Lexical.Text
+  alias Engine.Text
 
   require Logger
 

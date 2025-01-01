@@ -3,8 +3,8 @@ defmodule Engine.Build.Document.Compilers.Config do
   A compiler for elixir configuration
   """
   alias Elixir.Features
-  alias Lexical.Document
-  alias Lexical.Plugin.V1.Diagnostic
+  alias Engine.Document
+  alias Engine.Plugin.V1.Diagnostic
   alias Engine.Build
   alias Engine.Build.Error.Location
 

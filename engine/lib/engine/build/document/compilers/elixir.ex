@@ -4,7 +4,7 @@ defmodule Engine.Build.Document.Compilers.Elixir do
   """
 
   alias Elixir.Features
-  alias Lexical.Document
+  alias Engine.Document
   alias Engine.Build
   alias Engine.Build.Document.Compilers
 

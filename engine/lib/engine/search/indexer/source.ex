@@ -1,6 +1,6 @@
 defmodule Engine.Search.Indexer.Source do
-  alias Lexical.Ast
-  alias Lexical.Document
+  alias Engine.Ast
+  alias Engine.Document
   alias Engine.Search.Indexer
 
   require Logger

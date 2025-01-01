@@ -1,8 +1,8 @@
 defmodule Engine.Build.Error.Location do
-  alias Lexical.Document
-  alias Lexical.Document.Position
-  alias Lexical.Document.Range
-  alias Lexical.Plugin.V1.Diagnostic.Result
+  alias Engine.Document
+  alias Engine.Document.Position
+  alias Engine.Document.Range
+  alias Engine.Plugin.V1.Diagnostic.Result
 
   require Logger
 

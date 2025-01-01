@@ -2,9 +2,9 @@ defmodule Engine.Search.Store.Backends.Ets.Wal do
   @moduledoc """
   A (hopefully) simple write-ahead log
   """
-  alias Lexical.Identifier
-  alias Lexical.Project
-  alias Lexical.VM.Versions
+  alias Engine.Identifier
+  alias Engine.Project
+  alias Engine.VM.Versions
 
   import Record
 

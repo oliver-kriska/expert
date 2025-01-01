@@ -1,6 +1,6 @@
 defmodule Engine.Search.Indexer.Quoted do
-  alias Lexical.Ast.Analysis
-  alias Lexical.ProcessCache
+  alias Engine.Ast.Analysis
+  alias Engine.ProcessCache
   alias Engine.Search.Indexer.Source.Reducer
 
   require ProcessCache

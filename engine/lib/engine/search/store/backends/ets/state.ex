@@ -5,7 +5,7 @@ defmodule Engine.Search.Store.Backends.Ets.State do
   This backend uses an ETS table to store its data using a schema defined in the schemas submodule.
 
   """
-  alias Lexical.Project
+  alias Engine.Project
   alias Engine.Search.Indexer.Entry
   alias Engine.Search.Store.Backends.Ets.Schema
   alias Engine.Search.Store.Backends.Ets.Schemas

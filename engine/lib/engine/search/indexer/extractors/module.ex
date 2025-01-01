@@ -3,10 +3,10 @@ defmodule Engine.Search.Indexer.Extractors.Module do
   Extracts module references and definitions from AST
   """
 
-  alias Lexical.Ast
-  alias Lexical.Document.Position
-  alias Lexical.Document.Range
-  alias Lexical.ProcessCache
+  alias Engine.Ast
+  alias Engine.Document.Position
+  alias Engine.Document.Range
+  alias Engine.ProcessCache
 
   alias Engine.Search.Indexer.Entry
   alias Engine.Search.Indexer.Metadata

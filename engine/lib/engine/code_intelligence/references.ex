@@ -1,8 +1,8 @@
 defmodule Engine.CodeIntelligence.References do
-  alias Lexical.Ast.Analysis
-  alias Lexical.Document
-  alias Lexical.Document.Location
-  alias Lexical.Document.Position
+  alias Engine.Ast.Analysis
+  alias Engine.Document
+  alias Engine.Document.Location
+  alias Engine.Document.Position
   alias Engine.Analyzer
   alias Engine.CodeIntelligence.Entity
   alias Engine.CodeIntelligence.Variable

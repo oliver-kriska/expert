@@ -1,9 +1,9 @@
 defmodule Engine.CodeMod.Diff do
-  alias Lexical.CodeUnit
-  alias Lexical.Document
-  alias Lexical.Document.Edit
-  alias Lexical.Document.Position
-  alias Lexical.Document.Range
+  alias Engine.CodeUnit
+  alias Engine.Document
+  alias Engine.Document.Edit
+  alias Engine.Document.Position
+  alias Engine.Document.Range
 
   @spec diff(Document.t(), String.t()) :: [Edit.t()]
   def diff(%Document{} = document, dest) when is_binary(dest) do

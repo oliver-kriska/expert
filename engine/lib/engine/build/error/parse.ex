@@ -1,7 +1,7 @@
 defmodule Engine.Build.Error.Parse do
-  alias Lexical.Document
-  alias Lexical.Document.Range
-  alias Lexical.Plugin.V1.Diagnostic.Result
+  alias Engine.Document
+  alias Engine.Document.Range
+  alias Engine.Plugin.V1.Diagnostic.Result
   alias Engine.Build.Error.Location
 
   @elixir_source "Elixir"

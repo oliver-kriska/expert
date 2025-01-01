@@ -1,7 +1,7 @@
 defmodule Engine.Build.Document.Compilers.Quoted do
   alias Elixir.Features
-  alias Lexical.Ast
-  alias Lexical.Document
+  alias Engine.Ast
+  alias Engine.Document
   alias Engine.Build
   alias Engine.ModuleMappings
 

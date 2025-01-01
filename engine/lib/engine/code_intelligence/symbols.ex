@@ -1,6 +1,6 @@
 defmodule Engine.CodeIntelligence.Symbols do
-  alias Lexical.Document
-  alias Lexical.Document.Range
+  alias Engine.Document
+  alias Engine.Document.Range
   alias Engine.CodeIntelligence.Symbols
   alias Engine.Search
   alias Engine.Search.Indexer

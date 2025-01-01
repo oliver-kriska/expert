@@ -3,8 +3,8 @@ defmodule Engine.Search.Indexer.Extractors.ModuleAttribute do
   Extracts module attribute definitions and references from AST
   """
 
-  alias Lexical.Document.Position
-  alias Lexical.Document.Range
+  alias Engine.Document.Position
+  alias Engine.Document.Range
   alias Engine.Analyzer
   alias Engine.Search.Indexer.Entry
   alias Engine.Search.Indexer.Source.Reducer
@@ -95,7 +95,7 @@ defmodule Engine.Search.Indexer.Extractors.ModuleAttribute do
     [line: start_line, column: start_column] = Sourceror.get_start_position(attr_ast)
 
     end_line = Sourceror.get_end_line(attr_ast)
-    {:ok, line_text} = Lexical.Document.fetch_text_at(document, end_line)
+    {:ok, line_text} = Engine.Document.fetch_text_at(document, end_line)
     # add one because lsp positions are one-based
     end_column = String.length(line_text) + 1
 

@@ -3,7 +3,7 @@ defmodule Engine.Port do
   Utilities for launching ports in the context of a project
   """
 
-  alias Lexical.Project
+  alias Engine.Project
 
   @type open_opt ::
           {:env, list()}

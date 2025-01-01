@@ -30,8 +30,8 @@ defmodule Engine.Api.Proxy do
 
   """
 
-  alias Lexical.Document
-  alias Lexical.Document.Changes
+  alias Engine.Document
+  alias Engine.Document.Changes
 
   alias Engine.Api.Messages
   alias Engine.Api.Proxy.BufferingState

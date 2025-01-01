@@ -1,7 +1,7 @@
 defmodule Engine.Search.Indexer.Extractors.FunctionReference do
-  alias Lexical.Ast
-  alias Lexical.Document.Position
-  alias Lexical.Document.Range
+  alias Engine.Ast
+  alias Engine.Document.Position
+  alias Engine.Document.Range
 
   alias Engine.Search.Indexer.Entry
   alias Engine.Search.Indexer.Extractors.FunctionDefinition
@@ -110,7 +110,7 @@ defmodule Engine.Search.Indexer.Extractors.FunctionReference do
           Entry.reference(
             analysis.document.path,
             Reducer.current_block(reducer),
-            Lexical.Formats.mfa(module, function_name, arity),
+            Engine.Formats.mfa(module, function_name, arity),
             {:function, :usage},
             Ast.Range.get(ast, analysis.document),
             Application.get_application(module)

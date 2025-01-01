@@ -3,7 +3,7 @@ defmodule Engine.Dispatch.PubSub do
   A pubsub event handler for a gen_event controller.
   """
   defmodule State do
-    alias Lexical.Project
+    alias Engine.Project
 
     defstruct [:registrations]
 
@@ -55,7 +55,7 @@ defmodule Engine.Dispatch.PubSub do
     end
   end
 
-  alias Lexical.Project
+  alias Engine.Project
 
   @behaviour :gen_event
 

@@ -1,5 +1,5 @@
 defmodule Engine.Dispatch.Handlers.Indexing do
-  alias Lexical.Document
+  alias Engine.Document
   alias Engine.Api.Messages
   alias Engine.Commands
   alias Engine.Dispatch

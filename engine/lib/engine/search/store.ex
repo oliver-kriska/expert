@@ -3,7 +3,7 @@ defmodule Engine.Search.Store do
   A persistent store for search entries
   """
 
-  alias Lexical.Project
+  alias Engine.Project
 
   alias Engine.Api
   alias Engine.Search.Indexer.Entry

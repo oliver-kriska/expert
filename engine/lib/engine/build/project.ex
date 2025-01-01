@@ -1,5 +1,5 @@
 defmodule Engine.Build.Project do
-  alias Lexical.Project
+  alias Engine.Project
 
   alias Engine.Build
   alias Engine.Build.Isolation

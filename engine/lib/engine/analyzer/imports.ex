@@ -1,10 +1,10 @@
 defmodule Engine.Analyzer.Imports do
-  alias Lexical.Ast.Analysis
-  alias Lexical.Ast.Analysis.Import
-  alias Lexical.Ast.Analysis.Scope
-  alias Lexical.Document.Position
-  alias Lexical.Document.Range
-  alias Lexical.ProcessCache
+  alias Engine.Ast.Analysis
+  alias Engine.Ast.Analysis.Import
+  alias Engine.Ast.Analysis.Scope
+  alias Engine.Document.Position
+  alias Engine.Document.Range
+  alias Engine.ProcessCache
   alias Engine.Analyzer.Aliases
   alias Engine.Module.Loader
 

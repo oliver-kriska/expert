@@ -1,7 +1,7 @@
 defmodule Engine.CodeMod.Format do
-  alias Lexical.Document
-  alias Lexical.Document.Changes
-  alias Lexical.Project
+  alias Engine.Document
+  alias Engine.Document.Changes
+  alias Engine.Project
 
   alias Engine.Build
   alias Engine.CodeMod.Diff

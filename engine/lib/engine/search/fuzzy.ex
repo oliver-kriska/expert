@@ -11,7 +11,7 @@ defmodule Engine.Search.Fuzzy do
   returned.
   """
 
-  alias Lexical.Project
+  alias Engine.Project
 
   alias Engine.Search.Fuzzy.Scorer
   alias Engine.Search.Indexer.Entry
@@ -289,7 +289,7 @@ defmodule Engine.Search.Fuzzy do
   end
 
   defp stringify(mapped(type: :module, subject: module_name)) do
-    Lexical.Formats.module(module_name)
+    Engine.Formats.module(module_name)
   end
 
   defp stringify(mapped(subject: string)) when is_binary(string) do
@@ -307,10 +307,10 @@ defmodule Engine.Search.Fuzzy do
   defp stringify(atom) when is_atom(atom) do
     cond do
       function_exported?(atom, :__info__, 1) ->
-        Lexical.Formats.module(atom)
+        Engine.Formats.module(atom)
 
       function_exported?(atom, :module_info, 0) ->
-        Lexical.Formats.module(atom)
+        Engine.Formats.module(atom)
 
       true ->
         inspect(atom)

@@ -1,5 +1,5 @@
 defmodule Engine.ProjectNodeSupervisor do
-  alias Lexical.Project
+  alias Engine.Project
   alias Engine.ProjectNode
   use DynamicSupervisor
 

@@ -1,6 +1,6 @@
 defmodule Engine.Search.Indexer.Extractors.EctoSchema do
-  alias Lexical.Ast
-  alias Lexical.Document.Position
+  alias Engine.Ast
+  alias Engine.Document.Position
   alias Engine.Analyzer
   alias Engine.Search.Indexer.Entry
   alias Engine.Search.Indexer.Metadata

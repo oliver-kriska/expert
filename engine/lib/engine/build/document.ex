@@ -1,5 +1,5 @@
 defmodule Engine.Build.Document do
-  alias Lexical.Document
+  alias Engine.Document
   alias Engine.Build
   alias Engine.Build.Document.Compilers
   alias Engine.Build.Isolation

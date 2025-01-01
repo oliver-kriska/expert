@@ -1,6 +1,6 @@
 defmodule Engine.CodeAction.Handler do
-  alias Lexical.Document
-  alias Lexical.Document.Range
+  alias Engine.Document
+  alias Engine.Document.Range
   alias Engine.CodeAction
   alias Engine.CodeAction.Diagnostic
 

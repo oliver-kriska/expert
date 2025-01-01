@@ -4,7 +4,7 @@ defmodule Engine.Search.Indexer.Source.Block do
   """
 
   defstruct [:starts_at, :ends_at, :id, :parent_id]
-  alias Lexical.Identifier
+  alias Engine.Identifier
 
   def root do
     %__MODULE__{id: :root}

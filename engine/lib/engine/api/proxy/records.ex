@@ -1,5 +1,5 @@
 defmodule Engine.Api.Proxy.Records do
-  alias Lexical.Formats
+  alias Engine.Formats
 
   import Record
 

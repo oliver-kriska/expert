@@ -1,6 +1,6 @@
 defmodule Engine.CodeIntelligence.Symbols.Document do
-  alias Lexical.Document
-  alias Lexical.Formats
+  alias Engine.Document
+  alias Engine.Formats
   alias Engine.Search.Indexer.Entry
 
   defstruct [:name, :type, :range, :detail_range, :detail, :original_type, :subject, children: []]

@@ -40,9 +40,9 @@ defmodule Engine.Search.Indexer.Entry do
           application: module(),
           subject: subject(),
           block_id: block_id(),
-          block_range: Lexical.Document.Range.t() | nil,
+          block_range: Engine.Document.Range.t() | nil,
           path: Path.t(),
-          range: Lexical.Document.Range.t(),
+          range: Engine.Document.Range.t(),
           subtype: entry_subtype(),
           type: entry_type(),
           metadata: nil | map()
@@ -50,9 +50,9 @@ defmodule Engine.Search.Indexer.Entry do
   @type datetime_format :: :erl | :unix | :datetime
   @type date_type :: :calendar.datetime() | integer() | DateTime.t()
 
-  alias Lexical.Identifier
+  alias Engine.Identifier
   alias Engine.Search.Indexer.Source.Block
-  alias Lexical.StructAccess
+  alias Engine.StructAccess
 
   use StructAccess
 

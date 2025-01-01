@@ -21,13 +21,13 @@ defmodule Engine.CodeAction.Handlers.RemoveUnusedAlias do
   normalizer and possibly fix sourceror, so until then, this is what we have.
   """
 
-  alias Lexical.Ast
-  alias Lexical.Ast.Analysis
-  alias Lexical.Document
-  alias Lexical.Document.Changes
-  alias Lexical.Document.Edit
-  alias Lexical.Document.Position
-  alias Lexical.Document.Range
+  alias Engine.Ast
+  alias Engine.Ast.Analysis
+  alias Engine.Document
+  alias Engine.Document.Changes
+  alias Engine.Document.Edit
+  alias Engine.Document.Position
+  alias Engine.Document.Range
   alias Engine.Analyzer
   alias Engine.CodeAction
   alias Engine.CodeAction.Diagnostic

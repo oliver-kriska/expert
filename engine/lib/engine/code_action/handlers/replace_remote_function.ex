@@ -1,9 +1,9 @@
 defmodule Engine.CodeAction.Handlers.ReplaceRemoteFunction do
-  alias Lexical.Ast
-  alias Lexical.Document
-  alias Lexical.Document.Changes
-  alias Lexical.Document.Edit
-  alias Lexical.Document.Range
+  alias Engine.Ast
+  alias Engine.Document
+  alias Engine.Document.Changes
+  alias Engine.Document.Edit
+  alias Engine.Document.Range
 
   alias Engine.CodeAction
   alias Engine.CodeAction.Diagnostic

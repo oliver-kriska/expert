@@ -1,12 +1,12 @@
 defmodule Engine.CodeMod.Aliases do
-  alias Lexical.Ast
-  alias Lexical.Ast.Analysis
-  alias Lexical.Ast.Analysis.Alias
-  alias Lexical.Ast.Analysis.Scope
-  alias Lexical.Document
-  alias Lexical.Document.Edit
-  alias Lexical.Document.Position
-  alias Lexical.Document.Range
+  alias Engine.Ast
+  alias Engine.Ast.Analysis
+  alias Engine.Ast.Analysis.Alias
+  alias Engine.Ast.Analysis.Scope
+  alias Engine.Document
+  alias Engine.Document.Edit
+  alias Engine.Document.Position
+  alias Engine.Document.Range
 
   alias Sourceror.Zipper
 

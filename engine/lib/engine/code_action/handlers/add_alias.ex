@@ -1,12 +1,12 @@
 defmodule Engine.CodeAction.Handlers.AddAlias do
-  alias Lexical.Ast
-  alias Lexical.Ast.Analysis
-  alias Lexical.Ast.Analysis.Alias
-  alias Lexical.Document
-  alias Lexical.Document.Changes
-  alias Lexical.Document.Position
-  alias Lexical.Document.Range
-  alias Lexical.Formats
+  alias Engine.Ast
+  alias Engine.Ast.Analysis
+  alias Engine.Ast.Analysis.Alias
+  alias Engine.Document
+  alias Engine.Document.Changes
+  alias Engine.Document.Position
+  alias Engine.Document.Range
+  alias Engine.Formats
 
   alias Engine.Analyzer
   alias Engine.CodeAction

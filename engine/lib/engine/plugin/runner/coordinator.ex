@@ -1,7 +1,7 @@
 defmodule Engine.Plugin.Runner.Coordinator do
   @moduledoc false
 
-  alias Lexical.Formats
+  alias Engine.Formats
   alias Engine.Plugin.Runner.Coordinator.State
 
   require Logger
