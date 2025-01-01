@@ -1,5 +1,5 @@
 defmodule Engine.Api.Messages do
-  alias Engine.Project
+  alias Forge.Project
 
   import Record
   defrecord :project_compile_requested, project: nil, build_number: 0
@@ -53,12 +53,12 @@ defmodule Engine.Api.Messages do
 
   @type project_compile_requested ::
           record(:project_compile_requested,
-            project: Engine.Project.t(),
+            project: Forge.Project.t(),
             build_number: non_neg_integer()
           )
   @type project_compiled ::
           record(:project_compiled,
-            project: Engine.Project.t(),
+            project: Forge.Project.t(),
             build_number: non_neg_integer(),
             status: compile_status,
             elapsed_ms: non_neg_integer
@@ -67,13 +67,13 @@ defmodule Engine.Api.Messages do
   @type filesystem_event ::
           record(:filesystem_event,
             project: Project.t(),
-            uri: Engine.uri(),
+            uri: Forge.uri(),
             event_type: :created | :updated | :deleted
           )
 
   @type file_changed ::
           record(:file_changed,
-            uri: Engine.uri(),
+            uri: Forge.uri(),
             from_version: maybe_version,
             to_version: maybe_version,
             open?: boolean()
@@ -81,16 +81,16 @@ defmodule Engine.Api.Messages do
 
   @type file_compile_requested ::
           record(:file_compile_requested,
-            project: Engine.Project.t(),
+            project: Forge.Project.t(),
             build_number: non_neg_integer(),
-            uri: Engine.uri()
+            uri: Forge.uri()
           )
 
   @type file_compiled ::
           record(:file_compiled,
-            project: Engine.Project.t(),
+            project: Forge.Project.t(),
             build_number: non_neg_integer(),
-            uri: Engine.uri(),
+            uri: Forge.uri(),
             status: compile_status,
             elapsed_ms: non_neg_integer
           )
@@ -105,14 +105,14 @@ defmodule Engine.Api.Messages do
 
   @type project_diagnostics ::
           record(:project_diagnostics,
-            project: Engine.Project.t(),
+            project: Forge.Project.t(),
             diagnostics: diagnostics()
           )
 
   @type file_diagnostics ::
           record(:file_diagnostics,
-            project: Engine.Project.t(),
-            uri: Engine.uri(),
+            project: Forge.Project.t(),
+            uri: Forge.uri(),
             diagnostics: diagnostics()
           )
 
@@ -125,14 +125,14 @@ defmodule Engine.Api.Messages do
 
   @type struct_discovered :: record(:struct_discovered, module: module(), fields: field_list())
 
-  @type project_index_ready :: record(:project_index_ready, project: Engine.Project.t())
+  @type project_index_ready :: record(:project_index_ready, project: Forge.Project.t())
 
   @type project_reindex_requested ::
-          record(:project_reindex_requested, project: Engine.Project.t())
+          record(:project_reindex_requested, project: Forge.Project.t())
 
   @type project_reindexed ::
           record(:project_reindexed,
-            project: Engine.Project.t(),
+            project: Forge.Project.t(),
             elapsed_ms: non_neg_integer(),
             status: :success | {:error, term()}
           )

@@ -1,5 +1,5 @@
 defmodule Engine.Build.Document do
-  alias Engine.Document
+  alias Forge.Document
   alias Engine.Build
   alias Engine.Build.Document.Compilers
   alias Engine.Build.Isolation

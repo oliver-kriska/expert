@@ -16,7 +16,7 @@ defmodule Engine.Search.Store.Backends.Ets.Schema do
     quote do
       @behaviour unquote(__MODULE__)
       @version unquote(version)
-      alias Engine.Project
+      alias Forge.Project
       import unquote(__MODULE__), only: [defkey: 2]
 
       def version do
@@ -43,7 +43,7 @@ defmodule Engine.Search.Store.Backends.Ets.Schema do
     end
   end
 
-  alias Engine.Project
+  alias Forge.Project
   alias Engine.Search.Indexer.Entry
   alias Engine.Search.Store.Backends.Ets.Wal
 

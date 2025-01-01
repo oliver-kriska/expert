@@ -1,9 +1,8 @@
 defmodule Engine.Build.Project do
-  alias Engine.Project
+  alias Forge.Project
 
   alias Engine.Build
   alias Engine.Build.Isolation
-  alias Engine.Plugin
   alias Mix.Task.Compiler.Diagnostic
 
   use Engine.Progress
@@ -93,10 +92,6 @@ defmodule Engine.Build.Project do
 
     with_progress("mix deps.compile", fn ->
       Mix.Task.run("deps.safe_compile", ~w(--skip-umbrella-children))
-    end)
-
-    with_progress("loading plugins", fn ->
-      Plugin.Discovery.run()
     end)
   end
 

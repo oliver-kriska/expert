@@ -1,5 +1,5 @@
 defmodule Engine.CodeAction.Diagnostic do
-  alias Engine.Document.Range
+  alias Forge.Document.Range
 
   defstruct [:range, :message, :source]
   @type message :: String.t()

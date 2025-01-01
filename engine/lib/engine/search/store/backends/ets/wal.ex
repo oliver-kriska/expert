@@ -3,7 +3,7 @@ defmodule Engine.Search.Store.Backends.Ets.Wal do
   A (hopefully) simple write-ahead log
   """
   alias Engine.Identifier
-  alias Engine.Project
+  alias Forge.Project
   alias Engine.VM.Versions
 
   import Record

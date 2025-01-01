@@ -1,8 +1,8 @@
 defmodule Engine.CodeIntelligence.References do
-  alias Engine.Ast.Analysis
-  alias Engine.Document
-  alias Engine.Document.Location
-  alias Engine.Document.Position
+  alias Forge.Ast.Analysis
+  alias Forge.Document
+  alias Forge.Document.Location
+  alias Forge.Document.Position
   alias Engine.Analyzer
   alias Engine.CodeIntelligence.Entity
   alias Engine.CodeIntelligence.Variable

@@ -1,5 +1,5 @@
 defmodule Engine.Search.Indexer.Extractors.Variable do
-  alias Engine.Ast
+  alias Forge.Ast
   alias Engine.Analyzer
   alias Engine.Search.Indexer.Entry
   alias Engine.Search.Indexer.Source.Reducer

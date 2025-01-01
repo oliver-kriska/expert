@@ -1,7 +1,7 @@
 defmodule Engine.Commands.Reindex do
   defmodule State do
-    alias Engine.Ast.Analysis
-    alias Engine.Document
+    alias Forge.Ast.Analysis
+    alias Forge.Document
     alias Engine.ProcessCache
     alias Engine.Search
     alias Engine.Search.Indexer
@@ -70,8 +70,8 @@ defmodule Engine.Commands.Reindex do
   A simple genserver that prevents more than one reindexing job from running at the same time
   """
 
-  alias Engine.Document
-  alias Engine.Project
+  alias Forge.Document
+  alias Forge.Project
 
   alias Engine.Api
   alias Engine.Search

@@ -1,5 +1,5 @@
 defmodule Engine.ProjectNode do
-  alias Engine.Project
+  alias Forge.Project
 
   require Logger
 
@@ -104,7 +104,7 @@ defmodule Engine.ProjectNode do
     end
   end
 
-  alias Engine.Document
+  alias Forge.Document
   alias Engine.ProjectNodeSupervisor
   use GenServer
 

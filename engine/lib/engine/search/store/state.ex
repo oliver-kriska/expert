@@ -1,5 +1,5 @@
 defmodule Engine.Search.Store.State do
-  alias Engine.Project
+  alias Forge.Project
   alias Engine.Api.Messages
   alias Engine.Dispatch
   alias Engine.Search.Fuzzy

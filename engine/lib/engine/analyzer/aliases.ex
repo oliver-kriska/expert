@@ -1,8 +1,8 @@
 defmodule Engine.Analyzer.Aliases do
-  alias Engine.Ast.Analysis
-  alias Engine.Ast.Analysis.Alias
-  alias Engine.Ast.Analysis.Scope
-  alias Engine.Document.Position
+  alias Forge.Ast.Analysis
+  alias Forge.Ast.Analysis.Alias
+  alias Forge.Ast.Analysis.Scope
+  alias Forge.Document.Position
 
   @spec at(Analysis.t(), Position.t()) :: %{atom() => module()}
   def at(%Analysis{} = analysis, %Position{} = position) do

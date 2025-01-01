@@ -1,9 +1,9 @@
 defmodule Engine.Analyzer do
-  alias Engine.Ast
-  alias Engine.Ast.Analysis
-  alias Engine.Ast.Analysis.Require
-  alias Engine.Ast.Analysis.Use
-  alias Engine.Document.Position
+  alias Forge.Ast
+  alias Forge.Ast.Analysis
+  alias Forge.Ast.Analysis.Require
+  alias Forge.Ast.Analysis.Use
+  alias Forge.Document.Position
   alias Engine.Analyzer.Aliases
   alias Engine.Analyzer.Imports
   alias Engine.Analyzer.Requires
@@ -114,7 +114,7 @@ defmodule Engine.Analyzer do
         ) ::
           {:ok, module()} | :error
   def expand_alias([_ | _] = segments, %Analysis{} = analysis, %Position{} = position) do
-    with %Analysis{valid?: true} = analysis <- Engine.Ast.reanalyze_to(analysis, position),
+    with %Analysis{valid?: true} = analysis <- Forge.Ast.reanalyze_to(analysis, position),
          aliases <- aliases_at(analysis, position),
          {:ok, resolved} <- resolve_alias(segments, aliases) do
       {:ok, Module.concat(resolved)}

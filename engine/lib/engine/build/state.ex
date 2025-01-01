@@ -1,11 +1,10 @@
 defmodule Engine.Build.State do
   alias Elixir.Features
-  alias Engine.Document
-  alias Engine.Project
+  alias Forge.Document
+  alias Forge.Project
 
   alias Engine.Api.Messages
   alias Engine.Build
-  alias Engine.Plugin
   alias Engine.VM.Versions
 
   require Logger
@@ -118,7 +117,6 @@ defmodule Engine.Build.State do
 
       Engine.broadcast(compile_message)
       Engine.broadcast(diagnostics_message)
-      Plugin.diagnose(project, state.build_number)
     end)
 
     state
@@ -176,7 +174,6 @@ defmodule Engine.Build.State do
 
       Engine.broadcast(compile_message)
       Engine.broadcast(diagnostics)
-      Plugin.diagnose(project, state.build_number, document)
     end)
 
     state

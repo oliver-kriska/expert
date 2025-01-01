@@ -1,9 +1,9 @@
 defmodule Engine.CodeAction.Handlers.OrganizeAliases do
-  alias Engine.Ast.Analysis
-  alias Engine.Ast.Analysis.Scope
-  alias Engine.Document
-  alias Engine.Document.Changes
-  alias Engine.Document.Range
+  alias Forge.Ast.Analysis
+  alias Forge.Ast.Analysis.Scope
+  alias Forge.Document
+  alias Forge.Document.Changes
+  alias Forge.Document.Range
   alias Engine.CodeAction
   alias Engine.CodeMod
 

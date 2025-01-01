@@ -1,5 +1,5 @@
 defmodule Engine.Search.Store.Backends.Ets do
-  alias Engine.Project
+  alias Forge.Project
 
   alias Engine.Search.Indexer.Entry
   alias Engine.Search.Store.Backend

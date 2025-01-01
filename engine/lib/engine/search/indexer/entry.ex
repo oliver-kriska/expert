@@ -40,9 +40,9 @@ defmodule Engine.Search.Indexer.Entry do
           application: module(),
           subject: subject(),
           block_id: block_id(),
-          block_range: Engine.Document.Range.t() | nil,
+          block_range: Forge.Document.Range.t() | nil,
           path: Path.t(),
-          range: Engine.Document.Range.t(),
+          range: Forge.Document.Range.t(),
           subtype: entry_subtype(),
           type: entry_type(),
           metadata: nil | map()
@@ -52,7 +52,7 @@ defmodule Engine.Search.Indexer.Entry do
 
   alias Engine.Identifier
   alias Engine.Search.Indexer.Source.Block
-  alias Engine.StructAccess
+  alias Forge.StructAccess
 
   use StructAccess
 

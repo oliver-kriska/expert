@@ -30,8 +30,8 @@ defmodule Engine.Api.Proxy do
 
   """
 
-  alias Engine.Document
-  alias Engine.Document.Changes
+  alias Forge.Document
+  alias Forge.Document.Changes
 
   alias Engine.Api.Messages
   alias Engine.Api.Proxy.BufferingState

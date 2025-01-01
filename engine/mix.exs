@@ -22,6 +22,7 @@ defmodule Engine.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
+      {:forge, path: "../forge"},
       {:spitfire, "~> 0.1"},
       {:sourceror, "~> 1.0"},
       # {:gen_lsp, "~> 0.10"},

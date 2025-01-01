@@ -16,8 +16,6 @@ defmodule Engine.Application do
           Engine.ModuleMappings,
           Engine.Build,
           Engine.Build.CaptureServer,
-          Engine.Plugin.Runner.Supervisor,
-          Engine.Plugin.Runner.Coordinator,
           Engine.Search.Store.Backends.Ets,
           {Engine.Search.Store,
            [

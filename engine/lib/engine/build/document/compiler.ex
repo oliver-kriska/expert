@@ -2,7 +2,7 @@ defmodule Engine.Build.Document.Compiler do
   @moduledoc """
   A behaviour for document-level compilers
   """
-  alias Engine.Document
+  alias Forge.Document
   alias Engine.Plugin.V1.Diagnostic
 
   @type compile_response :: {:ok, [Diagnostic.Result.t()]} | {:error, [Diagnostic.Result.t()]}

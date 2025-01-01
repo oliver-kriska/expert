@@ -5,7 +5,7 @@ defmodule Engine do
   context of the remote VM.
   """
 
-  alias Engine.Project
+  alias Forge.Project
 
   alias Engine.Api.Proxy
   alias Engine.CodeAction
@@ -226,10 +226,4 @@ defmodule Engine do
     end)
     |> Enum.reject(&is_nil/1)
   end
-
-  @typedoc "A string representation of a uri"
-  @type uri :: String.t()
-
-  @typedoc "A string representation of a path on the filesystem"
-  @type path :: String.t()
 end

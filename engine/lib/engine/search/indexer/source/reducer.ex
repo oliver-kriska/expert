@@ -6,8 +6,8 @@ defmodule Engine.Search.Indexer.Source.Reducer do
   with the AST's overall structure, and can focus on extracting content from it.
   """
 
-  alias Engine.Ast.Analysis
-  alias Engine.Document.Position
+  alias Forge.Ast.Analysis
+  alias Forge.Document.Position
   alias Engine.Search.Indexer.Entry
   alias Engine.Search.Indexer.Extractors
   alias Engine.Search.Indexer.Metadata

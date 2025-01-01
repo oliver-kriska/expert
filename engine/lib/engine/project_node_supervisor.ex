@@ -1,5 +1,5 @@
 defmodule Engine.ProjectNodeSupervisor do
-  alias Engine.Project
+  alias Forge.Project
   alias Engine.ProjectNode
   use DynamicSupervisor
 

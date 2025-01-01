@@ -1,7 +1,7 @@
 defmodule Engine.Convertible.Helpers do
   @moduledoc false
 
-  alias Engine.Document
+  alias Forge.Document
 
   def apply(%{} = map, func) do
     result =
@@ -94,14 +94,14 @@ defprotocol Engine.Convertible do
   UTF-16 code unit) offsets. If not handled centrally, this leads to a profusion of conversion code throughout the language
   server codebase.
 
-  That's where this protocol comes in. Using this protocol allows us to define native `Engine.Document.Position` and
-  `Engine.Document.Range` structs and have them automatically convert into their Language Server counterparts, centralizing
+  That's where this protocol comes in. Using this protocol allows us to define native `Forge.Document.Position` and
+  `Forge.Document.Range` structs and have them automatically convert into their Language Server counterparts, centralizing
   the conversion logic in a single pace.
 
   Note: You do not need to do conversions manually, If you define a new type, it is sufficient to implement this
   protocol for your new type
   """
-  alias Engine.Document
+  alias Forge.Document
 
   @fallback_to_any true
 
@@ -170,7 +170,7 @@ end
 
 defimpl Engine.Convertible, for: Any do
   alias Engine.Convertible
-  alias Engine.Document
+  alias Forge.Document
   alias Engine.Convertible.Helpers
 
   def to_native(%_struct_module{} = struct, context_document) do

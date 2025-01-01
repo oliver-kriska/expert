@@ -1,10 +1,10 @@
 defmodule Engine.Api do
-  alias Engine.Ast.Analysis
-  alias Engine.Ast.Env
-  alias Engine.Document
-  alias Engine.Document.Position
-  alias Engine.Document.Range
-  alias Engine.Project
+  alias Forge.Ast.Analysis
+  alias Forge.Ast.Env
+  alias Forge.Document
+  alias Forge.Document.Position
+  alias Forge.Document.Range
+  alias Forge.Project
 
   alias Engine.CodeIntelligence
 

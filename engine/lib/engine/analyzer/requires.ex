@@ -1,8 +1,8 @@
 defmodule Engine.Analyzer.Requires do
-  alias Engine.Ast.Analysis
-  alias Engine.Ast.Analysis.Require
-  alias Engine.Ast.Analysis.Scope
-  alias Engine.Document.Position
+  alias Forge.Ast.Analysis
+  alias Forge.Ast.Analysis.Require
+  alias Forge.Ast.Analysis.Scope
+  alias Forge.Document.Position
 
   def at(%Analysis{} = analysis, %Position{} = position) do
     case Analysis.scopes_at(analysis, position) do

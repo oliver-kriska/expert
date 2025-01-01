@@ -3,7 +3,7 @@ defmodule Engine.Build.Document.Compilers.Config do
   A compiler for elixir configuration
   """
   alias Elixir.Features
-  alias Engine.Document
+  alias Forge.Document
   alias Engine.Plugin.V1.Diagnostic
   alias Engine.Build
   alias Engine.Build.Error.Location

@@ -1,6 +1,6 @@
 defmodule Engine.Build do
-  alias Engine.Document
-  alias Engine.Project
+  alias Forge.Document
+  alias Forge.Project
 
   alias Engine.Build.Document.Compilers.HEEx
   alias Engine.Build.State

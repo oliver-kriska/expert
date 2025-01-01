@@ -3,9 +3,9 @@ defmodule Engine.CodeIntelligence.Symbols.Workspace do
     defstruct [:uri, :range, :detail_range]
 
     @type t :: %__MODULE__{
-            uri: Engine.uri(),
-            range: Engine.Document.Range.t(),
-            detail_range: Engine.Document.Range.t()
+            uri: Forge.uri(),
+            range: Forge.Document.Range.t(),
+            detail_range: Forge.Document.Range.t()
           }
 
     def new(uri, range, detail_range \\ nil) do
@@ -13,7 +13,7 @@ defmodule Engine.CodeIntelligence.Symbols.Workspace do
     end
   end
 
-  alias Engine.Document
+  alias Forge.Document
   alias Engine.Formats
   alias Engine.Search.Indexer.Entry
 

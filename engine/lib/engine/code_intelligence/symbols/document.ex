@@ -1,5 +1,5 @@
 defmodule Engine.CodeIntelligence.Symbols.Document do
-  alias Engine.Document
+  alias Forge.Document
   alias Engine.Formats
   alias Engine.Search.Indexer.Entry
 

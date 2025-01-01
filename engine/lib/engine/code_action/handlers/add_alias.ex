@@ -1,11 +1,11 @@
 defmodule Engine.CodeAction.Handlers.AddAlias do
-  alias Engine.Ast
-  alias Engine.Ast.Analysis
-  alias Engine.Ast.Analysis.Alias
-  alias Engine.Document
-  alias Engine.Document.Changes
-  alias Engine.Document.Position
-  alias Engine.Document.Range
+  alias Forge.Ast
+  alias Forge.Ast.Analysis
+  alias Forge.Ast.Analysis.Alias
+  alias Forge.Document
+  alias Forge.Document.Changes
+  alias Forge.Document.Position
+  alias Forge.Document.Range
   alias Engine.Formats
 
   alias Engine.Analyzer
@@ -15,7 +15,6 @@ defmodule Engine.CodeAction.Handlers.AddAlias do
   alias Engine.Modules
   alias Engine.Search.Fuzzy
   alias Engine.Search.Indexer.Entry
-  alias Mix.Tasks.Namespace
   alias Sourceror.Zipper
 
   @behaviour CodeAction.Handler

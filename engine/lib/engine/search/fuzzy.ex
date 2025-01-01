@@ -11,7 +11,7 @@ defmodule Engine.Search.Fuzzy do
   returned.
   """
 
-  alias Engine.Project
+  alias Forge.Project
 
   alias Engine.Search.Fuzzy.Scorer
   alias Engine.Search.Indexer.Entry

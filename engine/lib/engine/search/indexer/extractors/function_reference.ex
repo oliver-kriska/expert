@@ -1,7 +1,7 @@
 defmodule Engine.Search.Indexer.Extractors.FunctionReference do
-  alias Engine.Ast
-  alias Engine.Document.Position
-  alias Engine.Document.Range
+  alias Forge.Ast
+  alias Forge.Document.Position
+  alias Forge.Document.Range
 
   alias Engine.Search.Indexer.Entry
   alias Engine.Search.Indexer.Extractors.FunctionDefinition

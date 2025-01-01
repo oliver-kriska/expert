@@ -3,9 +3,9 @@ defmodule Engine.Search.Indexer.Extractors.Module do
   Extracts module references and definitions from AST
   """
 
-  alias Engine.Ast
-  alias Engine.Document.Position
-  alias Engine.Document.Range
+  alias Forge.Ast
+  alias Forge.Document.Position
+  alias Forge.Document.Range
   alias Engine.ProcessCache
 
   alias Engine.Search.Indexer.Entry

@@ -1,12 +1,12 @@
 defmodule Engine.CodeMod.Aliases do
-  alias Engine.Ast
-  alias Engine.Ast.Analysis
-  alias Engine.Ast.Analysis.Alias
-  alias Engine.Ast.Analysis.Scope
-  alias Engine.Document
-  alias Engine.Document.Edit
-  alias Engine.Document.Position
-  alias Engine.Document.Range
+  alias Forge.Ast
+  alias Forge.Ast.Analysis
+  alias Forge.Ast.Analysis.Alias
+  alias Forge.Ast.Analysis.Scope
+  alias Forge.Document
+  alias Forge.Document.Edit
+  alias Forge.Document.Position
+  alias Forge.Document.Range
 
   alias Sourceror.Zipper
 

@@ -1,7 +1,7 @@
 defmodule Engine.CodeIntelligence.Variable do
-  alias Engine.Ast.Analysis
-  alias Engine.Document.Position
-  alias Engine.Document.Range
+  alias Forge.Ast.Analysis
+  alias Forge.Document.Position
+  alias Forge.Document.Range
   alias Engine.Search.Indexer
   alias Engine.Search.Indexer.Entry
 

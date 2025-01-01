@@ -1,7 +1,7 @@
 defmodule Engine.Build.Error do
-  alias Engine.Ast
-  alias Engine.Document
-  alias Engine.Plugin.V1.Diagnostic.Result
+  alias Forge.Ast
+  alias Forge.Document
+  alias Forge.Plugin.V1.Diagnostic.Result
   alias Engine.Build.Error.Location
   alias Mix.Task.Compiler
 

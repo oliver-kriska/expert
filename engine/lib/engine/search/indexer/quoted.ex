@@ -1,5 +1,5 @@
 defmodule Engine.Search.Indexer.Quoted do
-  alias Engine.Ast.Analysis
+  alias Forge.Ast.Analysis
   alias Engine.ProcessCache
   alias Engine.Search.Indexer.Source.Reducer
 

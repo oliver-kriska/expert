@@ -1,5 +1,5 @@
 defmodule Engine.Mix do
-  alias Engine.Project
+  alias Forge.Project
 
   def in_project(fun) do
     if Engine.project_node?() do

@@ -1,8 +1,8 @@
 defmodule Engine.Build.Error.Location do
-  alias Engine.Document
-  alias Engine.Document.Position
-  alias Engine.Document.Range
-  alias Engine.Plugin.V1.Diagnostic.Result
+  alias Forge.Document
+  alias Forge.Document.Position
+  alias Forge.Document.Range
+  alias Forge.Plugin.V1.Diagnostic.Result
 
   require Logger
 

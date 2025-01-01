@@ -1,9 +1,9 @@
 defmodule Engine.Analyzer.Imports do
-  alias Engine.Ast.Analysis
-  alias Engine.Ast.Analysis.Import
-  alias Engine.Ast.Analysis.Scope
-  alias Engine.Document.Position
-  alias Engine.Document.Range
+  alias Forge.Ast.Analysis
+  alias Forge.Ast.Analysis.Import
+  alias Forge.Ast.Analysis.Scope
+  alias Forge.Document.Position
+  alias Forge.Document.Range
   alias Engine.ProcessCache
   alias Engine.Analyzer.Aliases
   alias Engine.Module.Loader

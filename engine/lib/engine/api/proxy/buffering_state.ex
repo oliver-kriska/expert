@@ -1,5 +1,5 @@
 defmodule Engine.Api.Proxy.BufferingState do
-  alias Engine.Document
+  alias Forge.Document
 
   alias Engine.Api
   alias Engine.Build
