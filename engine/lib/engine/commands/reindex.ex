@@ -89,7 +89,7 @@ defmodule Engine.Commands.Reindex do
   end
 
   def perform do
-    perform(RemoteControl.get_project())
+    perform(Engine.get_project())
   end
 
   def perform(%Project{} = project) do
@@ -144,7 +144,7 @@ defmodule Engine.Commands.Reindex do
   end
 
   defp do_reindex(%Project{} = project) do
-    RemoteControl.broadcast(project_reindex_requested(project: project))
+    Engine.broadcast(project_reindex_requested(project: project))
 
     {elapsed_us, result} =
       :timer.tc(fn ->
@@ -153,7 +153,7 @@ defmodule Engine.Commands.Reindex do
         end
       end)
 
-    RemoteControl.broadcast(
+    Engine.broadcast(
       project_reindexed(project: project, elapsed_ms: round(elapsed_us / 1000), status: :success)
     )
 

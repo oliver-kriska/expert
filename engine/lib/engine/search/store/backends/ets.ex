@@ -94,7 +94,7 @@ defmodule Engine.Search.Store.Backends.Ets do
   end
 
   def start_link do
-    start_link(RemoteControl.get_project())
+    start_link(Engine.get_project())
   end
 
   def child_spec([%Project{}] = init_args) do
@@ -102,7 +102,7 @@ defmodule Engine.Search.Store.Backends.Ets do
   end
 
   def child_spec(_) do
-    child_spec([RemoteControl.get_project()])
+    child_spec([Engine.get_project()])
   end
 
   @impl GenServer
@@ -179,7 +179,7 @@ defmodule Engine.Search.Store.Backends.Ets do
   end
 
   defp genserver_name do
-    genserver_name(RemoteControl.get_project())
+    genserver_name(Engine.get_project())
   end
 
   defp genserver_name(%Project{} = project) do

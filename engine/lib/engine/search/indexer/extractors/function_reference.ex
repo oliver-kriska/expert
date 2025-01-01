@@ -64,7 +64,7 @@ defmodule Engine.Search.Indexer.Extractors.FunctionReference do
     position = Reducer.position(reducer)
 
     {module, _, _} =
-      RemoteControl.Analyzer.resolve_local_call(reducer.analysis, position, fn_name, arity)
+      Engine.Analyzer.resolve_local_call(reducer.analysis, position, fn_name, arity)
 
     entry = entry(reducer, end_metadata, arity_meta, module, fn_name, arity)
     {:ok, entry, nil}
@@ -133,7 +133,7 @@ defmodule Engine.Search.Indexer.Extractors.FunctionReference do
       position = Reducer.position(reducer)
 
       {module, _, _} =
-        RemoteControl.Analyzer.resolve_local_call(reducer.analysis, position, fn_name, arity)
+        Engine.Analyzer.resolve_local_call(reducer.analysis, position, fn_name, arity)
 
       entry = entry(reducer, meta, meta, [module], fn_name, args)
 
@@ -159,7 +159,7 @@ defmodule Engine.Search.Indexer.Extractors.FunctionReference do
     range =
       get_reference_range(reducer.analysis.document, start_metadata, end_metadata, function_name)
 
-    case RemoteControl.Analyzer.expand_alias(module, reducer.analysis, range.start) do
+    case Engine.Analyzer.expand_alias(module, reducer.analysis, range.start) do
       {:ok, module} ->
         mfa = Subject.mfa(module, function_name, arity)
 

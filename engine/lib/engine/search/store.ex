@@ -130,7 +130,7 @@ defmodule Engine.Search.Store do
     # we have this bandaid. We wait for the first compilation to complete, and then
     # the search store enables itself, at which point we index the code.
 
-    RemoteControl.register_listener(self(), project_compiled())
+    Engine.register_listener(self(), project_compiled())
     state = State.new(project, create_index, update_index, backend)
     {:ok, state}
   end

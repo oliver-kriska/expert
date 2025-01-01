@@ -63,7 +63,7 @@ defmodule Engine.ModuleMappings do
 
   @impl GenServer
   def init(_) do
-    RemoteControl.register_listener(self(), [module_updated()])
+    Engine.register_listener(self(), [module_updated()])
     {:ok, State.new()}
   end
 

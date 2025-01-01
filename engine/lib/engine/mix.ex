@@ -3,8 +3,8 @@ defmodule Engine.Mix do
   alias Engine
 
   def in_project(fun) do
-    if RemoteControl.project_node?() do
-      in_project(RemoteControl.get_project(), fun)
+    if Engine.project_node?() do
+      in_project(Engine.get_project(), fun)
     else
       {:error, :not_project_node}
     end
@@ -20,7 +20,7 @@ defmodule Engine.Mix do
       try do
         Mix.ProjectStack.post_config(prune_code_paths: false)
 
-        build_path = RemoteControl.Build.path(project)
+        build_path = Engine.Build.path(project)
         project_root = Project.root_path(project)
 
         project
@@ -49,6 +49,6 @@ defmodule Engine.Mix do
   end
 
   defp with_lock(fun) do
-    RemoteControl.with_lock(__MODULE__, fun)
+    Engine.with_lock(__MODULE__, fun)
   end
 end

@@ -20,7 +20,7 @@ defmodule Engine.Plugin do
             diagnostics: diagnostics
           )
 
-        RemoteControl.broadcast(message)
+        Engine.broadcast(message)
     end
 
     Runner.diagnose(project, on_complete)
@@ -40,7 +40,7 @@ defmodule Engine.Plugin do
             diagnostics: diagnostics
           )
 
-        RemoteControl.broadcast(message)
+        Engine.broadcast(message)
     end
 
     Runner.diagnose(document, on_complete)

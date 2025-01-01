@@ -60,7 +60,7 @@ defmodule Engine.CodeAction.Handlers.ReplaceRemoteFunction do
     |> Ast.traverse_line(line_number, [], fn
       %Zipper{node: {{:., _, [{:__aliases__, _, module_alias}, ^function_atom]}, _, _}} = zipper,
       patches ->
-        case RemoteControl.Analyzer.expand_alias(module_alias, analysis, position) do
+        case Engine.Analyzer.expand_alias(module_alias, analysis, position) do
           {:ok, ^module} ->
             patch = Sourceror.Patch.rename_call(zipper.node, suggestion)
             {zipper, [patch | patches]}

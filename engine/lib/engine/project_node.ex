@@ -40,7 +40,7 @@ defmodule Engine.ProjectNode do
         | path_append_arguments(paths)
       ]
 
-      port = RemoteControl.Port.open_elixir(state.project, args: args)
+      port = Engine.Port.open_elixir(state.project, args: args)
 
       %{state | port: port, started_by: from}
     end
@@ -114,7 +114,7 @@ defmodule Engine.ProjectNode do
 
     with {:ok, node_pid} <- ProjectNodeSupervisor.start_project_node(project),
          :ok <- start_node(project, paths),
-         :ok <- :rpc.call(node_name, RemoteControl.Bootstrap, :init, bootstrap_args) do
+         :ok <- :rpc.call(node_name, Engine.Bootstrap, :init, bootstrap_args) do
       {:ok, node_pid}
     end
   end

@@ -3,12 +3,12 @@ defmodule Engine.Compilation.Tracer do
   alias Engine.Build
   alias Engine.Module.Loader
 
-  import RemoteControl.Api.Messages
+  import Engine.Api.Messages
 
   def trace({:on_module, module_binary, _filename}, %Macro.Env{} = env) do
     message = extract_module_updated(env.module, module_binary, env.file)
     maybe_report_progress(env.file)
-    RemoteControl.broadcast(message)
+    Engine.broadcast(message)
     :ok
   end
 
@@ -60,7 +60,7 @@ defmodule Engine.Compilation.Tracer do
     if Path.extname(file) == ".ex" do
       file
       |> progress_message()
-      |> RemoteControl.broadcast()
+      |> Engine.broadcast()
     end
   end
 
@@ -75,7 +75,7 @@ defmodule Engine.Compilation.Tracer do
 
     message = "compiling: " <> Path.join([base_dir, "...", file_name])
 
-    label = Build.State.building_label(RemoteControl.get_project())
+    label = Build.State.building_label(Engine.get_project())
     project_progress(label: label, message: message)
   end
 end

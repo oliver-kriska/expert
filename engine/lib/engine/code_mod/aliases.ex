@@ -234,7 +234,7 @@ defmodule Engine.CodeMod.Aliases do
   end
 
   defp maybe_move_cursor_to_token_start(%Position{} = position, %Analysis{} = analysis) do
-    project = RemoteControl.get_project()
+    project = Engine.get_project()
 
     with {:ok, env} <- Ast.Env.new(project, analysis, position),
          false <- String.last(env.prefix) in [" ", ""] do

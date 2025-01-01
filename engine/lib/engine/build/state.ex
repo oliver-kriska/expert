@@ -12,7 +12,7 @@ defmodule Engine.Build.State do
 
   import Messages
 
-  use RemoteControl.Progress
+  use Engine.Progress
 
   defstruct project: nil,
             build_number: 0,
@@ -61,7 +61,7 @@ defmodule Engine.Build.State do
     # If the project directory isn't there, for some reason the main build fails, so we create it here
     # to ensure that the build will succeed.
     project = state.project
-    build_path = RemoteControl.Build.path(project)
+    build_path = Engine.Build.path(project)
 
     unless Versions.compatible?(build_path) do
       Logger.info("Build path #{build_path} was compiled on a previous erlang version. Deleting")
@@ -87,7 +87,7 @@ defmodule Engine.Build.State do
       compile_requested_message =
         project_compile_requested(project: project, build_number: state.build_number)
 
-      RemoteControl.broadcast(compile_requested_message)
+      Engine.broadcast(compile_requested_message)
       {elapsed_us, result} = :timer.tc(fn -> Build.Project.compile(project, initial?) end)
       elapsed_ms = to_ms(elapsed_us)
 
@@ -116,8 +116,8 @@ defmodule Engine.Build.State do
           diagnostics: diagnostics
         )
 
-      RemoteControl.broadcast(compile_message)
-      RemoteControl.broadcast(diagnostics_message)
+      Engine.broadcast(compile_message)
+      Engine.broadcast(diagnostics_message)
       Plugin.diagnose(project, state.build_number)
     end)
 
@@ -129,10 +129,10 @@ defmodule Engine.Build.State do
     project = state.project
 
     Build.with_lock(fn ->
-      RemoteControl.broadcast(file_compile_requested(uri: document.uri))
+      Engine.broadcast(file_compile_requested(uri: document.uri))
 
       safe_compile_func = fn ->
-        RemoteControl.Mix.in_project(fn _ -> Build.Document.compile(document) end)
+        Engine.Mix.in_project(fn _ -> Build.Document.compile(document) end)
       end
 
       {elapsed_us, result} = :timer.tc(fn -> safe_compile_func.() end)
@@ -174,8 +174,8 @@ defmodule Engine.Build.State do
           diagnostics: List.wrap(diagnostics)
         )
 
-      RemoteControl.broadcast(compile_message)
-      RemoteControl.broadcast(diagnostics)
+      Engine.broadcast(compile_message)
+      Engine.broadcast(diagnostics)
       Plugin.diagnose(project, state.build_number, document)
     end)
 
@@ -185,7 +185,7 @@ defmodule Engine.Build.State do
   def set_compiler_options do
     Code.compiler_options(
       parser_options: parser_options(),
-      tracers: [RemoteControl.Compilation.Tracer]
+      tracers: [Engine.Compilation.Tracer]
     )
 
     :ok

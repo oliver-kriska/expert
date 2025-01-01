@@ -128,7 +128,7 @@ defmodule Engine.Search.Indexer.Extractors.Module do
     line = Sourceror.get_line(ast)
     pos = Position.new(reducer.analysis.document, line - 1, 1)
 
-    case RemoteControl.Analyzer.current_module(reducer.analysis, pos) do
+    case Engine.Analyzer.current_module(reducer.analysis, pos) do
       {:ok, current_module} ->
         {start_line, start_col} = Metadata.position(metadata)
         start_pos = Position.new(reducer.analysis.document, start_line, start_col)
@@ -250,7 +250,7 @@ defmodule Engine.Search.Indexer.Extractors.Module do
   defp resolve_alias(%Reducer{} = reducer, unresolved_alias) do
     position = Reducer.position(reducer)
 
-    RemoteControl.Analyzer.expand_alias(unresolved_alias, reducer.analysis, position)
+    Engine.Analyzer.expand_alias(unresolved_alias, reducer.analysis, position)
   end
 
   defp module(%Reducer{} = reducer, maybe_module) when is_list(maybe_module) do

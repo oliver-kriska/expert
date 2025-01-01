@@ -29,16 +29,16 @@ defmodule Engine do
 
   defdelegate broadcast(message), to: Proxy
 
-  defdelegate expand_alias(segments_or_module, analysis, position), to: RemoteControl.Analyzer
+  defdelegate expand_alias(segments_or_module, analysis, position), to: Engine.Analyzer
 
   defdelegate list_modules, to: :code, as: :all_available
 
   defdelegate code_actions(document, range, diagnostics, kinds), to: CodeAction, as: :for_range
 
-  defdelegate complete(env), to: RemoteControl.Completion, as: :elixir_sense_expand
+  defdelegate complete(env), to: Engine.Completion, as: :elixir_sense_expand
 
   defdelegate complete_struct_fields(analysis, position),
-    to: RemoteControl.Completion,
+    to: Engine.Completion,
     as: :struct_fields
 
   defdelegate definition(document, position), to: CodeIntelligence.Definition
@@ -46,13 +46,13 @@ defmodule Engine do
   defdelegate references(analysis, position, include_definitions?),
     to: CodeIntelligence.References
 
-  defdelegate modules_with_prefix(prefix), to: RemoteControl.Modules, as: :with_prefix
+  defdelegate modules_with_prefix(prefix), to: Engine.Modules, as: :with_prefix
 
-  defdelegate modules_with_prefix(prefix, predicate), to: RemoteControl.Modules, as: :with_prefix
+  defdelegate modules_with_prefix(prefix, predicate), to: Engine.Modules, as: :with_prefix
 
   defdelegate docs(module, opts \\ []), to: CodeIntelligence.Docs, as: :for_module
 
-  defdelegate register_listener(listener_pid, message_types), to: RemoteControl.Dispatch
+  defdelegate register_listener(listener_pid, message_types), to: Engine.Dispatch
 
   defdelegate resolve_entity(analysis, position), to: CodeIntelligence.Entity, as: :resolve
 

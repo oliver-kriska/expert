@@ -18,11 +18,11 @@ defmodule Engine.Port do
   Launches elixir in a port.
 
   This function takes the project's context into account and looks for the executable via calling
-  `RemoteControl.elixir_executable(project)`. Environment variables are also retrieved with that call.
+  `Engine.elixir_executable(project)`. Environment variables are also retrieved with that call.
   """
   @spec open_elixir(Project.t(), open_opts()) :: port()
   def open_elixir(%Project{} = project, opts) do
-    {:ok, elixir_executable, environment_variables} = RemoteControl.elixir_executable(project)
+    {:ok, elixir_executable, environment_variables} = Engine.elixir_executable(project)
 
     opts =
       opts

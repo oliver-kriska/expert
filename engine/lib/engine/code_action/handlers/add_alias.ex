@@ -167,7 +167,7 @@ defmodule Engine.CodeAction.Handlers.AddAlias do
           {:elixir, split} = Ast.Module.safe_split(module)
           alias_as = List.last(split)
           subject_module = module
-          RemoteControl.Module.Loader.ensure_loaded(subject_module)
+          Engine.Module.Loader.ensure_loaded(subject_module)
 
           protocol_or_implementation? = function_exported?(module, :__impl__, 1)
 

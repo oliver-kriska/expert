@@ -46,7 +46,7 @@ defmodule Engine.Build do
   end
 
   def with_lock(func) do
-    RemoteControl.with_lock(__MODULE__, func)
+    Engine.with_lock(__MODULE__, func)
   end
 
   # GenServer Callbacks
@@ -57,7 +57,7 @@ defmodule Engine.Build do
 
   @impl GenServer
   def init([]) do
-    state = State.new(RemoteControl.get_project())
+    state = State.new(Engine.get_project())
 
     with :ok <- State.set_compiler_options() do
       {:ok, state, {:continue, :ensure_build_directory}}

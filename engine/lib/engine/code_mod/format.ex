@@ -97,7 +97,7 @@ defmodule Engine.CodeMod.Format do
 
   @spec edits(Document.t()) :: {:ok, Changes.t()} | {:error, any}
   def edits(%Document{} = document) do
-    project = RemoteControl.get_project()
+    project = Engine.get_project()
 
     with :ok <- Build.compile_document(project, document),
          {:ok, formatted} <- do_format(project, document) do
@@ -163,8 +163,8 @@ defmodule Engine.CodeMod.Format do
     fetch_formatter = fn _ -> Mix.Tasks.Format.formatter_for_file(file_path) end
 
     {formatter_function, opts} =
-      if RemoteControl.project_node?() do
-        case RemoteControl.Mix.in_project(project, fetch_formatter) do
+      if Engine.project_node?() do
+        case Engine.Mix.in_project(project, fetch_formatter) do
           {:ok, result} ->
             result
 

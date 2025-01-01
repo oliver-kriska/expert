@@ -340,7 +340,7 @@ defmodule Engine.Search.Fuzzy do
         deps_roots()
       else
         {:ok, deps_roots} =
-          RemoteControl.Mix.in_project(fn _ ->
+          Engine.Mix.in_project(fn _ ->
             deps_roots()
           end)
 
@@ -359,7 +359,7 @@ defmodule Engine.Search.Fuzzy do
   end
 
   defp deps_roots do
-    deps_roots(RemoteControl.get_project())
+    deps_roots(Engine.get_project())
   end
 
   defp deps_roots(%Project{mix_project?: true} = project) do

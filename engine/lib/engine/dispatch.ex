@@ -77,8 +77,8 @@ defmodule Engine.Dispatch do
   end
 
   defp progress_pid do
-    project = RemoteControl.get_project()
-    manager_node_name = RemoteControl.manager_node_name(project)
+    project = Engine.get_project()
+    manager_node_name = Engine.manager_node_name(project)
     :rpc.call(manager_node_name, Lexical.Server.Project.Progress, :whereis, [project])
   end
 end

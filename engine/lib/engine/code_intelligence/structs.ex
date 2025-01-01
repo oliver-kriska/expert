@@ -8,7 +8,7 @@ defmodule Engine.CodeIntelligence.Structs do
     if Mix.Project.get() do
       {:ok, structs_from_index()}
     else
-      RemoteControl.Mix.in_project(fn _ -> structs_from_index() end)
+      Engine.Mix.in_project(fn _ -> structs_from_index() end)
     end
   end
 

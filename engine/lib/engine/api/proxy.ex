@@ -63,25 +63,25 @@ defmodule Engine.Api.Proxy do
   # proxied functions
 
   def broadcast(percent_progress() = message) do
-    RemoteControl.Dispatch.broadcast(message)
+    Engine.Dispatch.broadcast(message)
   end
 
   def broadcast(message) do
-    mfa = to_mfa(RemoteControl.Dispatch.broadcast(message))
+    mfa = to_mfa(Engine.Dispatch.broadcast(message))
     :gen_statem.call(__MODULE__, buffer(contents: mfa))
   end
 
   def schedule_compile(force? \\ false) do
-    project = RemoteControl.get_project()
+    project = Engine.get_project()
 
-    mfa = to_mfa(RemoteControl.Build.schedule_compile(project, force?))
+    mfa = to_mfa(Engine.Build.schedule_compile(project, force?))
     :gen_statem.call(__MODULE__, buffer(contents: mfa))
   end
 
   def compile_document(document) do
-    project = RemoteControl.get_project()
+    project = Engine.get_project()
 
-    mfa = to_mfa(RemoteControl.Build.compile_document(project, document))
+    mfa = to_mfa(Engine.Build.compile_document(project, document))
 
     :gen_statem.call(__MODULE__, buffer(contents: mfa))
   end

@@ -62,7 +62,7 @@ defmodule Engine.Completion do
       |> container_struct_module()
 
     with {:ok, struct_module} <-
-           RemoteControl.Analyzer.expand_alias(container_struct_module, analysis, position),
+           Engine.Analyzer.expand_alias(container_struct_module, analysis, position),
          true <- function_exported?(struct_module, :__struct__, 0) do
       struct_module
       |> struct()

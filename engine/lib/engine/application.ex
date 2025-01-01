@@ -9,22 +9,22 @@ defmodule Engine.Application do
   @impl true
   def start(_type, _args) do
     children =
-      if RemoteControl.project_node?() do
+      if Engine.project_node?() do
         [
-          RemoteControl.Api.Proxy,
-          RemoteControl.Commands.Reindex,
-          RemoteControl.Module.Loader,
-          {RemoteControl.Dispatch, progress: true},
-          RemoteControl.ModuleMappings,
-          RemoteControl.Build,
-          RemoteControl.Build.CaptureServer,
-          RemoteControl.Plugin.Runner.Supervisor,
-          RemoteControl.Plugin.Runner.Coordinator,
-          RemoteControl.Search.Store.Backends.Ets,
-          {RemoteControl.Search.Store,
+          Engine.Api.Proxy,
+          Engine.Commands.Reindex,
+          Engine.Module.Loader,
+          {Engine.Dispatch, progress: true},
+          Engine.ModuleMappings,
+          Engine.Build,
+          Engine.Build.CaptureServer,
+          Engine.Plugin.Runner.Supervisor,
+          Engine.Plugin.Runner.Coordinator,
+          Engine.Search.Store.Backends.Ets,
+          {Engine.Search.Store,
            [
-             &RemoteControl.Search.Indexer.create_index/1,
-             &RemoteControl.Search.Indexer.update_index/2
+             &Engine.Search.Indexer.create_index/1,
+             &Engine.Search.Indexer.update_index/2
            ]}
         ]
       else

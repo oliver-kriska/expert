@@ -196,14 +196,14 @@ defmodule Engine.Search.Indexer do
   end
 
   defp deps_dir do
-    case RemoteControl.Mix.in_project(&Mix.Project.deps_path/0) do
+    case Engine.Mix.in_project(&Mix.Project.deps_path/0) do
       {:ok, path} -> path
       _ -> Mix.Project.deps_path()
     end
   end
 
   defp build_dir do
-    case RemoteControl.Mix.in_project(&Mix.Project.build_path/0) do
+    case Engine.Mix.in_project(&Mix.Project.build_path/0) do
       {:ok, path} -> path
       _ -> Mix.Project.build_path()
     end

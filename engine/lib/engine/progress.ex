@@ -41,26 +41,26 @@ defmodule Engine.Progress do
 
   @spec begin_progress(label :: label()) :: on_complete_callback()
   def begin_progress(label) do
-    RemoteControl.broadcast(project_progress(label: label, stage: :begin))
+    Engine.broadcast(project_progress(label: label, stage: :begin))
 
     fn ->
-      RemoteControl.broadcast(project_progress(label: label, stage: :complete))
+      Engine.broadcast(project_progress(label: label, stage: :complete))
     end
   end
 
   @spec begin_percent(label(), pos_integer()) ::
           {report_progress_callback(), on_complete_callback()}
   def begin_percent(label, max) do
-    RemoteControl.broadcast(percent_progress(label: label, max: max, stage: :begin))
+    Engine.broadcast(percent_progress(label: label, max: max, stage: :begin))
 
     report_progress = fn delta, message ->
-      RemoteControl.broadcast(
+      Engine.broadcast(
         percent_progress(label: label, message: message, delta: delta, stage: :report)
       )
     end
 
     complete = fn ->
-      RemoteControl.broadcast(percent_progress(label: label, stage: :complete))
+      Engine.broadcast(percent_progress(label: label, stage: :complete))
     end
 
     {report_progress, complete}

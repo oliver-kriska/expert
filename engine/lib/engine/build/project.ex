@@ -6,11 +6,11 @@ defmodule Engine.Build.Project do
   alias Engine.Plugin
   alias Mix.Task.Compiler.Diagnostic
 
-  use RemoteControl.Progress
+  use Engine.Progress
   require Logger
 
   def compile(%Project{} = project, initial?) do
-    RemoteControl.Mix.in_project(fn _ ->
+    Engine.Mix.in_project(fn _ ->
       Mix.Task.clear()
 
       prepare_for_project_build(initial?)

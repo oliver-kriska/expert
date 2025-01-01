@@ -23,7 +23,7 @@ defmodule Engine.Api.Proxy.BufferingState do
       state.buffer
       |> Enum.reverse()
       |> Enum.split_with(fn value ->
-        match?(mfa(module: RemoteControl.Dispatch, function: :broadcast), value)
+        match?(mfa(module: Engine.Dispatch, function: :broadcast), value)
       end)
 
     {project_compile, document_compiles, reindex} = collapse_commands(commands)

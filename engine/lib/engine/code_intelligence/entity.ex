@@ -85,7 +85,7 @@ defmodule Engine.CodeIntelligence.Entity do
       when def in [:def, :defp, :defmacro, :defmacrop] ->
         # This case handles resolving calls that come from zero-arg definitions in
         # a module, like hovering in `def my_fun| do`
-        {:ok, module} = RemoteControl.Analyzer.current_module(analysis, position)
+        {:ok, module} = Engine.Analyzer.current_module(analysis, position)
         {:ok, {:call, module, maybe_fun, 0}, node_range}
 
       {:ok, [{^maybe_fun, _, args} | _]} ->
@@ -152,7 +152,7 @@ defmodule Engine.CodeIntelligence.Entity do
     with {:ok, path} <- Ast.path_at(analysis, position),
          arity = arity_at_position(path, position),
          {module, ^fun, ^arity} <-
-           RemoteControl.Analyzer.resolve_local_call(analysis, position, fun, arity) do
+           Engine.Analyzer.resolve_local_call(analysis, position, fun, arity) do
       {:ok, {:call, module, fun, arity}, node_range}
     else
       _ ->
@@ -222,9 +222,9 @@ defmodule Engine.CodeIntelligence.Entity do
   end
 
   defp maybe_prepend_ecto_schema(module_string, %Analysis{} = analysis, %Position{} = position) do
-    with true <- Ecto.Schema in RemoteControl.Analyzer.uses_at(analysis, position),
+    with true <- Ecto.Schema in Engine.Analyzer.uses_at(analysis, position),
          true <- in_inline_embed?(analysis, position),
-         {:ok, parent_module} <- RemoteControl.Analyzer.current_module(analysis, position) do
+         {:ok, parent_module} <- Engine.Analyzer.current_module(analysis, position) do
       parent_module
       |> Module.concat(module_string)
       |> Formats.module()
@@ -254,7 +254,7 @@ defmodule Engine.CodeIntelligence.Entity do
   defp maybe_prepend_phoenix_scope_module(module_string, analysis, position) do
     with {:ok, scope_segments} <- fetch_phoenix_scope_alias_segments(analysis, position),
          {:ok, scope_module} <-
-           RemoteControl.Analyzer.expand_alias(scope_segments, analysis, position),
+           Engine.Analyzer.expand_alias(scope_segments, analysis, position),
          cursor_module = Module.concat(scope_module, module_string),
          true <-
            phoenix_controller_module?(cursor_module) or phoenix_liveview_module?(cursor_module) do
@@ -376,7 +376,7 @@ defmodule Engine.CodeIntelligence.Entity do
   defp expand_alias(module, analysis, %Position{} = position) when is_binary(module) do
     [module]
     |> Module.concat()
-    |> RemoteControl.Analyzer.expand_alias(analysis, position)
+    |> Engine.Analyzer.expand_alias(analysis, position)
   end
 
   defp expand_alias(_, _analysis, _position), do: :error
@@ -482,7 +482,7 @@ defmodule Engine.CodeIntelligence.Entity do
 
   defp fetch_module_for_imported_function(analysis, position, function_name, arity) do
     analysis
-    |> RemoteControl.Analyzer.imports_at(position)
+    |> Engine.Analyzer.imports_at(position)
     |> Enum.find_value({:error, :not_found}, fn
       {imported_module, ^function_name, ^arity} ->
         {:ok, imported_module}
@@ -493,7 +493,7 @@ defmodule Engine.CodeIntelligence.Entity do
   end
 
   defp fetch_module_for_local_function(analysis, position, function_name, arity) do
-    with {:ok, current_module} <- RemoteControl.Analyzer.current_module(analysis, position),
+    with {:ok, current_module} <- Engine.Analyzer.current_module(analysis, position),
          true <- function_exported?(current_module, function_name, arity) do
       {:ok, current_module}
     else
@@ -507,7 +507,7 @@ defmodule Engine.CodeIntelligence.Entity do
   end
 
   defp current_module(%Analysis{} = analysis, %Position{} = position) do
-    case RemoteControl.Analyzer.current_module(analysis, position) do
+    case Engine.Analyzer.current_module(analysis, position) do
       {:ok, module} -> module
       _ -> nil
     end
