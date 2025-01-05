@@ -1,5 +1,5 @@
 defmodule Expert.Project.Progress.Support do
-  alias Lexical.Project
+  alias Forge.Project
   alias Expert.Project.Progress
 
   import Forge.Api.Messages

@@ -1,7 +1,7 @@
 defmodule Expert.Project.Intelligence do
   defmodule State do
     alias Lexical.Formats
-    alias Lexical.Project
+    alias Forge.Project
 
     defstruct project: nil, struct_modules: MapSet.new()
 
@@ -58,7 +58,7 @@ defmodule Expert.Project.Intelligence do
     end
   end
 
-  alias Lexical.Project
+  alias Forge.Project
   alias Expert.Api
 
   use GenServer

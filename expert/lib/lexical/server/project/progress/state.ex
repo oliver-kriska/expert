@@ -1,5 +1,5 @@
 defmodule Expert.Project.Progress.State do
-  alias Lexical.Project
+  alias Forge.Project
   alias Lexical.Protocol.Id
   alias Lexical.Protocol.Requests
   alias Expert.Configuration

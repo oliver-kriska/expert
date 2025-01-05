@@ -2,7 +2,7 @@ defmodule Expert.Provider.Handlers.CodeLens do
   alias Forge.Document
   alias Forge.Document.Position
   alias Forge.Document.Range
-  alias Lexical.Project
+  alias Forge.Project
   alias Lexical.Protocol.Requests
   alias Lexical.Protocol.Responses
   alias Lexical.Protocol.Types.CodeLens

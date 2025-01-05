@@ -3,7 +3,7 @@ defmodule Expert.Configuration do
   Encapsulates server configuration options and client capability support.
   """
 
-  alias Lexical.Project
+  alias Forge.Project
   alias Lexical.Protocol.Id
   alias Lexical.Protocol.Notifications.DidChangeConfiguration
   alias Lexical.Protocol.Requests

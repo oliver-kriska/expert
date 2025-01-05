@@ -1,5 +1,5 @@
 defmodule Expert.Project.Supervisor do
-  alias Lexical.Project
+  alias Forge.Project
   alias Engine.ProjectNodeSupervisor
   alias Expert.Project.Diagnostics
   alias Expert.Project.Intelligence

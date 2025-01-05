@@ -30,7 +30,7 @@ defmodule Expert.Project.Diagnostics.State do
 
   alias Forge.Document
   alias Lexical.Plugin.V1.Diagnostic
-  alias Lexical.Project
+  alias Forge.Project
 
   defstruct project: nil, entries_by_uri: %{}
 

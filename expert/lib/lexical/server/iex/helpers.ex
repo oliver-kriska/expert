@@ -2,7 +2,7 @@ defmodule Expert.IEx.Helpers do
   alias Lexical.Ast
   alias Forge.Document
   alias Forge.Document.Position
-  alias Lexical.Project
+  alias Forge.Project
   alias Lexical.Protocol.Types.Completion
   alias Engine
   alias Engine.Search
@@ -142,19 +142,19 @@ defmodule Expert.IEx.Helpers do
   ## Examples
 
       iex> project()
-      %Lexical.Project{
+      %Forge.Project{
         root_uri: "file:///.../lexical
         ...
       }
 
       iex> project(:my_project)
-      %Lexical.Project{
+      %Forge.Project{
         root_uri: "file:///.../my_project"
         ...
       }
 
       iex> project(:navigations, fixture: true)
-      %Lexical.Project{
+      %Forge.Project{
         root_uri: "file:///.../lexical/apps/remote_control/test/fixtures/navigations"
         ...
       }
@@ -177,7 +177,7 @@ defmodule Expert.IEx.Helpers do
         |> Path.expand()
 
       project_uri = "file://#{project_path}"
-      Lexical.Project.new(project_uri)
+      Forge.Project.new(project_uri)
     end)
   end
 

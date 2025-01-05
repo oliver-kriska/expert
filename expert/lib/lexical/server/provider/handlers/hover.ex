@@ -3,7 +3,7 @@ defmodule Expert.Provider.Handlers.Hover do
   alias Lexical.Ast.Analysis
   alias Forge.Document
   alias Forge.Document.Position
-  alias Lexical.Project
+  alias Forge.Project
   alias Lexical.Protocol.Requests
   alias Lexical.Protocol.Responses
   alias Lexical.Protocol.Types.Hover

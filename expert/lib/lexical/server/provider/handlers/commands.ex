@@ -1,5 +1,5 @@
 defmodule Expert.Provider.Handlers.Commands do
-  alias Lexical.Project
+  alias Forge.Project
   alias Lexical.Protocol.Requests
   alias Lexical.Protocol.Responses
   alias Lexical.Protocol.Types

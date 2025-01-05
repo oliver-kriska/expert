@@ -139,7 +139,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.ModuleOrBehaviour do
   defp strip_leading_period(<<".", rest::binary>>), do: rest
   defp strip_leading_period(string_without_period), do: string_without_period
 
-  defp immediate_descendent_struct_modules(%Lexical.Project{} = project, module_name) do
+  defp immediate_descendent_struct_modules(%Forge.Project{} = project, module_name) do
     Intelligence.collect_struct_modules(project, module_name, to: :grandchild)
   end
 end

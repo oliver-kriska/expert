@@ -1,6 +1,6 @@
 defmodule Expert.Project.SearchListener do
   alias Lexical.Formats
-  alias Lexical.Project
+  alias Forge.Project
   alias Lexical.Protocol.Id
   alias Lexical.Protocol.Requests
   alias Expert.Api

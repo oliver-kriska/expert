@@ -11,7 +11,7 @@ defmodule Expert.Project.Node do
     end
   end
 
-  alias Lexical.Project
+  alias Forge.Project
   alias Engine
   alias Expert.Project.Progress
 
