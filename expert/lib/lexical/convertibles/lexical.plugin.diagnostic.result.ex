@@ -1,7 +1,7 @@
-defimpl Lexical.Convertible, for: Lexical.Plugin.V1.Diagnostic.Result do
-  alias Lexical.Document
-  alias Lexical.Document.Position
-  alias Lexical.Document.Range
+defimpl Forge.Convertible, for: Forge.Plugin.V1.Diagnostic.Result do
+  alias Forge.Document
+  alias Forge.Document.Position
+  alias Forge.Document.Range
   alias Lexical.Math
   alias Lexical.Plugin.V1.Diagnostic
   alias Lexical.Protocol.Conversions

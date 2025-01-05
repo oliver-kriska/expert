@@ -9,7 +9,7 @@ defmodule Engine.Dispatch do
 
   alias Engine.Dispatch.Handlers
   alias Engine.Dispatch.PubSub
-  import Engine.Api.Messages
+  import Forge.Api.Messages
 
   @handlers [PubSub, Handlers.Indexing]
 

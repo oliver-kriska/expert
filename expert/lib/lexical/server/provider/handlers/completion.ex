@@ -1,7 +1,7 @@
 defmodule Expert.Provider.Handlers.Completion do
   alias Lexical.Ast
-  alias Lexical.Document
-  alias Lexical.Document.Position
+  alias Forge.Document
+  alias Forge.Document.Position
   alias Lexical.Protocol.Requests
   alias Lexical.Protocol.Responses
   alias Lexical.Protocol.Types.Completion

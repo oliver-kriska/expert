@@ -1,11 +1,11 @@
 defmodule Expert.Provider.Handlers.DocumentSymbols do
-  alias Lexical.Document
+  alias Forge.Document
   alias Lexical.Protocol.Requests.DocumentSymbols
   alias Lexical.Protocol.Responses
   alias Lexical.Protocol.Types.Document.Symbol
   alias Lexical.Protocol.Types.Symbol.Kind, as: SymbolKind
-  alias Lexical.RemoteControl.Api
-  alias Lexical.RemoteControl.CodeIntelligence.Symbols
+  alias Engine.Api
+  alias Engine.CodeIntelligence.Symbols
   alias Expert.Configuration
 
   require SymbolKind

@@ -93,12 +93,6 @@ defmodule Engine do
 
   defdelegate stop(project), to: ProjectNode
 
-  def call(%Project{} = project, m, f, a \\ []) do
-    project
-    |> Project.node_name()
-    |> :erpc.call(m, f, a)
-  end
-
   def manager_node_name(%Project{} = project) do
     :"manager-#{Project.name(project)}-#{Project.entropy(project)}@127.0.0.1"
   end

@@ -1,12 +1,12 @@
 defmodule Expert.Provider.Handlers.CodeLens do
-  alias Lexical.Document
-  alias Lexical.Document.Position
-  alias Lexical.Document.Range
+  alias Forge.Document
+  alias Forge.Document.Position
+  alias Forge.Document.Range
   alias Lexical.Project
   alias Lexical.Protocol.Requests
   alias Lexical.Protocol.Responses
   alias Lexical.Protocol.Types.CodeLens
-  alias Lexical.RemoteControl
+  alias Engine
   alias Expert.Configuration
   alias Expert.Provider.Handlers
 
@@ -53,6 +53,6 @@ defmodule Expert.Provider.Handlers.CodeLens do
     document_path = Path.expand(document.path)
 
     document_path == Project.mix_exs_path(project) and
-      not RemoteControl.Api.index_running?(project)
+      not Engine.Api.index_running?(project)
   end
 end

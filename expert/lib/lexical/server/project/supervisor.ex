@@ -1,6 +1,6 @@
 defmodule Expert.Project.Supervisor do
   alias Lexical.Project
-  alias Lexical.RemoteControl.ProjectNodeSupervisor
+  alias Engine.ProjectNodeSupervisor
   alias Expert.Project.Diagnostics
   alias Expert.Project.Intelligence
   alias Expert.Project.Node

@@ -1,9 +1,9 @@
 defmodule Expert.Provider.Handlers.FindReferences do
   alias Lexical.Ast
-  alias Lexical.Document
+  alias Forge.Document
   alias Lexical.Protocol.Requests.FindReferences
   alias Lexical.Protocol.Responses
-  alias Lexical.RemoteControl.Api
+  alias Engine.Api
   alias Expert.Configuration
 
   require Logger

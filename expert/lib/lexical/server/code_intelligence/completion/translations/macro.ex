@@ -1,9 +1,9 @@
 defmodule Expert.CodeIntelligence.Completion.Translations.Macro do
   alias Lexical.Ast
   alias Lexical.Ast.Env
-  alias Lexical.Document
-  alias Lexical.Document.Position
-  alias Lexical.RemoteControl.Completion.Candidate
+  alias Forge.Document
+  alias Forge.Document.Position
+  alias Engine.Completion.Candidate
   alias Expert.CodeIntelligence.Completion.SortScope
   alias Expert.CodeIntelligence.Completion.Translatable
   alias Expert.CodeIntelligence.Completion.Translations

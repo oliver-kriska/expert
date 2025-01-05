@@ -50,6 +50,7 @@ defmodule Expert.MixProject do
        github: "elixir-tools/gen_lsp", branch: "change-schematic-function", override: true},
       # {:gen_lsp, "~> 0.10"},
       {:burrito, "~> 1.0", only: [:dev, :prod]},
+      {:forge, path: "../forge"},
       {:namespace, path: "../namespace"}
     ]
   end

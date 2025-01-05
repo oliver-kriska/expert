@@ -1,6 +1,6 @@
 defmodule Expert.CodeIntelligence.Completion.Translations.Callable do
   alias Lexical.Ast.Env
-  alias Lexical.RemoteControl.Completion.Candidate
+  alias Engine.Completion.Candidate
   alias Expert.CodeIntelligence.Completion.Builder
   alias Expert.CodeIntelligence.Completion.SortScope
 

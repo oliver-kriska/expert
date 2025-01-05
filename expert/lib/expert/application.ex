@@ -5,7 +5,6 @@ defmodule Expert.Application do
 
   use Application
 
-
   @impl true
   def start(_type, _args) do
     case System.cmd("epmd", ["-daemon"], stderr_to_stdout: true) do
@@ -21,12 +20,12 @@ defmodule Expert.Application do
     Node.start(:"expert-#{System.system_time()}", :shortnames)
 
     children = [
-        document_store_child_spec(),
-        Expert.LSPSupervisor
-      {DynamicSupervisor, Server.Project.Supervisor.options()},
-      {Task.Supervisor, name: TaskQueue.task_supervisor_name()},
-      TaskQueue,
-      ]
+      {Forge.Document.Store, derive: [analysis: &Forge.Ast.analyze/1]},
+      Expert.LSPSupervisor,
+      {DynamicSupervisor, Expert.Project.Supervisor.options()},
+      {Task.Supervisor, name: Expert.TaskQueue.task_supervisor_name()},
+      TaskQueue
+    ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options

@@ -1,6 +1,6 @@
 defmodule Engine.Search.Store.State do
   alias Forge.Project
-  alias Engine.Api.Messages
+  alias Forge.Api.Messages
   alias Engine.Dispatch
   alias Engine.Search.Fuzzy
   alias Engine.Search.Indexer.Entry

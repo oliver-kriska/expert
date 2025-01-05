@@ -2,7 +2,7 @@ defmodule Expert.Project.Progress.Support do
   alias Lexical.Project
   alias Expert.Project.Progress
 
-  import Lexical.RemoteControl.Api.Messages
+  import Forge.Api.Messages
 
   defmacro __using__(_) do
     quote do

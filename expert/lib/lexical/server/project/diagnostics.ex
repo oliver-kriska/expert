@@ -2,12 +2,12 @@ defmodule Expert.Project.Diagnostics do
   alias Lexical.Formats
   alias Lexical.Project
   alias Lexical.Protocol.Notifications.PublishDiagnostics
-  alias Lexical.RemoteControl
-  alias Lexical.RemoteControl.Api.Messages
+  alias Engine
+  alias Forge.Api.Messages
   alias Expert.Project.Diagnostics.State
   alias Expert.Transport
 
-  import Messages
+  import Forge.Api.Messages
   require Logger
   use GenServer
 
@@ -26,7 +26,7 @@ defmodule Expert.Project.Diagnostics do
 
   @impl GenServer
   def init([%Project{} = project]) do
-    RemoteControl.Api.register_listener(project, self(), [
+    Engine.Api.register_listener(project, self(), [
       file_diagnostics(),
       project_compile_requested(),
       project_compiled(),

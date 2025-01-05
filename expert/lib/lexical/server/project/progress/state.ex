@@ -7,7 +7,7 @@ defmodule Expert.Project.Progress.State do
   alias Expert.Project.Progress.Value
   alias Expert.Transport
 
-  import Lexical.RemoteControl.Api.Messages
+  import Forge.Api.Messages
 
   defstruct project: nil, progress_by_label: %{}
 

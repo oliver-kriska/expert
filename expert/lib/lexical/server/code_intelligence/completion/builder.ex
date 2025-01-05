@@ -12,10 +12,10 @@ defmodule Expert.CodeIntelligence.Completion.Builder do
 
   alias Future.Code, as: Code
   alias Lexical.Ast.Env
-  alias Lexical.Document
-  alias Lexical.Document.Edit
-  alias Lexical.Document.Position
-  alias Lexical.Document.Range
+  alias Forge.Document
+  alias Forge.Document.Edit
+  alias Forge.Document.Position
+  alias Forge.Document.Range
   alias Lexical.Protocol.Types.Completion
   alias Lexical.Protocol.Types.Markup.Content
   alias Expert.CodeIntelligence.Completion.SortScope

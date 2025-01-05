@@ -4,8 +4,8 @@ defmodule Expert.Provider.Handlers.WorkspaceSymbol do
   alias Lexical.Protocol.Types.Location
   alias Lexical.Protocol.Types.Symbol.Kind, as: SymbolKind
   alias Lexical.Protocol.Types.Workspace.Symbol
-  alias Lexical.RemoteControl.Api
-  alias Lexical.RemoteControl.CodeIntelligence.Symbols
+  alias Engine.Api
+  alias Engine.CodeIntelligence.Symbols
   alias Expert.Configuration
 
   require SymbolKind

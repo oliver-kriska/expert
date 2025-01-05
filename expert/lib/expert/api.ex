@@ -1,4 +1,4 @@
-defmodule Engine.Api do
+defmodule Expert.Api do
   alias Forge.Ast.Analysis
   alias Forge.Ast.Env
   alias Forge.Document
@@ -11,11 +11,17 @@ defmodule Engine.Api do
   require Logger
 
   def schedule_compile(%Project{} = project, force?) do
-    Engine.call(project, Engine, :schedule_compile, [force?])
+    call(project, Engine, :schedule_compile, [force?])
   end
 
   def compile_document(%Project{} = project, %Document{} = document) do
-    Engine.call(project, Engine, :compile_document, [document])
+    call(project, Engine, :compile_document, [document])
+  end
+
+  def call(%Project{} = project, m, f, a \\ []) do
+    project
+    |> Forge.Project.node_name()
+    |> :erpc.call(m, f, a)
   end
 
   def expand_alias(

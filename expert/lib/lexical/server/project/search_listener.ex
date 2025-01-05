@@ -3,11 +3,11 @@ defmodule Expert.Project.SearchListener do
   alias Lexical.Project
   alias Lexical.Protocol.Id
   alias Lexical.Protocol.Requests
-  alias Lexical.RemoteControl.Api
+  alias Expert.Api
   alias Expert
   alias Expert.Window
 
-  import Api.Messages
+  import Forge.Api.Messages
 
   use GenServer
   require Logger

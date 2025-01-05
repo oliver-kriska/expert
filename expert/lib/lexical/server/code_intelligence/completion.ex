@@ -1,20 +1,15 @@
 defmodule Expert.CodeIntelligence.Completion do
   alias Future.Code, as: Code
-  alias Lexical.Ast.Analysis
-  alias Lexical.Ast.Env
-  alias Lexical.Document.Position
-  alias Lexical.Project
-  alias Lexical.Protocol.Types.Completion
-  alias Lexical.Protocol.Types.InsertTextFormat
-  alias Lexical.RemoteControl
-  alias Lexical.RemoteControl.Completion.Candidate
+  alias Forge.Ast.Analysis
+  alias Forge.Ast.Env
+  alias Forge.Document.Position
+  alias Forge.Project
+  alias Engine.Completion.Candidate
   alias Expert.CodeIntelligence.Completion.Builder
   alias Expert.CodeIntelligence.Completion.Translatable
   alias Expert.Configuration
   alias Expert.Project.Intelligence
-  alias Mix.Tasks.Namespace
 
-  require InsertTextFormat
   require Logger
 
   @lexical_deps Enum.map([:lexical | Mix.Project.deps_apps()], &Atom.to_string/1)
@@ -78,12 +73,12 @@ defmodule Expert.CodeIntelligence.Completion do
 
       Env.in_context?(env, :struct_field_key) ->
         project
-        |> RemoteControl.Api.complete_struct_fields(env.analysis, env.position)
+        |> Engine.Api.complete_struct_fields(env.analysis, env.position)
         |> Enum.map(&Translatable.translate(&1, Builder, env))
 
       true ->
         project
-        |> RemoteControl.Api.complete(env)
+        |> Engine.Api.complete(env)
         |> to_completion_items(project, env, context)
     end
   end
@@ -271,7 +266,7 @@ defmodule Expert.CodeIntelligence.Completion do
     case completion do
       %{full_name: full_name} ->
         with_prefix =
-          RemoteControl.Api.modules_with_prefix(
+          Engine.Api.modules_with_prefix(
             env.project,
             full_name,
             {Kernel, :macro_exported?, [:__using__, 1]}
@@ -291,7 +286,7 @@ defmodule Expert.CodeIntelligence.Completion do
     case completion do
       %{full_name: full_name} ->
         with_prefix =
-          RemoteControl.Api.modules_with_prefix(
+          Engine.Api.modules_with_prefix(
             env.project,
             full_name,
             {Kernel, :function_exported?, [:behaviour_info, 1]}
@@ -326,7 +321,7 @@ defmodule Expert.CodeIntelligence.Completion do
   end
 
   defp typespec_or_type_candidate?(%Candidate.Function{} = function, %Env{} = env) do
-    case RemoteControl.Api.expand_alias(env.project, [:__MODULE__], env.analysis, env.position) do
+    case Engine.Api.expand_alias(env.project, [:__MODULE__], env.analysis, env.position) do
       {:ok, expanded} ->
         expanded == function.origin
 

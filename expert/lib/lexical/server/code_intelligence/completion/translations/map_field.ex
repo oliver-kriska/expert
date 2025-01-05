@@ -1,6 +1,6 @@
 defmodule Expert.CodeIntelligence.Completion.Translations.MapField do
   alias Lexical.Ast.Env
-  alias Lexical.RemoteControl.Completion.Candidate
+  alias Engine.Completion.Candidate
   alias Expert.CodeIntelligence.Completion.Translatable
 
   defimpl Translatable, for: Candidate.MapField do

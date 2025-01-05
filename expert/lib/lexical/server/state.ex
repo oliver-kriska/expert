@@ -1,5 +1,5 @@
 defmodule Expert.State do
-  alias Lexical.Document
+  alias Forge.Document
   alias Lexical.Protocol.Id
   alias Lexical.Protocol.Notifications
   alias Lexical.Protocol.Notifications.DidChange
@@ -23,8 +23,8 @@ defmodule Expert.State do
   alias Lexical.Protocol.Types.FileSystemWatcher
   alias Lexical.Protocol.Types.Registration
   alias Lexical.Protocol.Types.TextDocument
-  alias Lexical.RemoteControl
-  alias Lexical.RemoteControl.Api
+  alias Engine
+  alias Engine.Api
   alias Expert.CodeIntelligence
   alias Expert.Configuration
   alias Expert.Project
@@ -236,7 +236,7 @@ defmodule Expert.State do
 
     Enum.each(event.changes, fn %FileEvent{} = change ->
       event = filesystem_event(project: Project, uri: change.uri, event_type: change.type)
-      RemoteControl.Api.broadcast(project, event)
+      Engine.Api.broadcast(project, event)
     end)
 
     {:ok, state}

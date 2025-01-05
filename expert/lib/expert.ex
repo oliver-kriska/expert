@@ -3,7 +3,6 @@ defmodule Expert do
   alias GenLSP.Structures.CodeActionOptions
   use GenLSP
 
-  alias GenLSP.Structures.WorkspaceFoldersServerCapabilities
   alias GenLSP.Enumerations.TextDocumentSyncKind
   alias GenLSP.Structures.SaveOptions
   alias GenLSP.Structures.TextDocumentSyncOptions

@@ -59,10 +59,10 @@ defmodule Expert.Project.Intelligence do
   end
 
   alias Lexical.Project
-  alias Lexical.RemoteControl.Api
+  alias Expert.Api
 
   use GenServer
-  import Api.Messages
+  import Forge.Api.Messages
 
   @generations [
                  :self,

@@ -1,23 +1,23 @@
 defmodule Expert.IEx.Helpers do
   alias Lexical.Ast
-  alias Lexical.Document
-  alias Lexical.Document.Position
+  alias Forge.Document
+  alias Forge.Document.Position
   alias Lexical.Project
   alias Lexical.Protocol.Types.Completion
-  alias Lexical.RemoteControl
-  alias Lexical.RemoteControl.Search
+  alias Engine
+  alias Engine.Search
   alias Expert.CodeIntelligence
 
   defmacro __using__(_) do
     quote do
-      alias Lexical.Document
-      alias Lexical.Document.Position
-      alias Lexical.RemoteControl
-      alias Lexical.RemoteControl.Search
+      alias Forge.Document
+      alias Forge.Document.Position
+      alias Engine
+      alias Engine.Search
       import unquote(__MODULE__)
 
-      RemoteControl.Module.Loader.start_link(nil)
-      RemoteControl.Dispatch.start_link([])
+      Engine.Module.Loader.start_link(nil)
+      Engine.Dispatch.start_link([])
     end
   end
 
@@ -29,7 +29,7 @@ defmodule Expert.IEx.Helpers do
   def observer(project) do
     project
     |> ensure_project()
-    |> RemoteControl.call(:observer, :start)
+    |> Engine.call(:observer, :start)
   end
 
   def doc(text) do
@@ -56,7 +56,7 @@ defmodule Expert.IEx.Helpers do
 
   def search_store(project) do
     project = ensure_project(project)
-    RemoteControl.set_project(project)
+    Engine.set_project(project)
 
     Search.Store.start_link(
       project,
@@ -82,7 +82,7 @@ defmodule Expert.IEx.Helpers do
   def compile_project(project) do
     project
     |> ensure_project()
-    |> RemoteControl.Api.schedule_compile(true)
+    |> Engine.Api.schedule_compile(true)
   end
 
   def compile_file(project, source) when is_binary(source) do
@@ -94,7 +94,7 @@ defmodule Expert.IEx.Helpers do
   def compile_file(project, %Document{} = document) do
     project
     |> ensure_project()
-    |> RemoteControl.Api.compile_document(document)
+    |> Engine.Api.compile_document(document)
   end
 
   def complete(project, source, context \\ nil)

@@ -2,7 +2,7 @@ defmodule Expert.Project.Progress do
   alias Lexical.Project
   alias Expert.Project.Progress.State
 
-  import Lexical.RemoteControl.Api.Messages
+  import Forge.Api.Messages
 
   use GenServer
 

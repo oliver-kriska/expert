@@ -28,7 +28,7 @@ defmodule Expert.Project.Diagnostics.State do
     end
   end
 
-  alias Lexical.Document
+  alias Forge.Document
   alias Lexical.Plugin.V1.Diagnostic
   alias Lexical.Project
 

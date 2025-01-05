@@ -4,7 +4,7 @@ defmodule Expert.Provider.Handlers.Commands do
   alias Lexical.Protocol.Responses
   alias Lexical.Protocol.Types
   alias Lexical.Protocol.Types.ErrorCodes
-  alias Lexical.RemoteControl
+  alias Engine
   alias Expert.Configuration
   alias Expert.Window
 
@@ -42,7 +42,7 @@ defmodule Expert.Provider.Handlers.Commands do
   end
 
   defp reindex(%Project{} = project, request_id) do
-    case RemoteControl.Api.reindex(project) do
+    case Engine.Api.reindex(project) do
       :ok ->
         Responses.ExecuteCommand.new(request_id, "ok")
 

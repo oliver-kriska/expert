@@ -5,7 +5,7 @@ defmodule Engine.Api.Proxy.BufferingState do
   alias Engine.Build
   alias Engine.Commands
 
-  import Api.Messages
+  import Forge.Api.Messages
   import Api.Proxy.Records
 
   defstruct initiator_pid: nil, buffer: []
