@@ -1,5 +1,17 @@
 defmodule Expert do
+  alias GenLSP.Enumerations.CodeActionKind
+  alias GenLSP.Structures.CodeActionOptions
   use GenLSP
+
+  alias GenLSP.Structures.WorkspaceFoldersServerCapabilities
+  alias GenLSP.Enumerations.TextDocumentSyncKind
+  alias GenLSP.Structures.SaveOptions
+  alias GenLSP.Structures.TextDocumentSyncOptions
+  alias GenLSP.Structures.ServerCapabilities
+  alias GenLSP.Structures.InitializeResult
+  alias GenLSP.Structures.InitializeParams
+  alias GenLSP.Requests.Initialize
+
   require Logger
   require Expert.Runtime
 
@@ -7,9 +19,7 @@ defmodule Expert do
 
   def start_link(args) do
     {args, opts} =
-      Keyword.split(args, [
-        :dynamic_supervisor
-      ])
+      Keyword.split(args, [:dynamic_supervisor])
 
     GenLSP.start_link(__MODULE__, args, opts)
   end
@@ -28,8 +38,8 @@ defmodule Expert do
 
   @impl true
   def handle_request(
-        %GenLSP.Requests.Initialize{
-          params: %GenLSP.Structures.InitializeParams{
+        %Initialize{
+          params: %InitializeParams{
             root_uri: root_uri,
             workspace_folders: workspace_folders,
             capabilities: caps
@@ -37,48 +47,37 @@ defmodule Expert do
         },
         lsp
       ) do
-    parent = self()
-    name = Path.basename(root_uri)
-
-    working_dir = URI.parse(root_uri).path
-
-    DynamicSupervisor.start_child(
-      lsp.assigns.dynamic_supervisor,
-      {Expert.Runtime.Supervisor,
-       path: Path.join(working_dir, ".expert-lsp"),
-       name: name,
-       lsp: lsp,
-       lsp_pid: parent,
-       runtime: [
-         working_dir: working_dir,
-         uri: root_uri,
-         on_initialized: fn status ->
-           if status == :ready do
-             msg = {:runtime_ready, name, self()}
-
-             Process.send(parent, msg, [])
-           else
-             send(parent, {:runtime_failed, name, status})
-           end
-         end
-       ]}
-    )
-
     {:reply,
-     %GenLSP.Structures.InitializeResult{
-       capabilities: %GenLSP.Structures.ServerCapabilities{
-         text_document_sync: %GenLSP.Structures.TextDocumentSyncOptions{
+     %InitializeResult{
+       capabilities: %ServerCapabilities{
+         text_document_sync: %TextDocumentSyncOptions{
            open_close: true,
-           save: %GenLSP.Structures.SaveOptions{include_text: true},
-           change: GenLSP.Enumerations.TextDocumentSyncKind.incremental()
+           save: %SaveOptions{include_text: true},
+           change: TextDocumentSyncKind.incremental()
          },
+         code_action_provider: %CodeActionOptions{
+           code_action_kinds: [
+             # TODO(mhanberg): add code actions from Next LS
+             CodeActionKind.quick_fix(),
+             CodeActionKind.source_organize_imports()
+           ]
+         },
+         code_lens_provider: %GenLSP.Structures.CodeLensOptions{
+           resolve_provider: false
+         },
+         completion_provider: %GenLSP.Structures.CompletionOptions{
+           trigger_characters: [".", "@", "&", "%", "^", ":", "!", "-", "~"]
+         },
+         definition_provider: true,
          document_symbol_provider: true,
-         workspace: %{
-           workspace_folders: %GenLSP.Structures.WorkspaceFoldersServerCapabilities{
-             supported: true,
-             change_notifications: true
-           }
-         }
+         document_formatting_provider: true,
+         execute_command_provider: %GenLSP.Structures.ExecuteCommandOptions{
+           # TODO(mhanberg): add commands from Next LS
+           commands: ["Reindex"]
+         },
+         hover_provider: true,
+         references_provider: true,
+         workspace_symbol_provider: true
        },
        server_info: %{name: "Expert"}
      },
