@@ -1,4 +1,4 @@
-defmodule Engine.Math do
+defmodule Forge.Math do
   @moduledoc """
   Utilities related to mathematical operations
   """

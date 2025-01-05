@@ -4,7 +4,7 @@ defmodule Engine.Analyzer.Imports do
   alias Forge.Ast.Analysis.Scope
   alias Forge.Document.Position
   alias Forge.Document.Range
-  alias Engine.ProcessCache
+  alias Forge.ProcessCache
   alias Engine.Analyzer.Aliases
   alias Engine.Module.Loader
 

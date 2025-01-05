@@ -1,6 +1,6 @@
 defmodule Engine.Search.Indexer.Quoted do
   alias Forge.Ast.Analysis
-  alias Engine.ProcessCache
+  alias Forge.ProcessCache
   alias Engine.Search.Indexer.Source.Reducer
 
   require ProcessCache

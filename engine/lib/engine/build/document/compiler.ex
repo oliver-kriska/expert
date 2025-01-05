@@ -3,7 +3,7 @@ defmodule Engine.Build.Document.Compiler do
   A behaviour for document-level compilers
   """
   alias Forge.Document
-  alias Engine.Plugin.V1.Diagnostic
+  alias Forge.Plugin.V1.Diagnostic
 
   @type compile_response :: {:ok, [Diagnostic.Result.t()]} | {:error, [Diagnostic.Result.t()]}
 

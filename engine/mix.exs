@@ -24,6 +24,8 @@ defmodule Engine.MixProject do
     [
       {:forge, path: "../forge"},
       {:spitfire, "~> 0.1"},
+      {:elixir_sense, github: "elixir-lsp/elixir_sense"},
+      {:path_glob, "~> 0.2.0"},
       {:sourceror, "~> 1.0"},
       # {:gen_lsp, "~> 0.10"},
       {:gen_lsp,

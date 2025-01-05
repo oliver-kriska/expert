@@ -5,7 +5,7 @@ defmodule Forge.Project do
   This struct contains all the information required to build a project and interrogate its configuration,
   as well as business logic for how to change its attributes.
   """
-  alias Engine.Document
+  alias Forge.Document
 
   defstruct root_uri: nil,
             mix_exs_uri: nil,
@@ -28,7 +28,7 @@ defmodule Forge.Project do
         }
   @type error_with_message :: {:error, message}
 
-  @workspace_directory_name ".lexical"
+  @workspace_directory_name ".expert-lsp"
 
   # Public
   @spec new(Forge.uri()) :: t

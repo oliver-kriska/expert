@@ -2,7 +2,7 @@ defmodule Engine.Commands.Reindex do
   defmodule State do
     alias Forge.Ast.Analysis
     alias Forge.Document
-    alias Engine.ProcessCache
+    alias Forge.ProcessCache
     alias Engine.Search
     alias Engine.Search.Indexer
 

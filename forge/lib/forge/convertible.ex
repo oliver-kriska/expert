@@ -1,4 +1,4 @@
-defmodule Engine.Convertible.Helpers do
+defmodule Forge.Convertible.Helpers do
   @moduledoc false
 
   alias Forge.Document
@@ -83,7 +83,7 @@ defmodule Engine.Convertible.Helpers do
   end
 end
 
-defprotocol Engine.Convertible do
+defprotocol Forge.Convertible do
   @moduledoc """
   A protocol that details conversions to and from Language Server idioms
 
@@ -133,9 +133,9 @@ defprotocol Engine.Convertible do
   def to_lsp(t)
 end
 
-defimpl Engine.Convertible, for: List do
-  alias Engine.Convertible
-  alias Engine.Convertible.Helpers
+defimpl Forge.Convertible, for: List do
+  alias Forge.Convertible
+  alias Forge.Convertible.Helpers
 
   def to_native(l, context_document) do
     case Helpers.apply(l, &Convertible.to_native/2, context_document) do
@@ -152,9 +152,9 @@ defimpl Engine.Convertible, for: List do
   end
 end
 
-defimpl Engine.Convertible, for: Map do
-  alias Engine.Convertible
-  alias Engine.Convertible.Helpers
+defimpl Forge.Convertible, for: Map do
+  alias Forge.Convertible
+  alias Forge.Convertible.Helpers
 
   def to_native(map, context_document) do
     case Helpers.apply(map, &Convertible.to_native/2, context_document) do
@@ -168,10 +168,10 @@ defimpl Engine.Convertible, for: Map do
   end
 end
 
-defimpl Engine.Convertible, for: Any do
-  alias Engine.Convertible
+defimpl Forge.Convertible, for: Any do
+  alias Forge.Convertible
   alias Forge.Document
-  alias Engine.Convertible.Helpers
+  alias Forge.Convertible.Helpers
 
   def to_native(%_struct_module{} = struct, context_document) do
     context_document = Document.Container.context_document(struct, context_document)

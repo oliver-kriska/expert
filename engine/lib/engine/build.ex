@@ -4,7 +4,7 @@ defmodule Engine.Build do
 
   alias Engine.Build.Document.Compilers.HEEx
   alias Engine.Build.State
-  alias Engine.VM.Versions
+  alias Forge.VM.Versions
 
   require Logger
   use GenServer

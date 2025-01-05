@@ -4,7 +4,7 @@ defmodule Engine.Build.Document.Compilers.Config do
   """
   alias Elixir.Features
   alias Forge.Document
-  alias Engine.Plugin.V1.Diagnostic
+  alias Forge.Plugin.V1.Diagnostic
   alias Engine.Build
   alias Engine.Build.Error.Location
 

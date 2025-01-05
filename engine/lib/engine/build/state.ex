@@ -5,7 +5,7 @@ defmodule Engine.Build.State do
 
   alias Engine.Api.Messages
   alias Engine.Build
-  alias Engine.VM.Versions
+  alias Forge.VM.Versions
 
   require Logger
 

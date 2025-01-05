@@ -6,7 +6,7 @@ defmodule Engine.Search.Indexer.Extractors.Module do
   alias Forge.Ast
   alias Forge.Document.Position
   alias Forge.Document.Range
-  alias Engine.ProcessCache
+  alias Forge.ProcessCache
 
   alias Engine.Search.Indexer.Entry
   alias Engine.Search.Indexer.Metadata

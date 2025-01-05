@@ -50,7 +50,7 @@ defmodule Engine.Search.Indexer.Entry do
   @type datetime_format :: :erl | :unix | :datetime
   @type date_type :: :calendar.datetime() | integer() | DateTime.t()
 
-  alias Engine.Identifier
+  alias Forge.Identifier
   alias Engine.Search.Indexer.Source.Block
   alias Forge.StructAccess
 

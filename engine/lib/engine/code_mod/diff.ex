@@ -1,5 +1,5 @@
 defmodule Engine.CodeMod.Diff do
-  alias Engine.CodeUnit
+  alias Forge.CodeUnit
   alias Forge.Document
   alias Forge.Document.Edit
   alias Forge.Document.Position
