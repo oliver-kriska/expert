@@ -5,10 +5,8 @@ defmodule Expert.Provider.Handlers.WorkspaceSymbol do
   alias Lexical.Protocol.Types.Symbol.Kind, as: SymbolKind
   alias Lexical.Protocol.Types.Workspace.Symbol
   alias Engine.Api
-  alias Engine.CodeIntelligence.Symbols
+  alias Forge.CodeIntelligence.Symbols
   alias Expert.Configuration
-
-  require SymbolKind
 
   require Logger
 

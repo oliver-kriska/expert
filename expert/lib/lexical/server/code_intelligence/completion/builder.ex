@@ -11,35 +11,35 @@ defmodule Expert.CodeIntelligence.Completion.Builder do
   """
 
   alias Future.Code, as: Code
-  alias Lexical.Ast.Env
+  alias Forge.Ast.Env
   alias Forge.Document
   alias Forge.Document.Edit
   alias Forge.Document.Position
   alias Forge.Document.Range
-  alias Lexical.Protocol.Types.Completion
-  alias Lexical.Protocol.Types.Markup.Content
+  alias GenLSP.Structures.CompletionItem
+  alias GenLSP.Structures.MarkupContent
   alias Expert.CodeIntelligence.Completion.SortScope
 
-  @doc "Fields found in `t:Lexical.Protocol.Types.Completion.Item.t()`"
+  @doc "Fields found in `t:GenLSP.Structures.CompletionItem.t()`"
   @type item_opts :: keyword()
 
   @type t :: module()
 
   @type line_range :: {start_character :: pos_integer, end_character :: pos_integer}
 
-  @spec snippet(Env.t(), String.t(), item_opts) :: Completion.Item.t()
+  @spec snippet(Env.t(), String.t(), item_opts) :: CompletionItem.t()
   def snippet(%Env{} = env, text, options \\ []) do
     range = prefix_range(env)
     text_edit_snippet(env, text, range, options)
   end
 
-  @spec plain_text(Env.t(), String.t(), item_opts) :: Completion.Item.t()
+  @spec plain_text(Env.t(), String.t(), item_opts) :: CompletionItem.t()
   def plain_text(%Env{} = env, text, options \\ []) do
     range = prefix_range(env)
     text_edit(env, text, range, options)
   end
 
-  @spec text_edit(Env.t(), String.t(), line_range, item_opts) :: Completion.Item.t()
+  @spec text_edit(Env.t(), String.t(), line_range, item_opts) :: CompletionItem.t()
   def text_edit(%Env{} = env, text, {start_char, end_char}, options \\ []) do
     line_number = env.position.line
 
@@ -53,12 +53,12 @@ defmodule Expert.CodeIntelligence.Completion.Builder do
 
     options
     |> Keyword.put(:text_edit, edits)
-    |> Completion.Item.new()
+    |> then(&struct(CompletionItem, &1))
     |> markdown_docs()
     |> set_sort_scope(SortScope.default())
   end
 
-  @spec text_edit_snippet(Env.t(), String.t(), line_range, item_opts) :: Completion.Item.t()
+  @spec text_edit_snippet(Env.t(), String.t(), line_range, item_opts) :: CompletionItem.t()
   def text_edit_snippet(%Env{} = env, text, {start_char, end_char}, options \\ []) do
     snippet = String.trim_trailing(text, "\n")
     line_number = env.position.line
@@ -74,7 +74,7 @@ defmodule Expert.CodeIntelligence.Completion.Builder do
     options
     |> Keyword.put(:text_edit, edits)
     |> Keyword.put(:insert_text_format, :snippet)
-    |> Completion.Item.new()
+    |> then(&struct(CompletionItem, &1))
     |> markdown_docs()
     |> set_sort_scope(SortScope.default())
   end
@@ -84,10 +84,10 @@ defmodule Expert.CodeIntelligence.Completion.Builder do
   def fallback("", fallback), do: fallback
   def fallback(detail, _), do: detail
 
-  @spec set_sort_scope(Completion.Item.t(), sort_scope :: String.t()) :: Completion.Item.t()
+  @spec set_sort_scope(CompletionItem.t(), sort_scope :: String.t()) :: CompletionItem.t()
   def set_sort_scope(item, default \\ SortScope.default())
 
-  def set_sort_scope(%Completion.Item{} = item, sort_scope)
+  def set_sort_scope(%CompletionItem{} = item, sort_scope)
       when is_binary(sort_scope) do
     stripped_sort_text =
       item.sort_text
@@ -95,7 +95,7 @@ defmodule Expert.CodeIntelligence.Completion.Builder do
       |> strip_sort_text()
 
     sort_text = "0#{sort_scope}_#{stripped_sort_text}"
-    %Completion.Item{item | sort_text: sort_text}
+    %CompletionItem{item | sort_text: sort_text}
   end
 
   # private
@@ -176,10 +176,17 @@ defmodule Expert.CodeIntelligence.Completion.Builder do
     String.replace(sort_text, @sort_prefix_re, "")
   end
 
-  defp markdown_docs(%Completion.Item{} = item) do
+  defp markdown_docs(%CompletionItem{} = item) do
     case item.documentation do
       doc when is_binary(doc) ->
-        %{item | documentation: %Content{kind: :markdown, value: doc}}
+        # FIXME: fix the content kind
+        %{
+          item
+          | documentation: %MarkupContent{
+              kind: GenLSP.Enumerations.MarkupKind.markdown(),
+              value: doc
+            }
+        }
 
       _ ->
         item

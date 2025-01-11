@@ -6,7 +6,7 @@ defmodule Engine.Search.Store do
   alias Forge.Project
 
   alias Forge.Api
-  alias Engine.Search.Indexer.Entry
+  alias Forge.Search.Indexer.Entry
   alias Engine.Search.Store
   alias Engine.Search.Store.State
 

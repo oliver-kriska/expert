@@ -3,7 +3,6 @@ defmodule Expert.Project.Diagnostics do
   alias Forge.Project
   alias Lexical.Protocol.Notifications.PublishDiagnostics
   alias Engine
-  alias Forge.Api.Messages
   alias Expert.Project.Diagnostics.State
   alias Expert.Transport
 

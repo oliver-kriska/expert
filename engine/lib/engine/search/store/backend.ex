@@ -3,7 +3,7 @@ defmodule Engine.Search.Store.Backend do
   A behaviour for search store backends
   """
   alias Forge.Project
-  alias Engine.Search.Indexer.Entry
+  alias Forge.Search.Indexer.Entry
   @type version :: pos_integer()
 
   @type priv_state :: term()

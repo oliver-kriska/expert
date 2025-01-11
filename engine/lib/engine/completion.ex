@@ -5,7 +5,7 @@ defmodule Engine.Completion do
   alias Forge.Document.Position
 
   alias Engine.CodeMod.Format
-  alias Engine.Completion.Candidate
+  alias Forge.Completion.Candidate
 
   import Document.Line
 
@@ -62,7 +62,7 @@ defmodule Engine.Completion do
       |> container_struct_module()
 
     with {:ok, struct_module} <-
-           Engine.Analyzer.expand_alias(container_struct_module, analysis, position),
+           Forge.Analyzer.expand_alias(container_struct_module, analysis, position),
          true <- function_exported?(struct_module, :__struct__, 0) do
       struct_module
       |> struct()

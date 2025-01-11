@@ -1,7 +1,7 @@
 defmodule Expert.CodeIntelligence.Completion.Translations.StructField do
   alias Future.Code, as: Code
-  alias Lexical.Ast.Env
-  alias Engine.Completion.Candidate
+  alias Forge.Ast.Env
+  alias Forge.Completion.Candidate
   alias Expert.CodeIntelligence.Completion.SortScope
   alias Expert.CodeIntelligence.Completion.Translatable
   alias Expert.CodeIntelligence.Completion.Translations

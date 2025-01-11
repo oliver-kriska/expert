@@ -1,5 +1,5 @@
 defmodule Expert.IEx.Helpers do
-  alias Lexical.Ast
+  alias Forge.Ast
   alias Forge.Document
   alias Forge.Document.Position
   alias Forge.Project

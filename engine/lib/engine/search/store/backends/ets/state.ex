@@ -6,7 +6,7 @@ defmodule Engine.Search.Store.Backends.Ets.State do
 
   """
   alias Forge.Project
-  alias Engine.Search.Indexer.Entry
+  alias Forge.Search.Indexer.Entry
   alias Engine.Search.Store.Backends.Ets.Schema
   alias Engine.Search.Store.Backends.Ets.Schemas
   alias Engine.Search.Store.Backends.Ets.Wal

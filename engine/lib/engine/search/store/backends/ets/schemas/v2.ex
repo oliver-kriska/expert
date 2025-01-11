@@ -1,5 +1,5 @@
 defmodule Engine.Search.Store.Backends.Ets.Schemas.V2 do
-  alias Engine.Search.Indexer.Entry
+  alias Forge.Search.Indexer.Entry
   alias Engine.Search.Store.Backends.Ets.Schema
 
   require Entry

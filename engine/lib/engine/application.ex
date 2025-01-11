@@ -19,8 +19,8 @@ defmodule Engine.Application do
           Engine.Search.Store.Backends.Ets,
           {Engine.Search.Store,
            [
-             &Engine.Search.Indexer.create_index/1,
-             &Engine.Search.Indexer.update_index/2
+             &Forge.Search.Indexer.create_index/1,
+             &Forge.Search.Indexer.update_index/2
            ]}
         ]
       else

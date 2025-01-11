@@ -1,11 +1,11 @@
-defmodule Engine.Search.Indexer do
+defmodule Forge.Search.Indexer do
   alias Forge.Identifier
   alias Forge.ProcessCache
   alias Forge.Project
 
   alias Engine.Progress
-  alias Engine.Search.Indexer
-  alias Engine.Search.Indexer.Entry
+  alias Forge.Search.Indexer
+  alias Forge.Search.Indexer.Entry
 
   require ProcessCache
 

@@ -6,7 +6,7 @@ defmodule Expert.Api do
   alias Forge.Document.Range
   alias Forge.Project
 
-  alias Engine.CodeIntelligence
+  alias Forge.CodeIntelligence
 
   require Logger
 

@@ -8,8 +8,8 @@ defmodule Engine do
   alias Forge.Project
 
   alias Engine.Api.Proxy
-  alias Engine.CodeAction
-  alias Engine.CodeIntelligence
+  alias Forge.CodeAction
+  alias Forge.CodeIntelligence
   alias Engine.ProjectNode
 
   require Logger
@@ -29,7 +29,7 @@ defmodule Engine do
 
   defdelegate broadcast(message), to: Proxy
 
-  defdelegate expand_alias(segments_or_module, analysis, position), to: Engine.Analyzer
+  defdelegate expand_alias(segments_or_module, analysis, position), to: Forge.Analyzer
 
   defdelegate list_modules, to: :code, as: :all_available
 

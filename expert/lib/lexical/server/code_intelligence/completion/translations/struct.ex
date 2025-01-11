@@ -1,6 +1,6 @@
 defmodule Expert.CodeIntelligence.Completion.Translations.Struct do
   alias Future.Code, as: Code
-  alias Lexical.Ast.Env
+  alias Forge.Ast.Env
   alias Lexical.Formats
 
   def completion(%Env{} = _env, _builder, _module_name, _full_name, 0) do

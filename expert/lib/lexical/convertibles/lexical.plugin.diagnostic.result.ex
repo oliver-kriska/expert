@@ -3,14 +3,14 @@ defimpl Forge.Convertible, for: Forge.Plugin.V1.Diagnostic.Result do
   alias Forge.Document.Position
   alias Forge.Document.Range
   alias Lexical.Math
-  alias Lexical.Plugin.V1.Diagnostic
+  alias Forge.Plugin.V1.Diagnostic
   alias Lexical.Protocol.Conversions
   alias Lexical.Protocol.Types
   alias Lexical.Text
 
   def to_lsp(%Diagnostic.Result{} = diagnostic) do
     with {:ok, lsp_range} <- lsp_range(diagnostic) do
-      proto_diagnostic = %Types.Diagnostic{
+      proto_diagnostic = %GenLSP.Structures.Diagnostic{
         message: diagnostic.message,
         range: lsp_range,
         severity: diagnostic.severity,

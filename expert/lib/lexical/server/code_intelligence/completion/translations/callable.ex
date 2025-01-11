@@ -1,6 +1,6 @@
 defmodule Expert.CodeIntelligence.Completion.Translations.Callable do
-  alias Lexical.Ast.Env
-  alias Engine.Completion.Candidate
+  alias Forge.Ast.Env
+  alias Forge.Completion.Candidate
   alias Expert.CodeIntelligence.Completion.Builder
   alias Expert.CodeIntelligence.Completion.SortScope
 

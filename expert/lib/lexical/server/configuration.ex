@@ -4,11 +4,8 @@ defmodule Expert.Configuration do
   """
 
   alias Forge.Project
-  alias Lexical.Protocol.Id
-  alias Lexical.Protocol.Notifications.DidChangeConfiguration
-  alias Lexical.Protocol.Requests
-  alias Lexical.Protocol.Requests.RegisterCapability
-  alias Lexical.Protocol.Types.ClientCapabilities
+  alias GenLSP.Notifications.WorkspaceDidChangeConfiguration
+  alias GenLSP.Structures.ClientCapabilities
   alias Lexical.Protocol.Types.Registration
   alias Expert.Configuration.Support
   alias Expert.Dialyzer
@@ -84,7 +81,7 @@ defmodule Expert.Configuration do
     apply_config_change(old_config, default_config())
   end
 
-  def on_change(%__MODULE__{} = old_config, %DidChangeConfiguration{} = change) do
+  def on_change(%__MODULE__{} = old_config, %WorkspaceDidChangeConfiguration{} = change) do
     apply_config_change(old_config, change.lsp.settings)
   end
 

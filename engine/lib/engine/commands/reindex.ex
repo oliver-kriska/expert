@@ -4,7 +4,7 @@ defmodule Engine.Commands.Reindex do
     alias Forge.Document
     alias Forge.ProcessCache
     alias Engine.Search
-    alias Engine.Search.Indexer
+    alias Forge.Search.Indexer
 
     require Logger
     require ProcessCache

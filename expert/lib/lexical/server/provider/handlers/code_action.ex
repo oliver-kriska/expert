@@ -1,15 +1,14 @@
 defmodule Expert.Provider.Handlers.CodeAction do
   alias Lexical.Protocol.Requests
-  alias Lexical.Protocol.Responses
-  alias Lexical.Protocol.Types
-  alias Lexical.Protocol.Types.Workspace
-  alias Engine
-  alias Engine.CodeAction
+  alias GenLSP.Requests.TextDocumentCodeAction
+  alias GenLSP.Structures.Diagnostic
+  alias GenLSP.Structures.WorkspaceEdit
+  alias Forge.CodeAction
   alias Expert.Configuration
 
   require Logger
 
-  def handle(%Requests.CodeAction{} = request, %Configuration{} = config) do
+  def handle(%TextDocumentCodeAction{} = request, %Configuration{} = config) do
     diagnostics = Enum.map(request.context.diagnostics, &to_code_action_diagnostic/1)
 
     code_actions =
@@ -27,7 +26,7 @@ defmodule Expert.Provider.Handlers.CodeAction do
     {:reply, reply}
   end
 
-  defp to_code_action_diagnostic(%Types.Diagnostic{} = diagnostic) do
+  defp to_code_action_diagnostic(%Diagnostic{} = diagnostic) do
     CodeAction.Diagnostic.new(diagnostic.range, diagnostic.message, diagnostic.source)
   end
 

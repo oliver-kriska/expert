@@ -87,36 +87,6 @@ defmodule Expert do
      )}
   end
 
-  def handle_request(
-        %GenLSP.Requests.TextDocumentDocumentSymbol{params: %{text_document: %{uri: uri}}},
-        lsp
-      ) do
-    path = URI.parse(uri).path
-    doc = File.read!(path)
-
-    lsp =
-      if lsp.assigns[:runtime] == nil do
-        receive do
-          {:runtime_ready, _name, runtime_pid} = msg ->
-            send(self(), msg)
-            assign(lsp, ready: true, runtime: runtime_pid)
-        end
-      else
-        lsp
-      end
-
-    symbols =
-      Expert.Runtime.execute! lsp.assigns.runtime do
-        Engine.DocumentSymbol.fetch(doc)
-      end
-
-    # which then will get serialized again on the way out
-    # we could potentially namespace our app too, but i think that
-    # makes our dev experience worse
-
-    {:reply, symbols, lsp}
-  end
-
   def handle_request(%GenLSP.Requests.Shutdown{}, lsp) do
     {:reply, nil, assign(lsp, exit_code: 0)}
   end
@@ -134,6 +104,8 @@ defmodule Expert do
     Logger.info("Expert v#{version()} has initialized!")
 
     Logger.info("Log file located at #{Path.join(File.cwd!(), ".expert-lsp/expert.log")}")
+
+    Expert.Project.Supervisor.start()
 
     {:noreply, lsp}
   end

@@ -14,7 +14,7 @@ defmodule Engine.Search.Fuzzy do
   alias Forge.Project
 
   alias Engine.Search.Fuzzy.Scorer
-  alias Engine.Search.Indexer.Entry
+  alias Forge.Search.Indexer.Entry
   import Record
 
   defstruct subject_to_values: %{},

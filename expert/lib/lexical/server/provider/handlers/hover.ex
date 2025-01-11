@@ -8,7 +8,7 @@ defmodule Expert.Provider.Handlers.Hover do
   alias Lexical.Protocol.Responses
   alias Lexical.Protocol.Types.Hover
   alias Engine
-  alias Engine.CodeIntelligence.Docs
+  alias Forge.CodeIntelligence.Docs
   alias Expert.Configuration
   alias Expert.Provider.Markdown
 

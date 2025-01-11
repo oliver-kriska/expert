@@ -24,17 +24,15 @@ defmodule Expert.State do
   alias Lexical.Protocol.Types.Registration
   alias Lexical.Protocol.Types.TextDocument
   alias Engine
-  alias Engine.Api
   alias Expert.CodeIntelligence
   alias Expert.Configuration
   alias Expert.Project
   alias Expert.Provider.Handlers
   alias Expert.Transport
 
-  require CodeAction.Kind
   require Logger
 
-  import Api.Messages
+  import Forge.Api.Messages
 
   defstruct configuration: nil,
             initialized?: false,

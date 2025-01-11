@@ -1,7 +1,7 @@
 defmodule Expert.Configuration.Support do
   @moduledoc false
 
-  alias Lexical.Protocol.Types.ClientCapabilities
+  alias GenLSP.Structures.ClientCapabilities
 
   # To track a new client capability, add a new field and the path to the
   # capability in the `Lexical.Protocol.Types.ClientCapabilities` struct

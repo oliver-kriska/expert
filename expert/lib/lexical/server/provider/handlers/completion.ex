@@ -2,9 +2,7 @@ defmodule Expert.Provider.Handlers.Completion do
   alias Lexical.Ast
   alias Forge.Document
   alias Forge.Document.Position
-  alias Lexical.Protocol.Requests
-  alias Lexical.Protocol.Responses
-  alias Lexical.Protocol.Types.Completion
+  alias GenLSP.Structures.CompletionContext
   alias Expert.CodeIntelligence
   alias Expert.Configuration
 
@@ -16,7 +14,8 @@ defmodule Expert.Provider.Handlers.Completion do
         config.project,
         document_analysis(request.document, request.position),
         request.position,
-        request.context || Completion.Context.new(trigger_kind: :invoked)
+        request.context ||
+          %CompletionContext{trigger_kind: GenLSP.Enumerations.CompletionTriggerKind.invoked()}
       )
 
     response = Responses.Completion.new(request.id, completions)

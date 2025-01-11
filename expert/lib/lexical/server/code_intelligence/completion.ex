@@ -4,11 +4,13 @@ defmodule Expert.CodeIntelligence.Completion do
   alias Forge.Ast.Env
   alias Forge.Document.Position
   alias Forge.Project
-  alias Engine.Completion.Candidate
+  alias Forge.Completion.Candidate
   alias Expert.CodeIntelligence.Completion.Builder
   alias Expert.CodeIntelligence.Completion.Translatable
   alias Expert.Configuration
   alias Expert.Project.Intelligence
+  alias GenLSP.Structures.CompletionContext
+  alias GenLSP.Structures.CompletionItem
 
   require Logger
 
@@ -26,7 +28,7 @@ defmodule Expert.CodeIntelligence.Completion do
         %Project{} = project,
         %Analysis{} = analysis,
         %Position{} = position,
-        %Completion.Context{} = context
+        %CompletionContext{} = context
       ) do
     case Env.new(project, analysis, position) do
       {:ok, env} ->
@@ -42,7 +44,7 @@ defmodule Expert.CodeIntelligence.Completion do
 
   defp log_candidates(candidates) do
     log_iolist =
-      Enum.reduce(candidates, ["Emitting Completions: ["], fn %Completion.Item{} = completion,
+      Enum.reduce(candidates, ["Emitting Completions: ["], fn %CompletionItem{} = completion,
                                                               acc ->
         name = Map.get(completion, :name) || Map.get(completion, :label)
         kind = completion |> Map.get(:kind, :unknown) |> to_string()
@@ -53,7 +55,7 @@ defmodule Expert.CodeIntelligence.Completion do
     Logger.info([log_iolist, "]"])
   end
 
-  defp completions(%Project{} = project, %Env{} = env, %Completion.Context{} = context) do
+  defp completions(%Project{} = project, %Env{} = env, %CompletionContext{} = context) do
     prefix_tokens = Env.prefix_tokens(env, 1)
 
     cond do
@@ -158,7 +160,7 @@ defmodule Expert.CodeIntelligence.Completion do
          local_completions,
          %Project{} = project,
          %Env{} = env,
-         %Completion.Context{} = context
+         %CompletionContext{} = context
        ) do
     debug_local_completions(local_completions)
 
@@ -166,7 +168,7 @@ defmodule Expert.CodeIntelligence.Completion do
         displayable?(project, result),
         applies_to_context?(project, result, context),
         applies_to_env?(env, result),
-        %Completion.Item{} = item <- to_completion_item(result, env) do
+        %CompletionItem{} = item <- to_completion_item(result, env) do
       item
     end
   end
@@ -334,8 +336,9 @@ defmodule Expert.CodeIntelligence.Completion do
     false
   end
 
-  defp applies_to_context?(%Project{} = project, result, %Completion.Context{
-         trigger_kind: :trigger_character,
+  @trigger_character GenLSP.Enumerations.CompletionTriggerKind.trigger_character()
+  defp applies_to_context?(%Project{} = project, result, %CompletionContext{
+         trigger_kind: @trigger_character,
          trigger_character: "%"
        }) do
     case result do

@@ -5,10 +5,8 @@ defmodule Expert.Provider.Handlers.DocumentSymbols do
   alias Lexical.Protocol.Types.Document.Symbol
   alias Lexical.Protocol.Types.Symbol.Kind, as: SymbolKind
   alias Engine.Api
-  alias Engine.CodeIntelligence.Symbols
+  alias Forge.CodeIntelligence.Symbols
   alias Expert.Configuration
-
-  require SymbolKind
 
   def handle(%DocumentSymbols{} = request, %Configuration{} = config) do
     symbols =
