@@ -1,5 +1,4 @@
 defmodule Expert.Provider.Handlers.CodeAction do
-  alias Lexical.Protocol.Requests
   alias GenLSP.Requests.TextDocumentCodeAction
   alias GenLSP.Structures.Diagnostic
   alias GenLSP.Structures.WorkspaceEdit

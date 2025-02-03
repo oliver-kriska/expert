@@ -6,7 +6,7 @@ defmodule Forge.Analyzer.Imports do
   alias Forge.Document.Range
   alias Forge.ProcessCache
   alias Forge.Analyzer.Aliases
-  alias Engine.Module.Loader
+  alias Forge.Module.Loader
 
   @spec at(Analysis.t(), Position.t()) :: [Scope.import_mfa()]
   def at(%Analysis{} = analysis, %Position{} = position) do

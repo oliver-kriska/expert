@@ -14,7 +14,7 @@ defmodule Forge.CodeIntelligence.Symbols.Workspace do
   end
 
   alias Forge.Document
-  alias Engine.Formats
+  alias Forge.Formats
   alias Forge.Search.Indexer.Entry
 
   defstruct [:name, :type, :link, container_name: nil]

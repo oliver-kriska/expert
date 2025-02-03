@@ -5,7 +5,7 @@ defmodule Forge.CodeAction.Handlers.OrganizeAliases do
   alias Forge.Document.Changes
   alias Forge.Document.Range
   alias Forge.CodeAction
-  alias Engine.CodeMod
+  alias Forge.CodeMod
 
   require Logger
 

@@ -1,6 +1,6 @@
 defmodule Forge.CodeIntelligence.Symbols.Document do
   alias Forge.Document
-  alias Engine.Formats
+  alias Forge.Formats
   alias Forge.Search.Indexer.Entry
 
   defstruct [:name, :type, :range, :detail_range, :detail, :original_type, :subject, children: []]

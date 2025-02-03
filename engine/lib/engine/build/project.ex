@@ -9,7 +9,7 @@ defmodule Engine.Build.Project do
   require Logger
 
   def compile(%Project{} = project, initial?) do
-    Engine.Mix.in_project(fn _ ->
+    Forge.Mix.in_project(fn _ ->
       Mix.Task.clear()
 
       prepare_for_project_build(initial?)

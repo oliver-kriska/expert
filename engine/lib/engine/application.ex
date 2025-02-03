@@ -7,17 +7,17 @@ defmodule Engine.Application do
   @impl true
   def start(_type, _args) do
     children =
-      if Engine.project_node?() do
+      if Forge.project_node?() do
         [
           Engine.Api.Proxy,
           Engine.Commands.Reindex,
-          Engine.Module.Loader,
-          {Engine.Dispatch, progress: true},
+          Forge.Module.Loader,
+          {Forge.Dispatch, progress: true},
           Engine.ModuleMappings,
           Engine.Build,
           Engine.Build.CaptureServer,
-          Engine.Search.Store.Backends.Ets,
-          {Engine.Search.Store,
+          Forge.Search.Store.Backends.Ets,
+          {Forge.Search.Store,
            [
              &Forge.Search.Indexer.create_index/1,
              &Forge.Search.Indexer.update_index/2

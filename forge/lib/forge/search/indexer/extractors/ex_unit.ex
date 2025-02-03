@@ -3,7 +3,7 @@ defmodule Forge.Search.Indexer.Extractors.ExUnit do
   alias Forge.Ast.Analysis
   alias Forge.Document.Position
   alias Forge.Document.Range
-  alias Engine.Formats
+  alias Forge.Formats
   alias Forge.Analyzer
   alias Forge.Search.Indexer.Entry
   alias Forge.Search.Indexer.Metadata

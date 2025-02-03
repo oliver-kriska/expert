@@ -6,14 +6,14 @@ defmodule Forge.CodeAction.Handlers.AddAlias do
   alias Forge.Document.Changes
   alias Forge.Document.Position
   alias Forge.Document.Range
-  alias Engine.Formats
+  alias Forge.Formats
 
   alias Forge.Analyzer
   alias Forge.CodeAction
   alias Forge.CodeIntelligence.Entity
-  alias Engine.CodeMod
-  alias Engine.Modules
-  alias Engine.Search.Fuzzy
+  alias Forge.CodeMod
+  alias Forge.Modules
+  alias Forge.Search.Fuzzy
   alias Forge.Search.Indexer.Entry
   alias Sourceror.Zipper
 
@@ -166,7 +166,7 @@ defmodule Forge.CodeAction.Handlers.AddAlias do
           {:elixir, split} = Ast.Module.safe_split(module)
           alias_as = List.last(split)
           subject_module = module
-          Engine.Module.Loader.ensure_loaded(subject_module)
+          Forge.Module.Loader.ensure_loaded(subject_module)
 
           protocol_or_implementation? = function_exported?(module, :__impl__, 1)
 

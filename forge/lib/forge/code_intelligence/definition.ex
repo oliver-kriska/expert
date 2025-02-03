@@ -6,11 +6,11 @@ defmodule Forge.CodeIntelligence.Definition do
   alias Forge.Document
   alias Forge.Document.Location
   alias Forge.Document.Position
-  alias Engine.Formats
+  alias Forge.Formats
   alias Forge.CodeIntelligence.Entity
   alias Forge.Search.Indexer.Entry
-  alias Engine.Search.Store
-  alias Engine.Text
+  alias Forge.Search.Store
+  alias Forge.Text
 
   require Logger
 

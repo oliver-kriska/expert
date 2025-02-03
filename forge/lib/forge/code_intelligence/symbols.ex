@@ -2,7 +2,7 @@ defmodule Forge.CodeIntelligence.Symbols do
   alias Forge.Document
   alias Forge.Document.Range
   alias Forge.CodeIntelligence.Symbols
-  alias Engine.Search
+  alias Forge.Search
   alias Forge.Search.Indexer
   alias Forge.Search.Indexer.Entry
   alias Forge.Search.Indexer.Extractors

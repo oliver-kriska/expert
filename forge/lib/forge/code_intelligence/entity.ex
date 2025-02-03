@@ -5,7 +5,7 @@ defmodule Forge.CodeIntelligence.Entity do
   alias Forge.Document
   alias Forge.Document.Position
   alias Forge.Document.Range
-  alias Engine.Formats
+  alias Forge.Formats
 
   alias Sourceror.Zipper
 

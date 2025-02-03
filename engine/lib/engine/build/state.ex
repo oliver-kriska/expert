@@ -130,7 +130,7 @@ defmodule Engine.Build.State do
       Engine.broadcast(file_compile_requested(uri: document.uri))
 
       safe_compile_func = fn ->
-        Engine.Mix.in_project(fn _ -> Build.Document.compile(document) end)
+        Forge.Mix.in_project(fn _ -> Build.Document.compile(document) end)
       end
 
       {elapsed_us, result} = :timer.tc(fn -> safe_compile_func.() end)

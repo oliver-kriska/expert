@@ -30,7 +30,7 @@ defmodule Engine.MixProject do
       # {:gen_lsp, "~> 0.10"},
       {:gen_lsp,
        github: "elixir-tools/gen_lsp", branch: "change-schematic-function", override: true},
-      {:namespace, path: "../namespace", only: [:dev, :prod], runtime: false}
+      {:namespace, path: "../namespace", runtime: false}
     ]
   end
 end

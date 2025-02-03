@@ -8,7 +8,7 @@ defmodule Forge.Search.Indexer.Extractors.ModuleAttribute do
   alias Forge.Analyzer
   alias Forge.Search.Indexer.Entry
   alias Forge.Search.Indexer.Source.Reducer
-  alias Engine.Search.Subject
+  alias Forge.Search.Subject
 
   require Logger
 

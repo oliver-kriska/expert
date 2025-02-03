@@ -4,7 +4,7 @@ defmodule Forge.Search.Indexer.Extractors.FunctionDefinition do
   alias Forge.Analyzer
   alias Forge.Search.Indexer.Entry
   alias Forge.Search.Indexer.Source.Reducer
-  alias Engine.Search.Subject
+  alias Forge.Search.Subject
 
   @function_definitions [:def, :defp]
 

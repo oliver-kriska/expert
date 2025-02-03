@@ -24,7 +24,7 @@ defmodule Engine.Bootstrap do
          {:ok, _} <- Application.ensure_all_started(:mix),
          {:ok, _} <- Application.ensure_all_started(:logger) do
       project = maybe_load_mix_exs(project)
-      Engine.set_project(project)
+      Forge.set_project(project)
       Mix.env(:test)
       ExUnit.start()
       start_logger(project)
@@ -76,7 +76,7 @@ defmodule Engine.Bootstrap do
     # app is an umbrella (umbrealla? returns false when started in a subapp)
     # to no avail. This was the only thing that consistently worked
     {:ok, configured_root} =
-      Engine.Mix.in_project(project, fn _ ->
+      Forge.Mix.in_project(project, fn _ ->
         Mix.Project.config()
         |> Keyword.get(:config_path)
         |> Path.dirname()

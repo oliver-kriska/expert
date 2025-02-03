@@ -1,25 +1,21 @@
 defmodule Expert.Provider.Handlers.DocumentSymbols do
   alias Forge.Document
-  alias Lexical.Protocol.Requests.DocumentSymbols
-  alias Lexical.Protocol.Responses
-  alias Lexical.Protocol.Types.Document.Symbol
-  alias Lexical.Protocol.Types.Symbol.Kind, as: SymbolKind
+  alias GenLSP.Requests.TextDocumentDocumentSymbol
   alias Engine.Api
-  alias Forge.CodeIntelligence.Symbols
+  # alias Forge.CodeIntelligence.Symbols
   alias Expert.Configuration
+  alias GenLSP.Structures.DocumentSymbol
 
-  def handle(%DocumentSymbols{} = request, %Configuration{} = config) do
+  def handle(%TextDocumentDocumentSymbol{} = request, %Configuration{} = config) do
     symbols =
       config.project
       |> Api.document_symbols(request.document)
       |> Enum.map(&to_response(&1, request.document))
 
-    response = Responses.DocumentSymbols.new(request.id, symbols)
-
-    {:reply, response}
+    {:reply, symbols}
   end
 
-  def to_response(%Symbols.Document{} = root, %Document{} = document) do
+  def to_response(%DocumentSymbol{} = root, %Document{} = document) do
     children =
       case root.children do
         list when is_list(list) ->
@@ -29,14 +25,14 @@ defmodule Expert.Provider.Handlers.DocumentSymbols do
           nil
       end
 
-    Symbol.new(
+    %DocumentSymbol{
       children: children,
       detail: root.detail,
       kind: to_kind(root.type),
       name: root.name,
       range: root.range,
       selection_range: root.detail_range
-    )
+    }
   end
 
   defp to_kind(:struct), do: :struct

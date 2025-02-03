@@ -4,7 +4,7 @@ defmodule Forge.CodeIntelligence.Docs do
   """
 
   alias Forge.CodeIntelligence.Docs.Entry
-  alias Engine.Modules
+  alias Forge.Modules
 
   defstruct [:module, :doc, functions_and_macros: [], callbacks: [], types: []]
 

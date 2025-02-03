@@ -1,4 +1,4 @@
-defmodule Engine.Search.Fuzzy.Scorer do
+defmodule Forge.Search.Fuzzy.Scorer do
   @moduledoc """
   Scores a match based on heuristics.
 

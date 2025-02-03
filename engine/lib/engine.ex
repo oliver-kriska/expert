@@ -46,13 +46,13 @@ defmodule Engine do
   defdelegate references(analysis, position, include_definitions?),
     to: CodeIntelligence.References
 
-  defdelegate modules_with_prefix(prefix), to: Engine.Modules, as: :with_prefix
+  defdelegate modules_with_prefix(prefix), to: Forge.Modules, as: :with_prefix
 
-  defdelegate modules_with_prefix(prefix, predicate), to: Engine.Modules, as: :with_prefix
+  defdelegate modules_with_prefix(prefix, predicate), to: Forge.Modules, as: :with_prefix
 
   defdelegate docs(module, opts \\ []), to: CodeIntelligence.Docs, as: :for_module
 
-  defdelegate register_listener(listener_pid, message_types), to: Engine.Dispatch
+  defdelegate register_listener(listener_pid, message_types), to: Forge.Dispatch
 
   defdelegate resolve_entity(analysis, position), to: CodeIntelligence.Entity, as: :resolve
 
@@ -79,17 +79,6 @@ defmodule Engine do
     :global.trans({lock_type, self()}, func, [Node.self()])
   end
 
-  def project_node? do
-    !!:persistent_term.get({__MODULE__, :project}, false)
-  end
-
-  def get_project do
-    :persistent_term.get({__MODULE__, :project}, nil)
-  end
-
-  def set_project(%Project{} = project) do
-    :persistent_term.put({__MODULE__, :project}, project)
-  end
 
   defdelegate stop(project), to: ProjectNode
 

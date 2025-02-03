@@ -1,13 +1,13 @@
 defmodule Forge.CodeIntelligence.Structs do
-  alias Engine.Module.Loader
+  alias Forge.Module.Loader
   alias Forge.Search.Indexer.Entry
-  alias Engine.Search.Store
+  alias Forge.Search.Store
 
   def for_project do
     if Mix.Project.get() do
       {:ok, structs_from_index()}
     else
-      Engine.Mix.in_project(fn _ -> structs_from_index() end)
+      Forge.Mix.in_project(fn _ -> structs_from_index() end)
     end
   end
 

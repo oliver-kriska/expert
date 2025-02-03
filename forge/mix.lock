@@ -1,4 +1,5 @@
 %{
+  "elixir_sense": {:git, "https://github.com/elixir-lsp/elixir_sense.git", "706c498be371882366151b588e5cd13c9c08404c", []},
   "snowflake": {:hex, :snowflake, "1.0.4", "8433b4e04fbed19272c55e1b7de0f7a1ee1230b3ae31a813b616fd6ef279e87a", [:mix], [], "hexpm", "badb07ebb089a5cff737738297513db3962760b10fe2b158ae3bebf0b4d5be13"},
   "sourceror": {:hex, :sourceror, "1.7.1", "599d78f4cc2be7d55c9c4fd0a8d772fd0478e3a50e726697c20d13d02aa056d4", [:mix], [], "hexpm", "cd6f268fe29fa00afbc535e215158680a0662b357dc784646d7dff28ac65a0fc"},
 }

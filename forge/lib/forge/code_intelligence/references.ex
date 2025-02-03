@@ -7,8 +7,8 @@ defmodule Forge.CodeIntelligence.References do
   alias Forge.CodeIntelligence.Entity
   alias Forge.CodeIntelligence.Variable
   alias Forge.Search.Indexer.Entry
-  alias Engine.Search.Store
-  alias Engine.Search.Subject
+  alias Forge.Search.Store
+  alias Forge.Search.Subject
 
   require Logger
 

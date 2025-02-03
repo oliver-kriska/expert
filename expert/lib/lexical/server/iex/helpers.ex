@@ -5,7 +5,7 @@ defmodule Expert.IEx.Helpers do
   alias Forge.Project
   alias Lexical.Protocol.Types.Completion
   alias Engine
-  alias Engine.Search
+  alias Forge.Search
   alias Expert.CodeIntelligence
 
   defmacro __using__(_) do
@@ -13,11 +13,11 @@ defmodule Expert.IEx.Helpers do
       alias Forge.Document
       alias Forge.Document.Position
       alias Engine
-      alias Engine.Search
+      alias Forge.Search
       import unquote(__MODULE__)
 
-      Engine.Module.Loader.start_link(nil)
-      Engine.Dispatch.start_link([])
+      Forge.Module.Loader.start_link(nil)
+      Forge.Dispatch.start_link([])
     end
   end
 
@@ -56,7 +56,7 @@ defmodule Expert.IEx.Helpers do
 
   def search_store(project) do
     project = ensure_project(project)
-    Engine.set_project(project)
+    Forge.set_project(project)
 
     Search.Store.start_link(
       project,

@@ -1,34 +1,10 @@
 defmodule Expert.State do
   alias Forge.Document
-  alias Lexical.Protocol.Id
-  alias Lexical.Protocol.Notifications
-  alias Lexical.Protocol.Notifications.DidChange
-  alias Lexical.Protocol.Notifications.DidChangeConfiguration
-  alias Lexical.Protocol.Notifications.DidClose
-  alias Lexical.Protocol.Notifications.DidOpen
-  alias Lexical.Protocol.Notifications.DidSave
-  alias Lexical.Protocol.Notifications.Exit
-  alias Lexical.Protocol.Notifications.Initialized
-  alias Lexical.Protocol.Requests.Initialize
-  alias Lexical.Protocol.Requests.RegisterCapability
-  alias Lexical.Protocol.Requests.Shutdown
-  alias Lexical.Protocol.Responses
-  alias Lexical.Protocol.Types
-  alias Lexical.Protocol.Types.CodeAction
-  alias Lexical.Protocol.Types.CodeLens
-  alias Lexical.Protocol.Types.Completion
-  alias Lexical.Protocol.Types.DidChangeWatchedFiles
-  alias Lexical.Protocol.Types.ExecuteCommand
-  alias Lexical.Protocol.Types.FileEvent
-  alias Lexical.Protocol.Types.FileSystemWatcher
-  alias Lexical.Protocol.Types.Registration
-  alias Lexical.Protocol.Types.TextDocument
-  alias Engine
   alias Expert.CodeIntelligence
   alias Expert.Configuration
   alias Expert.Project
-  alias Expert.Provider.Handlers
-  alias Expert.Transport
+  # alias Expert.Provider.Handlers
+  alias GenLSP.Requests.Initialize
 
   require Logger
 
@@ -48,24 +24,24 @@ defmodule Expert.State do
     %__MODULE__{}
   end
 
-  def initialize(%__MODULE__{initialized?: false} = state, %Initialize{
-        lsp: %Initialize.LSP{} = event
-      }) do
+  def initialize(%__MODULE__{initialized?: false} = state, %Initialize{params: params}) do
     client_name =
-      case event.client_info do
+      case params.client_info do
         %{name: name} -> name
         _ -> nil
       end
 
-    config = Configuration.new(event.root_uri, event.capabilities, client_name)
+    config = Configuration.new(params.root_uri, params.capabilities, client_name)
     new_state = %__MODULE__{state | configuration: config, initialized?: true}
     Logger.info("Starting project at uri #{config.project.root_uri}")
 
-    event.id
-    |> initialize_result()
-    |> Transport.write()
+    # we do this in the server process
+    # event.id
+    # |> initialize_result()
+    # |> Transport.write()
 
-    Transport.write(registrations())
+    # same here
+    # Transport.write(registrations())
 
     Project.Supervisor.start(config.project)
     {:ok, new_state}

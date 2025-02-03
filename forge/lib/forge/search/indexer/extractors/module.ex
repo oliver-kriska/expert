@@ -12,7 +12,7 @@ defmodule Forge.Search.Indexer.Extractors.Module do
   alias Forge.Search.Indexer.Metadata
   alias Forge.Search.Indexer.Source.Block
   alias Forge.Search.Indexer.Source.Reducer
-  alias Engine.Search.Subject
+  alias Forge.Search.Subject
 
   require Logger
 

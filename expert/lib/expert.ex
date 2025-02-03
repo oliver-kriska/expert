@@ -11,10 +11,9 @@ defmodule Expert do
   alias GenLSP.Structures.InitializeParams
   alias GenLSP.Requests.Initialize
 
-  require Logger
-  require Expert.Runtime
+  alias Expert.State
 
-  alias Expert.Runtime
+  require Logger
 
   def start_link(args) do
     {args, opts} =
@@ -31,7 +30,8 @@ defmodule Expert do
      assign(lsp,
        dynamic_supervisor: dynamic_supervisor,
        exit_code: 1,
-       client_capabilities: nil
+       client_capabilities: nil,
+       state: State.new()
      )}
   end
 
@@ -43,9 +43,11 @@ defmodule Expert do
             workspace_folders: workspace_folders,
             capabilities: caps
           }
-        },
+        } = request,
         lsp
       ) do
+    state = Expert.State.initialize(Expert.State.new(), request)
+
     {:reply,
      %InitializeResult{
        capabilities: %ServerCapabilities{
@@ -83,7 +85,8 @@ defmodule Expert do
      assign(lsp,
        root_uri: root_uri,
        workspace_folders: workspace_folders,
-       client_capabilities: caps
+       client_capabilities: caps,
+       state: state
      )}
   end
 

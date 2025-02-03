@@ -57,7 +57,7 @@ defmodule Engine.Build do
 
   @impl GenServer
   def init([]) do
-    state = State.new(Engine.get_project())
+    state = State.new(Forge.get_project())
 
     with :ok <- State.set_compiler_options() do
       {:ok, state, {:continue, :ensure_build_directory}}

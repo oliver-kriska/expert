@@ -3,7 +3,7 @@ defmodule Engine.Commands.Reindex do
     alias Forge.Ast.Analysis
     alias Forge.Document
     alias Forge.ProcessCache
-    alias Engine.Search
+    alias Forge.Search
     alias Forge.Search.Indexer
 
     require Logger
@@ -73,7 +73,7 @@ defmodule Engine.Commands.Reindex do
   alias Forge.Document
   alias Forge.Project
 
-  alias Engine.Search
+  alias Forge.Search
 
   use GenServer
   import Forge.Api.Messages
@@ -88,7 +88,7 @@ defmodule Engine.Commands.Reindex do
   end
 
   def perform do
-    perform(Engine.get_project())
+    perform(Forge.get_project())
   end
 
   def perform(%Project{} = project) do

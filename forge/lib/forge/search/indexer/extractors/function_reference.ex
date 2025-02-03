@@ -7,7 +7,7 @@ defmodule Forge.Search.Indexer.Extractors.FunctionReference do
   alias Forge.Search.Indexer.Extractors.FunctionDefinition
   alias Forge.Search.Indexer.Metadata
   alias Forge.Search.Indexer.Source.Reducer
-  alias Engine.Search.Subject
+  alias Forge.Search.Subject
 
   require Logger
 
@@ -110,7 +110,7 @@ defmodule Forge.Search.Indexer.Extractors.FunctionReference do
           Entry.reference(
             analysis.document.path,
             Reducer.current_block(reducer),
-            Engine.Formats.mfa(module, function_name, arity),
+            Forge.Formats.mfa(module, function_name, arity),
             {:function, :usage},
             Ast.Range.get(ast, analysis.document),
             Application.get_application(module)

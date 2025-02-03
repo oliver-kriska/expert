@@ -7,7 +7,7 @@ defmodule Forge.CodeAction.Handlers.ReplaceRemoteFunction do
 
   alias Forge.CodeAction
   alias Forge.CodeAction.Diagnostic
-  alias Engine.Modules
+  alias Forge.Modules
   alias Sourceror.Zipper
 
   @behaviour CodeAction.Handler

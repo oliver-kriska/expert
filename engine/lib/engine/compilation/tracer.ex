@@ -1,6 +1,6 @@
 defmodule Engine.Compilation.Tracer do
   alias Engine.Build
-  alias Engine.Module.Loader
+  alias Forge.Module.Loader
 
   import Forge.Api.Messages
 
@@ -74,7 +74,7 @@ defmodule Engine.Compilation.Tracer do
 
     message = "compiling: " <> Path.join([base_dir, "...", file_name])
 
-    label = Build.State.building_label(Engine.get_project())
+    label = Build.State.building_label(Forge.get_project())
     project_progress(label: label, message: message)
   end
 end
