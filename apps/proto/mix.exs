@@ -26,7 +26,6 @@ defmodule Proto.MixProject do
   defp deps do
     [
       {:jason, "~> 1.4", optional: true},
-      {:lexical_shared, path: "../../projects/lexical_shared"},
       {:common, in_umbrella: true}
     ]
   end

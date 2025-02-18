@@ -40,7 +40,6 @@ defmodule Lexical.Server.MixProject do
 
   defp deps do
     [
-      {:lexical_shared, path: "../../projects/lexical_shared", override: true},
       {:lexical_test, path: "../../projects/lexical_test", only: [:dev, :test]},
       {:common, in_umbrella: true},
       {:elixir_sense,

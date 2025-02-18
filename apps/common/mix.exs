@@ -33,7 +33,6 @@ defmodule Common.MixProject do
 
   defp deps do
     [
-      {:lexical_shared, path: "../../projects/lexical_shared"},
       {:lexical_test, path: "../../projects/lexical_test", only: :test},
       {:snowflake, "~> 1.0"},
       {:sourceror, "~> 1.7"},
