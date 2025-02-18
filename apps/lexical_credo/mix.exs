@@ -8,11 +8,14 @@ defmodule LexicalCredo.MixProject do
     [
       app: :lexical_credo,
       version: @version,
+      build_path: "../../_build",
+      config_path: "../../config/config.exs",
+      deps_path: "../../deps",
+      lockfile: "../../mix.lock",
       elixir: "~> 1.13",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
-      docs: docs(),
-      package: package()
+      docs: docs()
     ]
   end
 
@@ -27,10 +30,7 @@ defmodule LexicalCredo.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      env_dep(
-        hex: {:lexical_plugin, "~> 0.5"},
-        else: {:lexical_plugin, path: "../lexical_plugin"}
-      ),
+      {:common, in_umbrella: true},
       {:credo, "> 0.0.0", optional: true},
       {:jason, "> 0.0.0", optional: true},
       {:ex_doc, "~> 0.34", optional: true, only: [:dev, :hex]}
@@ -45,23 +45,5 @@ defmodule LexicalCredo.MixProject do
       source_ref: "v#{@version}",
       source_url: @repo_url
     ]
-  end
-
-  defp package do
-    [
-      licenses: ["Apache-2.0"],
-      description: "A plugin for the lexical language server that enables Credo checks",
-      links: %{
-        "Lexical Credo" => "https://github.com/lexical-lsp/lexical",
-        "Credo" => "https://github.com/rrrene/credo"
-      }
-    ]
-  end
-
-  defp env_dep(opts) do
-    case Keyword.fetch(opts, Mix.env()) do
-      {:ok, dep} -> dep
-      :error -> Keyword.fetch!(opts, :else)
-    end
   end
 end
