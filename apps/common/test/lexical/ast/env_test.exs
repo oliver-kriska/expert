@@ -2,14 +2,14 @@ defmodule Lexical.Ast.EnvTest do
   use ExUnit.Case, async: true
 
   alias Lexical.Ast
+  alias Lexical.Project
 
   import Lexical.Ast.Env
   import Lexical.Test.CursorSupport
-  import Lexical.Test.Fixtures
 
   def new_env(text, opts \\ []) do
     opts = Keyword.merge([as: :document], opts)
-    project = project()
+    project = Project.new("file://#{File.cwd!()}")
     {position, document} = pop_cursor(text, opts)
     analysis = Ast.analyze(document)
     {:ok, env} = new(project, analysis, position)

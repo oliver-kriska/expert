@@ -1,12 +1,7 @@
 # Used by "mix format"
 current_directory = Path.dirname(__ENV__.file)
 
-import_deps =
-  if Mix.env() == :test do
-    [:lexical_test, :common]
-  else
-    [:common]
-  end
+import_deps = [:common]
 
 impossible_to_format = [
   Path.join([
