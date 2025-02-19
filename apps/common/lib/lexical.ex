@@ -18,8 +18,4 @@ defmodule Lexical do
 
   @typedoc "A string representation of a path on the filesystem"
   @type path :: String.t()
-
-  def fun() do
-    :ok
-  end
 end

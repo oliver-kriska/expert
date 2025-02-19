@@ -1,10 +1,10 @@
 defmodule Lexical.Test.RangeSupport do
-  alias Lexical.Math
-  alias Lexical.Text
   alias Lexical.Document
   alias Lexical.Document.Position
   alias Lexical.Document.Range
+  alias Lexical.Math
   alias Lexical.Test.CursorSupport
+  alias Lexical.Text
 
   import Lexical.Document.Line, only: [line: 1]
 
