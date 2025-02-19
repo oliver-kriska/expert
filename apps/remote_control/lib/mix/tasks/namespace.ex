@@ -20,7 +20,6 @@ defmodule Mix.Tasks.Namespace do
   # by this task. Plugin discovery uses this task, which happens after
   # namespacing.
   @extra_apps %{
-    "lexical_shared" => "Lexical",
     "proto" => "Lexical",
     "protocol" => "Lexical",
     "remote_control" => "Lexical",

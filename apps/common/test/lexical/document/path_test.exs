@@ -147,7 +147,7 @@ defmodule ElixirLS.LanguageServer.SourceFile.PathTest do
 
     test "windows path" do
       if windows?() do
-        drive_letter = Path.expand("/") |> String.split(":") |> hd()
+        drive_letter = "/" |> Path.expand() |> String.split(":") |> hd()
         assert "file:///c%3A/win/path" == to_uri("c:/win/path")
         assert "file:///c%3A/win/path" == to_uri("C:/win/path")
         assert "file:///c%3A/win/path" == to_uri("c:/win/path/")

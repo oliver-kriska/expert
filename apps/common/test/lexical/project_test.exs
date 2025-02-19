@@ -12,8 +12,8 @@ defmodule Lexical.ProjectTest do
 
   describe "name/1" do
     test "a project's name starts with a lowercase character and contains alphanumeric characters and _" do
-      check all folder_name <- string(:ascii, min_length: 1) do
-        patch Project, :folder_name, folder_name
+      check all(folder_name <- string(:ascii, min_length: 1)) do
+        patch(Project, :folder_name, folder_name)
         assert Regex.match?(~r/[a-z][a-zA-Z_]*/, Project.name(project()))
       end
     end

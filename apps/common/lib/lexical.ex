@@ -1,6 +1,6 @@
 defmodule Lexical do
   @moduledoc """
-  Shared data structures and utilities for the Lexical Language Server.
+  Common data structures and utilities for the Lexical Language Server.
 
   If you're building a plugin, You're probably going to want to look at the documentation
   for core data structures like
