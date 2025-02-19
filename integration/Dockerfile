@@ -32,7 +32,6 @@ RUN integration/boot/set_up_asdf.sh
 
 COPY apps apps
 COPY config config
-COPY projects projects
 COPY mix* .
 
 RUN mix local.hex --force

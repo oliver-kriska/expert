@@ -31,7 +31,7 @@ defmodule LexicalCredo.MixProject do
   defp deps do
     [
       {:common, in_umbrella: true},
-      {:credo, "> 0.0.0", optional: true},
+      {:credo, "> 0.0.0", only: [:dev, :test]},
       {:jason, "> 0.0.0", optional: true},
       {:ex_doc, "~> 0.34", optional: true, only: [:dev, :hex]}
     ]
