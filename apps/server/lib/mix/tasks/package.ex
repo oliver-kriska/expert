@@ -97,6 +97,7 @@ defmodule Mix.Tasks.Package do
     copy_priv_files(package_root)
     copy_config(package_root)
     write_vm_versions(package_root)
+
     File.rm_rf!(scratch_directory)
 
     if Keyword.get(opts, :zip, false) do
@@ -230,15 +231,22 @@ defmodule Mix.Tasks.Package do
   end
 
   defp server_deps do
-    server_path = Mix.Project.deps_paths()[:server]
+    deps_apps =
+      if Mix.Project.get() == Lexical.Server.MixProject do
+        Mix.Project.deps_apps()
+      else
+        server_path = Mix.Project.deps_paths()[:server]
+
+        Mix.Project.in_project(:server, server_path, fn _ ->
+          Mix.Project.deps_apps()
+        end)
+      end
 
     deps =
-      Mix.Project.in_project(:server, server_path, fn _ ->
-        Enum.map(Mix.Project.deps_apps(), fn app_module ->
-          app_module
-          |> Namespace.Module.apply()
-          |> to_string()
-        end)
+      Enum.map(deps_apps, fn app_module ->
+        app_module
+        |> Namespace.Module.apply()
+        |> to_string()
       end)
 
     server_dep =

@@ -1,6 +1,6 @@
 defmodule LexicalCredo.MixProject do
   use Mix.Project
-
+  Code.require_file("../../mix_dialyzer.exs")
   @repo_url "https://github.com/lexical-lsp/lexical/"
   @version "0.5.0"
 
@@ -8,14 +8,11 @@ defmodule LexicalCredo.MixProject do
     [
       app: :lexical_credo,
       version: @version,
-      build_path: "../../_build",
-      config_path: "../../config/config.exs",
-      deps_path: "../../deps",
-      lockfile: "../../mix.lock",
       elixir: "~> 1.13",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
-      docs: docs()
+      docs: docs(),
+      dialyzer: Mix.Dialyzer.config(add_apps: [:jason])
     ]
   end
 
@@ -30,8 +27,9 @@ defmodule LexicalCredo.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:common, in_umbrella: true},
+      {:common, path: "../common", env: Mix.env()},
       {:credo, "> 0.0.0", only: [:dev, :test]},
+      Mix.Dialyzer.dependency(),
       {:jason, "> 0.0.0", optional: true},
       {:ex_doc, "~> 0.34", optional: true, only: [:dev, :hex]}
     ]

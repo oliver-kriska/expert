@@ -1,17 +1,15 @@
 defmodule Lexical.RemoteControl.MixProject do
   use Mix.Project
+  Code.require_file("../../mix_dialyzer.exs")
 
   def project do
     [
       app: :remote_control,
       version: "0.7.2",
-      build_path: "../../_build",
-      config_path: "../../config/config.exs",
-      deps_path: "../../deps",
-      lockfile: "../../mix.lock",
       elixir: "~> 1.13",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
+      dialyzer: Mix.Dialyzer.config(),
       elixirc_paths: elixirc_paths(Mix.env()),
       aliases: aliases(),
       preferred_cli_env: [benchmark: :test]
@@ -20,7 +18,7 @@ defmodule Lexical.RemoteControl.MixProject do
 
   def application do
     [
-      extra_applications: [:logger, :sasl, :eex],
+      extra_applications: [:logger, :sasl, :eex, :path_glob],
       mod: {Lexical.RemoteControl.Application, []}
     ]
   end
@@ -43,13 +41,13 @@ defmodule Lexical.RemoteControl.MixProject do
   defp deps do
     [
       {:benchee, "~> 1.3", only: :test},
-      {:common, in_umbrella: true},
+      {:common, path: "../common", env: Mix.env()},
+      Mix.Dialyzer.dependency(),
       {:elixir_sense,
        github: "elixir-lsp/elixir_sense", ref: "73ce7e0d239342fb9527d7ba567203e77dbb9b25"},
       {:patch, "~> 0.15", only: [:dev, :test], optional: true, runtime: false},
       {:path_glob, "~> 0.2", optional: true},
       {:phoenix_live_view, "~> 1.0", only: [:test], optional: true, runtime: false},
-      {:snowflake, "~> 1.0"},
       {:sourceror, "~> 1.7"}
     ]
   end

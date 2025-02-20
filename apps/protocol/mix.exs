@@ -1,17 +1,16 @@
 defmodule Lexical.Protocol.MixProject do
   use Mix.Project
+  Code.require_file("../../mix_dialyzer.exs")
 
   def project do
     [
       app: :protocol,
+      env: Mix.env(),
       version: "0.7.2",
-      build_path: "../../_build",
-      config_path: "../../config/config.exs",
-      deps_path: "../../deps",
-      lockfile: "../../mix.lock",
       elixir: "~> 1.13",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
+      dialyzer: Mix.Dialyzer.config(add_apps: [:jason]),
       consolidate_protocols: Mix.env() != :test,
       elixirc_paths: elixirc_paths(Mix.env())
     ]
@@ -30,10 +29,11 @@ defmodule Lexical.Protocol.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:common, in_umbrella: true},
+      {:common, path: "../common", env: Mix.env()},
+      Mix.Dialyzer.dependency(),
       {:jason, "~> 1.4", optional: true},
       {:patch, "~> 0.15", only: [:test]},
-      {:proto, in_umbrella: true}
+      {:proto, path: "../proto", env: Mix.env()}
     ]
   end
 end

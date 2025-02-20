@@ -4,11 +4,16 @@ defmodule Mix.Tasks.Namespace.Transform.AppDirectories do
   def apply_to_all(base_directory) do
     base_directory
     |> find_app_directories()
-    |> Enum.each(&apply/1)
+    |> Enum.each(&apply_transform(base_directory, &1))
   end
 
-  def apply(app_path) do
-    namespaced_app_path = Namespace.Path.apply(app_path)
+  def apply_transform(base_dirctory, app_path) do
+    namespaced_relative_path =
+      app_path
+      |> Path.relative_to(base_dirctory)
+      |> Namespace.Path.apply()
+
+    namespaced_app_path = Path.join(base_dirctory, namespaced_relative_path)
 
     with {:ok, _} <- File.rm_rf(namespaced_app_path) do
       File.rename!(app_path, namespaced_app_path)

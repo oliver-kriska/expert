@@ -1,17 +1,15 @@
 defmodule Proto.MixProject do
   use Mix.Project
+  Code.require_file("../../mix_dialyzer.exs")
 
   def project do
     [
       app: :proto,
       version: "0.7.2",
-      build_path: "../../_build",
-      config_path: "../../config/config.exs",
-      deps_path: "../../deps",
-      lockfile: "../../mix.lock",
       elixir: "~> 1.13",
       start_permanent: Mix.env() == :prod,
-      deps: deps()
+      deps: deps(),
+      dialyzer: Mix.Dialyzer.config(add_apps: [:jason])
     ]
   end
 
@@ -25,8 +23,9 @@ defmodule Proto.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:jason, "~> 1.4", optional: true},
-      {:common, in_umbrella: true}
+      {:common, path: "../common", env: Mix.env()},
+      Mix.Dialyzer.dependency(),
+      {:jason, "~> 1.4", optional: true}
     ]
   end
 end
