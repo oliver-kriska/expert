@@ -47,10 +47,10 @@ jobs:
         uses: actions/cache@v3
         with:
           path: |
-            deps
-            _build
+            /apps/**/deps
+            /apps/**/_build
 
-          key: ${{ runner.os }}-mix-${{ env.DEFAULT_ELIXIR }}-${{ env.DEFAULT_OTP }}-${{ hashFiles('**/mix.lock') }}
+          key: ${{ runner.os }}-mix-${{ env.DEFAULT_ELIXIR }}-${{ env.DEFAULT_OTP }}-${{ hashFiles('/apps/**/mix.lock') }}
           restore-keys: |
             ${{ runner.os }}-mix-${{ env.DEFAULT_ELIXIR }}-${{ env.DEFAULT_OTP }}-
 
@@ -58,11 +58,11 @@ jobs:
       # the cached version.
       - name: Install and compile dependencies
         run: |
-          mix deps.get
-          mix deps.compile --skip-umbrella-children
+          make deps.poncho
+          make deps.compile.poncho
 
       - name: Compile and don't let warnings through
-        run: mix compile --warnings-as-errors
+        run: make compile.poncho
 
       # Step: Check that the checked in code has already been formatted.
       # This step fails if something was found unformatted.
@@ -72,7 +72,7 @@ jobs:
 
       # Step: Run credo static code analysis
       - name: Credo static analysis
-        run: mix credo
+        run: make credo.check.poncho
 
   dialyzer:
     runs-on: ubuntu-latest
@@ -194,17 +194,17 @@ jobs:
         uses: actions/cache@v3
         with:
           path: |
-            deps
-            _build
+            /apps/**/deps
+            /apps/**/_build
 
-          key: ${{ runner.os }}-mix-${{ matrix.elixir }}-${{ matrix.otp }}-${{ hashFiles('**/mix.lock') }}
+          key: ${{ runner.os }}-mix-${{ matrix.elixir }}-${{ matrix.otp }}-${{ hashFiles('/apps/**/mix.lock') }}
           restore-keys: |
             ${{ runner.os }}-mix-${{ matrix.elixir }}-${{ matrix.otp }}-
 
       # Step: Download project dependencies. If unchanged, uses
       # the cached version.
       - name: Install and compile the app
-        run: make compile.all
+        run: make compile.poncho
 
       # Step: Execute the tests.
       - name: Run tests

@@ -1,6 +1,6 @@
 defmodule Lexical.Server.MixProject do
   use Mix.Project
-  Code.require_file("../../mix_dialyzer.exs")
+  Code.require_file("../../mix_includes.exs")
 
   def project do
     [
@@ -41,6 +41,7 @@ defmodule Lexical.Server.MixProject do
   defp deps do
     [
       {:common, path: "../common", env: Mix.env()},
+      Mix.Credo.dependency(),
       Mix.Dialyzer.dependency(),
       {:elixir_sense,
        github: "elixir-lsp/elixir_sense", ref: "73ce7e0d239342fb9527d7ba567203e77dbb9b25"},

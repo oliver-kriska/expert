@@ -1,6 +1,6 @@
 defmodule Common.MixProject do
   use Mix.Project
-  Code.require_file("../../mix_dialyzer.exs")
+  Code.require_file("../../mix_includes.exs")
 
   def project do
     [
@@ -32,6 +32,7 @@ defmodule Common.MixProject do
   defp deps do
     [
       {:benchee, "~> 1.3", only: :test},
+      Mix.Credo.dependency(),
       Mix.Dialyzer.dependency(),
       {:snowflake, "~> 1.0"},
       {:sourceror, "~> 1.7"},

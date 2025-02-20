@@ -1,6 +1,6 @@
 defmodule Lexical.Protocol.MixProject do
   use Mix.Project
-  Code.require_file("../../mix_dialyzer.exs")
+  Code.require_file("../../mix_includes.exs")
 
   def project do
     [
@@ -30,6 +30,7 @@ defmodule Lexical.Protocol.MixProject do
   defp deps do
     [
       {:common, path: "../common", env: Mix.env()},
+      Mix.Credo.dependency(),
       Mix.Dialyzer.dependency(),
       {:jason, "~> 1.4", optional: true},
       {:patch, "~> 0.15", only: [:test]},
