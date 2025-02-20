@@ -1,5 +1,4 @@
 defmodule Lexical.LanguageServer.MixProject do
-  Code.require_file("mix_dialyzer.exs")
   use Mix.Project
 
   def project do
@@ -11,16 +10,14 @@ defmodule Lexical.LanguageServer.MixProject do
       aliases: aliases(),
       docs: docs(),
       name: "Lexical",
-      consolidate_protocols: Mix.env() != :test,
-      dialyzer: Mix.Dialyzer.config(:lexical)
+      consolidate_protocols: Mix.env() != :test
     ]
   end
 
   defp deps do
     [
       {:ex_doc, "~> 0.34", only: :dev, runtime: false},
-      {:credo, "~> 1.7", only: [:dev, :test]},
-      Mix.Dialyzer.dependency()
+      {:credo, "~> 1.7", only: [:dev, :test]}
     ]
   end
 
