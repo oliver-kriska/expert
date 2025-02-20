@@ -10,6 +10,9 @@ test.all: test.poncho
 
 dialyzer.plt.all: dialyzer.plt.poncho
 
+env.test:
+	export MIX_ENV=test
+
 deps.poncho:
 	$(foreach dir, $(poncho_dirs), cd apps/$(dir) && mix deps.get && cd ../..;)
 
@@ -25,7 +28,7 @@ compile.protocols.poncho: deps.poncho
 test.poncho: deps.poncho
 	$(foreach dir, $(poncho_dirs), cd apps/$(dir) && MIX_ENV=test mix test && cd ../..;)
 
-format.check.poncho: deps.poncho
+format.check.poncho: env.test deps.poncho
 	$(foreach dir, $(poncho_dirs), cd apps/$(dir) && mix format --check-formatted && cd ../..;)
 
 credo.check.poncho: deps.poncho
