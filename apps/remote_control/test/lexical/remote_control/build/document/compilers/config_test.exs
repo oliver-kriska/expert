@@ -43,7 +43,7 @@ defmodule Lexical.RemoteControl.Build.Document.Compilers.ConfigTest do
     end
 
     test "files in the config directory with relative paths are detected" do
-      assert recognizes?(document_with_path("../../config/test.exs"))
+      assert recognizes?(document_with_path("./config/test.exs"))
     end
 
     test "files outside the config directory are not detected" do
