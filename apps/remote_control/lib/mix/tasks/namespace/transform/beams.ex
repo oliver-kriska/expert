@@ -21,9 +21,8 @@ defmodule Mix.Tasks.Namespace.Transform.Beams do
     me = self()
 
     spawn(fn ->
-      Task.async_stream(all_beams, fn beam_file ->
-        apply_and_update_progress(beam_file, me)
-      end)
+      all_beams
+      |> Task.async_stream(&apply_and_update_progress(&1, me))
       |> Stream.run()
     end)
 
