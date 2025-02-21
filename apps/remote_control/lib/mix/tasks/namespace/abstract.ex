@@ -58,9 +58,13 @@ defmodule Mix.Tasks.Namespace.Abstract do
     {:attribute, anno, type, {name, rewrite(type_rep), rewrite(clauses)}}
   end
 
-  defp do_rewrite({:for, target}) do
+  defp do_rewrite({:for, target}) when is_atom(target) do
     # Protocol implementation
     {:for, rewrite_module(target)}
+  end
+
+  defp do_rewrite({:for, target}) do
+    {:for, rewrite(target)}
   end
 
   defp do_rewrite({:protocol, protocol}) do
