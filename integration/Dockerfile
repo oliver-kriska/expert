@@ -31,7 +31,6 @@ COPY integration/boot/set_up_asdf.sh integration/boot/set_up_asdf.sh
 RUN integration/boot/set_up_asdf.sh
 
 COPY apps apps
-COPY bin bin
 
 WORKDIR /apps/server
 RUN mix local.hex --force
