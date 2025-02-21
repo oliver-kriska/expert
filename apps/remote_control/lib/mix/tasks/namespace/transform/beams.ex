@@ -17,16 +17,14 @@ defmodule Mix.Tasks.Namespace.Transform.Beams do
 
     all_beams = Enum.concat(consolidated_beams, app_beams)
     total_files = length(all_beams)
-    chunk_size = ceil(total_files / System.schedulers_online())
 
     me = self()
 
-    all_beams
-    |> Enum.chunk_every(chunk_size)
-    |> Enum.each(fn chunk ->
-      Task.async(fn ->
-        Enum.each(chunk, &apply_and_update_progress(&1, me))
+    spawn(fn ->
+      Task.async_stream(all_beams, fn beam_file ->
+        apply_and_update_progress(beam_file, me)
       end)
+      |> Stream.run()
     end)
 
     block_until_done(0, total_files)
