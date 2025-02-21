@@ -31,15 +31,12 @@ COPY integration/boot/set_up_asdf.sh integration/boot/set_up_asdf.sh
 RUN integration/boot/set_up_asdf.sh
 
 COPY apps apps
-COPY config config
-COPY mix* .
+COPY bin bin
 
+WORKDIR /apps/server
 RUN mix local.hex --force
 RUN mix deps.get
 RUN mix compile
-
-COPY bin bin
-
 RUN mix package
 
 CMD bash
