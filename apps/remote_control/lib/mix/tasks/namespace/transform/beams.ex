@@ -22,7 +22,11 @@ defmodule Mix.Tasks.Namespace.Transform.Beams do
 
     spawn(fn ->
       all_beams
-      |> Task.async_stream(&apply_and_update_progress(&1, me))
+      |> Task.async_stream(
+        &apply_and_update_progress(&1, me),
+        ordered: false,
+        timeout: :infinity
+      )
       |> Stream.run()
     end)
 
