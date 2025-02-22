@@ -47,8 +47,8 @@ jobs:
         uses: actions/cache@v3
         with:
           path: |
-            /apps/**/deps
-            /apps/**/_build
+            apps/**/deps
+            apps/**/_build
 
           key: ${{ runner.os }}-mix-${{ env.DEFAULT_ELIXIR }}-${{ env.DEFAULT_OTP }}-${{ hashFiles('/apps/**/mix.lock') }}
           restore-keys: |
@@ -110,8 +110,8 @@ jobs:
           cache-name: cache-elixir-deps-1
         with:
           path: |
-            deps
-            _build
+            apps/**/deps
+            apps/**/_build
 
           key: ${{ runner.os }}-mix-${{ env.DEFAULT_ELIXIR }}-${{ env.DEFAULT_OTP }}-${{ hashFiles('**/mix.lock') }}
           restore-keys: |
@@ -194,8 +194,8 @@ jobs:
         uses: actions/cache@v3
         with:
           path: |
-            /apps/**/deps
-            /apps/**/_build
+            apps/**/deps
+            apps/**/_build
 
           key: ${{ runner.os }}-mix-${{ matrix.elixir }}-${{ matrix.otp }}-${{ hashFiles('/apps/**/mix.lock') }}
           restore-keys: |
