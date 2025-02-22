@@ -30,9 +30,11 @@ RUN integration/boot/set_up_mise.sh
 COPY integration/boot/set_up_asdf.sh integration/boot/set_up_asdf.sh
 RUN integration/boot/set_up_asdf.sh
 
+COPY mix_*.exs .
 COPY apps apps
 
-WORKDIR /apps/server
+WORKDIR /lexical/apps/server
+
 RUN mix local.hex --force
 RUN mix deps.get
 RUN mix compile
