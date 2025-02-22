@@ -50,7 +50,7 @@ jobs:
             apps/**/deps
             apps/**/_build
 
-          key: ${{ runner.os }}-mix-${{ env.DEFAULT_ELIXIR }}-${{ env.DEFAULT_OTP }}-${{ hashFiles('/apps/**/mix.lock') }}
+          key: ${{ runner.os }}-mix-${{ env.DEFAULT_ELIXIR }}-${{ env.DEFAULT_OTP }}-${{ hashFiles('apps/**/mix.lock') }}
           restore-keys: |
             ${{ runner.os }}-mix-${{ env.DEFAULT_ELIXIR }}-${{ env.DEFAULT_OTP }}-
 
@@ -197,7 +197,7 @@ jobs:
             apps/**/deps
             apps/**/_build
 
-          key: ${{ runner.os }}-mix-${{ matrix.elixir }}-${{ matrix.otp }}-${{ hashFiles('/apps/**/mix.lock') }}
+          key: ${{ runner.os }}-mix-${{ matrix.elixir }}-${{ matrix.otp }}-${{ hashFiles('apps/**/mix.lock') }}
           restore-keys: |
             ${{ runner.os }}-mix-${{ matrix.elixir }}-${{ matrix.otp }}-
 
