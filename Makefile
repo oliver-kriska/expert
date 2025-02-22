@@ -1,24 +1,41 @@
-dialyzer_dirs = lexical_shared lexical_plugin
+poncho_dirs = common lexical_credo proto protocol remote_control server
 
-compile.all: compile.umbrella
+dialyzer_dirs= lexical_shared lexical_plugin
 
-dialyzer.all: compile.all dialyzer.umbrella
+compile.all: compile.poncho
 
-test.all: test.umbrella
+dialyzer.all: compile.poncho dialyzer.poncho
 
-dialyzer.plt.all: dialyzer.plt.umbrella
+test.all: test.poncho
 
-dialyzer.umbrella:
-	mix dialyzer
+dialyzer.plt.all: dialyzer.plt.poncho
 
-dialyzer.plt.umbrella:
-	mix dialyzer --plt
+env.test:
+	export MIX_ENV=test
 
-test.umbrella:
-	mix test
+deps.poncho:
+	$(foreach dir, $(poncho_dirs), cd apps/$(dir) && mix deps.get && cd ../..;)
 
-compile.umbrella:
-	mix deps.get
-	mix compile --skip-umbrella-children --warnings-as-errors
+deps.compile.poncho: deps.poncho
+	$(foreach dir, $(poncho_dirs), cd apps/$(dir) && mix deps.compile && cd ../..;)
 
+compile.poncho: deps.poncho
+	$(foreach dir, $(poncho_dirs), cd apps/$(dir) && mix deps.get && mix compile --warnings-as-errors && cd ../..;)
 
+compile.protocols.poncho: deps.poncho
+	$(foreach dir, $(poncho_dirs), cd apps/$(dir) && mix deps.get && mix compile.protocols --warnings-as-errors && cd ../..;)
+
+test.poncho: deps.poncho
+	$(foreach dir, $(poncho_dirs), cd apps/$(dir) && MIX_ENV=test mix test && cd ../..;)
+
+format.check.poncho: env.test deps.poncho
+	$(foreach dir, $(poncho_dirs), cd apps/$(dir) && mix format --check-formatted && cd ../..;)
+
+credo.check.poncho: deps.poncho
+	$(foreach dir, $(poncho_dirs), cd apps/$(dir) && mix credo && cd ../..;)
+
+dialyzer.plt.poncho:
+	$(foreach dir, $(poncho_dirs), cd apps/$(dir) && mix dialyzer --plt && cd ../..;)
+
+dialyzer.poncho: compile.poncho compile.protocols.poncho
+	$(foreach dir, $(poncho_dirs), cd apps/$(dir) && mix dialyzer && cd ../..;)

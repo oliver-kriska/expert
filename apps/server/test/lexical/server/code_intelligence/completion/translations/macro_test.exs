@@ -846,7 +846,7 @@ defmodule Lexical.Server.CodeIntelligence.Completion.Translations.MacroTest do
                "macro_2_without_parens ${1:arg1}, ${2:arg2}, ${3:arg3}, ${4:arg4}"
     end
 
-    @broken_by_elixir_sense? Version.match?(System.version(), ">= 1.14.0")
+    @broken_by_elixir_sense? Version.match?(System.version(), ">= 1.13.0")
 
     # The update to elixir sense broke these tests
     @tag [skip: @broken_by_elixir_sense?]

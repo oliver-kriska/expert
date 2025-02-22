@@ -1,19 +1,17 @@
 defmodule Common.MixProject do
   use Mix.Project
+  Code.require_file("../../mix_includes.exs")
 
   def project do
     [
       app: :common,
       version: "0.7.2",
-      build_path: "../../_build",
-      config_path: "../../config/config.exs",
-      deps_path: "../../deps",
-      lockfile: "../../mix.lock",
       elixir: "~> 1.13",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       deps: deps(),
-      compilers: [:yecc] ++ Mix.compilers()
+      compilers: [:yecc] ++ Mix.compilers(),
+      dialyzer: Mix.Dialyzer.config()
     ]
   end
 
@@ -33,6 +31,9 @@ defmodule Common.MixProject do
 
   defp deps do
     [
+      {:benchee, "~> 1.3", only: :test},
+      Mix.Credo.dependency(),
+      Mix.Dialyzer.dependency(),
       {:snowflake, "~> 1.0"},
       {:sourceror, "~> 1.7"},
       {:stream_data, "~> 1.1", only: [:test], runtime: false},

@@ -30,16 +30,14 @@ RUN integration/boot/set_up_mise.sh
 COPY integration/boot/set_up_asdf.sh integration/boot/set_up_asdf.sh
 RUN integration/boot/set_up_asdf.sh
 
+COPY mix_*.exs .
 COPY apps apps
-COPY config config
-COPY mix* .
+
+WORKDIR /lexical/apps/server
 
 RUN mix local.hex --force
 RUN mix deps.get
 RUN mix compile
-
-COPY bin bin
-
 RUN mix package
 
 CMD bash
