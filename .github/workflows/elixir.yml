@@ -78,9 +78,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Run Dialyzer
     env:
-      project_mix_lock: ${{ format('{0}{1}', github.workspace, '/mix.lock') }}
-      projects_ex_blob: ${{ format('{0}{1}', github.workspace, '/projects/**/*.ex') }}
-      projects_locks_blob: ${{ format('{0}{1}', github.workspace, '/projects/*/mix.lock') }}
+      apps_mix_lock: ${{ format('{0}{1}', github.workspace, 'apps/**/mix.lock') }}
       MIX_ENV: dev
     steps:
       # Step: Setup Elixir + Erlang image as the base.
@@ -95,13 +93,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set Variables
-        id: set_mix_lock_hash
-        run: |
-          mix_lock_hash="${{ hashFiles(env.project_mix_lock) }}"
-          projects_hash="${{ hashFiles(env.projects_ex_blob, env.projects_locks_blob) }}"
-          echo "mix_lock_hash=$mix_lock_hash::$projects_hash" >> "$GITHUB_OUTPUT"
-
       # Step: Define how to cache deps. Restores existing cache if present.
       - name: Cache deps
         id: cache-deps
@@ -113,7 +104,7 @@ jobs:
             apps/**/deps
             apps/**/_build
 
-          key: ${{ runner.os }}-mix-${{ env.DEFAULT_ELIXIR }}-${{ env.DEFAULT_OTP }}-${{ hashFiles('**/mix.lock') }}
+          key: ${{ runner.os }}-mix-${{ env.DEFAULT_ELIXIR }}-${{ env.DEFAULT_OTP }}-${{ hashFiles('apps/**/mix.lock') }}
           restore-keys: |
             ${{ runner.os }}-mix-${{ env.DEFAULT_ELIXIR }}-${{ env.DEFAULT_OTP }}-
 
@@ -123,7 +114,10 @@ jobs:
         uses: actions/cache@v3
         with:
           path: "priv/plts"
-          key: lexical-plts-2-${{ env.DEFAULT_OTP }}-${{ env.DEFAULT_ELIXIR }}-${{ steps.set_mix_lock_hash.outputs.mix_lock_hash }}
+          key: lexical-plts-2-${{ env.DEFAULT_OTP }}-${{ env.DEFAULT_ELIXIR }}-${{ hashFiles('apps/**/mix.lock' ) }}-${{ github.run_id }}
+          restore-keys: |
+            lexical-plts-2-${{ env.DEFAULT_OTP }}-${{ env.DEFAULT_ELIXIR }}-${{ hashFiles('apps/**/mix.lock') }}-
+            lexical-plts-2-${{ env.DEFAULT_OTP }}-${{ env.DEFAULT_ELIXIR }}-
 
       # Step: Download project dependencies. If unchanged, uses
       # the cached version.
