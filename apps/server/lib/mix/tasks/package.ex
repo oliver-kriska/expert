@@ -42,7 +42,8 @@ defmodule Mix.Tasks.Package do
   ```text
   bin/
     start_lexical.sh
-    debug_shell.sh
+    server_shell.sh
+    project_shell.sh
   lib/
     lx_common.sh
     lx_remote_control.sh
