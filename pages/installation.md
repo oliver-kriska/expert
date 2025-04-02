@@ -27,10 +27,10 @@ Then, clone Expert's git repository:
 git clone git@github.com:elixir-lang/expert.git
 ```
 
-Then change to the lexical directory:
+Then change into the server app directory:
 
 ```shell
-cd expert
+cd expert/apps/server
 ```
 
 Then fetch Expert's dependencies:
@@ -47,7 +47,7 @@ mix package
 
 *The output directory may also be changed with the `--path` option.*
 
-If things complete successfully, you will then have a release in your `_build/dev/package/lexical` directory. If you see errors, please file a bug.
+If things complete successfully, you will then have a release in your `apps/server/_build/dev/package/lexical` directory. If you see errors, please file a bug.
 
 For the following examples, assume the absolute path to your Lexical source code is `/my/home/projects/lexical`.
 
