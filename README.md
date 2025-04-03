@@ -84,9 +84,9 @@ Lexical will be available in `/path/to/lexical`.
 
 ## Development
 
-Lexical is intended to run on any version of Erlang 24+ and Elixir
-1.13+. Before beginning development, you should install Erlang
-`24.3.4.12` and Elixir `1.13.4` and use those versions when you're
+Lexical is intended to run on any version of Erlang 25+ and Elixir
+1.15+. Before beginning development, you should install Erlang
+`25.3.2` and Elixir `1.15.8` and use those versions when you're
 building code.
 
 You should also look at the [complete compatibility
