@@ -162,13 +162,9 @@ jobs:
             otp: "26"
           - elixir: "1.16"
             otp: "25"
-          - elixir: "1.15.6"
+          - elixir: "1.15.8"
             otp: "26"
           - elixir: "1.15.6"
-            otp: "25"
-          - elixir: "1.14"
-            otp: "25"
-          - elixir: "1.13"
             otp: "25"
     steps:
       # Step: Check out the code.
