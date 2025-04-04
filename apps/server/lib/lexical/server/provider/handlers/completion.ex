@@ -23,7 +23,7 @@ defmodule Lexical.Server.Provider.Handlers.Completion do
   response =
     case completions do
       {:ok, {:redirect, data}} ->
-      # This doesn't seems to halt when I try it, might be an issue on the plugin side:
+      # How would I do this?
       #  ResponseError.new([
       #   code: :language_service_redirect,
       #   message: "language service redirect",
