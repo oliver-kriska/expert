@@ -7,17 +7,9 @@ defmodule Lexical.Server.Provider.Handlers.Completion do
   alias Lexical.Protocol.Types.Completion
   alias Lexical.Server.CodeIntelligence
   alias Lexical.Server.Configuration
-
-  alias Lexical.Proto
+  # alias Lexical.Proto.LspTypes.ResponseError
 
   require Logger
-
-  defmodule DelegateResp do
-    use Proto
-
-    defresponse list_of(integer())
-  end
-
 
   def handle(%Requests.Completion{} = request, %Configuration{} = config) do
     completions =
@@ -31,7 +23,14 @@ defmodule Lexical.Server.Provider.Handlers.Completion do
   response =
     case completions do
       {:ok, {:redirect, data}} ->
-        DelegateResp.error(request.id, :language_service_redirect, Jason.encode!(data))
+      # This doesn't seems to halt when I try it, might be an issue on the plugin side:
+      #  ResponseError.new([
+      #   code: :language_service_redirect,
+      #   message: "language service redirect",
+      #   data: Jason.encode!(data)]
+      # )
+      Responses.Completion.error(request.id, :language_service_redirect, Jason.encode!(data))
+
       {:ok, completions} ->
         Responses.Completion.new(request.id, completions)
     end
