@@ -8,7 +8,16 @@ defmodule Lexical.Server.Provider.Handlers.Completion do
   alias Lexical.Server.CodeIntelligence
   alias Lexical.Server.Configuration
 
+  alias Lexical.Proto
+
   require Logger
+
+  defmodule DelegateResp do
+    use Proto
+
+    defresponse list_of(integer())
+  end
+
 
   def handle(%Requests.Completion{} = request, %Configuration{} = config) do
     completions =
@@ -19,7 +28,14 @@ defmodule Lexical.Server.Provider.Handlers.Completion do
         request.context || Completion.Context.new(trigger_kind: :invoked)
       )
 
-    response = Responses.Completion.new(request.id, completions)
+  response =
+    case completions do
+      {:ok, {:redirect, data}} ->
+        DelegateResp.error(request.id, :language_service_redirect, Jason.encode!(data))
+      {:ok, completions} ->
+        Responses.Completion.new(request.id, completions)
+    end
+
     {:reply, response}
   end
 

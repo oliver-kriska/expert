@@ -15,7 +15,8 @@ defmodule Lexical.Proto.LspTypes do
             request_failed: -32_803,
             server_cancelled: -32_802,
             content_modified: -32_801,
-            request_cancelled: -32_800
+            request_cancelled: -32_800,
+            language_service_redirect: -32_900
   end
 
   defmodule ResponseError do

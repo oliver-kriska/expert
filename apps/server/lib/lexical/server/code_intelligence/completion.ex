@@ -34,10 +34,20 @@ defmodule Lexical.Server.CodeIntelligence.Completion do
         %Completion.Context{} = context
       ) do
     case Env.new(project, analysis, position) do
+      {:ok, %{detected_contexts: %{sigil_CSS: true}} = _env} ->
+        {:ok, path} = Lexical.Ast.path_at(analysis, position)
+
+        [{:sigil_CSS, _, [{:<<>>, _, [css_string]}, _]} | _] = path
+
+        Logger.info("sigil_CSS path: #{inspect(path)}")
+        Logger.info("sigil_CSS: \"#{css_string}\"")
+
+        {:ok, {:redirect, %{language: "css", content: css_string}}}
+
       {:ok, env} ->
         completions = completions(project, env, context)
         log_candidates(completions)
-        maybe_to_completion_list(completions)
+        {:ok, maybe_to_completion_list(completions)}
 
       {:error, _} = error ->
         Logger.error("Failed to build completion env #{inspect(error)}")

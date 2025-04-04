@@ -12,6 +12,8 @@ defmodule Lexical.Ast.Env do
   alias Lexical.Document.Position
   alias Lexical.Project
 
+  require Logger
+
   defstruct [
     :project,
     :analysis,
@@ -91,6 +93,8 @@ defmodule Lexical.Ast.Env do
 
         env = detect_contexts(env)
 
+        Logger.info("detected contexts: #{inspect(env.detected_contexts)}")
+
         {:ok, env}
 
       _ ->
@@ -127,6 +131,7 @@ defmodule Lexical.Ast.Env do
     :require => Detection.Require,
     :spec => Detection.Spec,
     :string => Detection.String,
+    :sigil_CSS => Detection.SigilCSS,
     :struct_field_key => Detection.StructFieldKey,
     :struct_field_value => Detection.StructFieldValue,
     :struct_fields => Detection.StructFields,
