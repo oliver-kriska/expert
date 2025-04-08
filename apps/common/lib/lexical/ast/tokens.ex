@@ -163,6 +163,10 @@ defmodule Lexical.Ast.Tokens do
     Enum.reverse(ranges)
   end
 
+  defp get_start_pos([{:eol, {start_line, start_column, _}} | _]) do
+    {start_line, start_column}
+  end
+
   defp get_start_pos([{_, {start_line, start_column, _}, _} | _]) do
     {start_line, start_column}
   end
