@@ -34,7 +34,6 @@ defmodule Common.MixProject do
       {:benchee, "~> 1.3", only: :test},
       Mix.Credo.dependency(),
       Mix.Dialyzer.dependency(),
-      {:snowflake, "~> 1.0"},
       {:sourceror, "~> 1.7"},
       {:stream_data, "~> 1.1", only: [:test], runtime: false},
       {:patch, "~> 0.15", only: [:test], optional: true, runtime: false}
