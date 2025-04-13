@@ -1,4 +1,4 @@
-defmodule Lexical.Ast.Detection.SigilCSS do
+defmodule Lexical.Ast.Detection.EmbeddedSigil do
   @moduledoc """
   Hard-coded throw-away module for the sake of demonstration.
   """
@@ -38,7 +38,7 @@ defmodule Lexical.Ast.Detection.SigilCSS do
 
   # String sigils
   defp do_detect({sigil, _, _} = ast, %Position{} = position)
-       when sigil in [:sigil_css, :sigil_CSS] do
+       when sigil in [:sigil_HTML, :sigil_CSS, :sigil_JS] do
     case fetch_range(ast, 0, 0) do
       {:ok, range} -> Range.contains?(range, position)
       _ -> false

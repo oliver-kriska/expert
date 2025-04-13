@@ -131,7 +131,7 @@ defmodule Lexical.Ast.Env do
     :require => Detection.Require,
     :spec => Detection.Spec,
     :string => Detection.String,
-    :sigil_CSS => Detection.SigilCSS,
+    :embedded_sigil => Detection.EmbeddedSigil,
     :struct_field_key => Detection.StructFieldKey,
     :struct_field_value => Detection.StructFieldValue,
     :struct_fields => Detection.StructFields,

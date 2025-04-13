@@ -25,9 +25,22 @@ The primary issue with VSCode's request forwarding is that it depends on the *la
 
 There is also the matter of knowing which language service we should forward requests to for given sigils. Ideally this information can be associated with each sigil's source code.
 
+Some sigils may also utilize interpolation, take the following for sake of demonstration:
+```elixir
+talkgroup_id = 10
+
+~SQL"SELECT * FROM calls WHERE talkgroup_id = #{^talkgroup_id};"
+```
+
+The sigil author would likely want to forward the request like so:
+```sql
+SELECT * FROM calls WHERE talkgroup_id = ?;
+```
+
 In short, we have the following problems:
 1. Assocating language services with a sigil definition.
-2. Detecting sigils with an associated language service.
+2. Associate a function that derives "virtual content" from a written sigil.
+2. Detecting sigils with the above properties.
 3. Have the language service initiate a redirect.
 
 Point 3 has actually been demonstrated in [Shopify's Ruby Language Server](https://github.com/Shopify/ruby-lsp/blob/main/lib/ruby_lsp/utils.rb#L34).
