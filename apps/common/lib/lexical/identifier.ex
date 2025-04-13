@@ -11,8 +11,8 @@ defmodule Lexical.Identifier do
   # First second of 2024 (milliseconds)
   @epoch 1_704_070_800_000
 
-  @spec next_global!() :: integer
-  def next_global!() do
+  @spec next_global! :: integer
+  def next_global! do
     ts = System.os_time(:millisecond) - @epoch
     seq = rem(:erlang.unique_integer([:positive]), @seq_max)
 
