@@ -1,15 +1,31 @@
 defmodule Lexical.Identifier do
-  @doc """
-  Returns the next globally unique identifier.
-  Raises a MatchError if this cannot be computed.
+  @moduledoc """
+  Returns the next globally unique identifier with an embedded timestamp and sequence ID.
   """
-  def next_global! do
-    {:ok, next_id} = Snowflake.next_id()
-    next_id
+
+  import Bitwise
+
+  @ts_size 42
+  @seq_size 64 - @ts_size
+  @seq_max 2 ** @seq_size - 1
+  # First second of 2024 (milliseconds)
+  @epoch 1_704_070_800_000
+
+  @spec next_global!() :: integer
+  def next_global!() do
+    ts = System.os_time(:millisecond) - @epoch
+    seq = rem(:erlang.unique_integer([:positive]), @seq_max)
+
+    <<new_id::unsigned-integer-size(64)>> = <<
+      ts::unsigned-integer-size(@ts_size),
+      seq::unsigned-integer-size(@seq_size)
+    >>
+
+    new_id
   end
 
-  def to_unix(id) do
-    Snowflake.Util.real_timestamp_of_id(id)
+  def to_unix(id) when is_integer(id) do
+    (id >>> @seq_size) + @epoch
   end
 
   def to_datetime(id) do
