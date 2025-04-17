@@ -44,6 +44,9 @@ defmodule Lexical.RemoteControl.CodeAction.Handlers.AddAlias do
     [:quick_fix]
   end
 
+  @impl CodeAction.Handler
+  def trigger_kind, do: :all
+
   defp build_code_action(%Analysis{} = analysis, range, current_aliases, potential_alias_module) do
     case Ast.Module.safe_split(potential_alias_module, as: :atoms) do
       {:erlang, _} ->
