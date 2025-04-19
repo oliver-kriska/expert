@@ -11,16 +11,13 @@ Lexical supports the following versions of Elixir and Erlang:
 
 | Erlang      | Version range    | Notes  |
 | ----------- |----------------- | ------ |
-|  24         | `>= 24.3.4.12`   | Might run on older versions; this was the lowest that would compile on arm |
 |  25         | `>= 25.0`        |        |
 |  26         | `>= 26.0.2`      |        |
 |  27         | `>= 27.0`        | Will use dramatically more memory due to a bug in Erlang's ETS table compression  |
 
 | Elixir   | Version Range  | Notes    |
 | -------- | -------------- | -------- |
-| 1.13     |    `>= 1.13.4` |          |
-| 1.14     |    `all`       |          |
-| 1.15     | `>= 1.15.3`    | `1.15.0` - `1.15.2` had compiler bugs that prevented lexical from working |
+| 1.15     | `>= 1.15.8`    |          |
 | 1.16     | `>= 1.16.0`    |          |
 | 1.17     | `>= 1.17.0`    |          |
 
@@ -29,12 +26,12 @@ supports, but it's important to understand that Lexical needs to be
 compiled under the lowest version of elixir and erlang that you intend
 to use it with. That means if you have the following projects:
 
-   * `first`: elixir `1.14.4` erlang `24.3.2`
-   * `second`: elixir `1.14.3` erlang `25.0`
-   * `third`: elixir: `1.13.3` erlang `25.2.3`
+   * `first`: elixir `1.18.3` erlang `27.3.3`
+   * `second`: elixir `1.16.1` erlang `25.2.3`
+   * `third`: elixir: `1.15.8` erlang `26.0`
 
-Lexical would need to be compiled with Erlang `24.3.2` and Elixir `1.13.3`.
-Lexical's prepackaged builds use Erlang `24.3.4.12` and Elixir `1.13.4`
+Lexical would need to be compiled with Erlang `25.2.3` and Elixir `1.15.8`.
+Lexical's prepackaged builds use Erlang `25.0` and Elixir `1.15.8`
 
 ## Prerequisites
 First, Install git LFS by [following these instructions](https://docs.github.com/en/repositories/working-with-files/managing-large-files/installing-git-large-file-storage).

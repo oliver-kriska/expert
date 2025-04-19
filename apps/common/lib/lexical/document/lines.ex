@@ -147,11 +147,7 @@ defimpl Enumerable, for: Lexical.Document.Lines do
 
   def slice(%Lines{} = document) do
     slicing_function =
-      if Version.match?(System.version(), ">= 1.14.0") do
-        fn start, len, step -> do_slice(document, start, len, step) end
-      else
-        fn start, len -> do_slice(document, start, len, 1) end
-      end
+      fn start, len, step -> do_slice(document, start, len, step) end
 
     {:ok, Lines.size(document), slicing_function}
   end

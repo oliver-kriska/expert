@@ -63,23 +63,23 @@ defmodule Lexical.Ast.TokensTest do
       tokens = Tokens.prefix_stream(document, position)
 
       assert Enum.to_list(tokens) == [
-               {:eol, '\n', []},
-               {:eol, '\n', []},
-               {:eol, '\n', []},
-               {:eol, '\n', []},
+               {:eol, ~c"\n", []},
+               {:eol, ~c"\n", []},
+               {:eol, ~c"\n", []},
+               {:eol, ~c"\n", []},
                {
                  :interpolated_string,
                  [
                    {:literal, "foo«", {{1, 1}, {1, 5}}},
                    {:interpolation,
-                    [{:eol, {3, 18, 1}}, {:int, {4, 13, 2}, '2'}, {:eol, {4, 14, 1}}],
+                    [{:eol, {3, 18, 1}}, {:int, {4, 13, 2}, ~c"2"}, {:eol, {4, 14, 1}}],
                     {{3, 18}, {5, 11}}},
                    {:literal, "»bar", {{5, 11}, {5, 15}}}
                  ],
                  {3, 11}
                },
-               {:eol, '\n', []},
-               {:eol, '\n', []}
+               {:eol, ~c"\n", []},
+               {:eol, ~c"\n", []}
              ]
     end
   end

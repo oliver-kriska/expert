@@ -7,7 +7,7 @@ defmodule CompilationCallbackErrors.MixProject do
     [
       app: :compilation_callback_errors,
       version: "0.1.0",
-      elixir: "~> 1.13",
+      elixir: "~> 1.15",
       start_permanent: Mix.env() == :prod,
       deps: deps()
     ]

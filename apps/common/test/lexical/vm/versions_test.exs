@@ -85,29 +85,29 @@ defmodule Lexical.VM.VersionTest do
 
   describe "compatible?/1" do
     test "lower major versions of erlang are compatible with later major versions" do
-      patch_system_versions("1.14.5", "26.0")
-      patch_tagged_versions("1.14.5", "25.0")
+      patch_system_versions("1.15.8", "26.0")
+      patch_tagged_versions("1.15.8", "25.0")
 
       assert compatible?("/foo/bar/baz")
     end
 
     test "higher major versions are not compatible with lower major versions" do
-      patch_system_versions("1.14.5", "25.0")
-      patch_tagged_versions("1.14.5", "26.0")
+      patch_system_versions("1.15.8", "25.0")
+      patch_tagged_versions("1.15.8", "26.0")
 
       refute compatible?("/foo/bar/baz")
     end
 
     test "the same versions are compatible with each other" do
-      patch_system_versions("1.14.5", "25.3.3")
-      patch_tagged_versions("1.14.5", "25.0")
+      patch_system_versions("1.15.8", "25.3.3")
+      patch_tagged_versions("1.15.8", "25.0")
 
       assert compatible?("/foo/bar/baz")
     end
 
     test "higher minor versions are compatible" do
-      patch_system_versions("1.14.5", "25.3.0")
-      patch_tagged_versions("1.14.5", "25.0")
+      patch_system_versions("1.15.8", "25.3.0")
+      patch_tagged_versions("1.15.8", "25.0")
 
       assert compatible?("/foo/bar/baz")
     end
