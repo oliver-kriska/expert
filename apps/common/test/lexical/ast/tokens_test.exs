@@ -47,5 +47,40 @@ defmodule Lexical.Ast.TokensTest do
 
       assert Enum.to_list(tokens) == []
     end
+
+    test "works on interpolations with newlines" do
+      text = ~S[
+          ~S"""
+          "foo«#{
+            2
+          }»bar"
+          """
+          |
+          ]
+
+      {position, document} = pop_cursor(text, as: :document)
+
+      tokens = Tokens.prefix_stream(document, position)
+
+      assert Enum.to_list(tokens) == [
+               {:eol, '\n', []},
+               {:eol, '\n', []},
+               {:eol, '\n', []},
+               {:eol, '\n', []},
+               {
+                 :interpolated_string,
+                 [
+                   {:literal, "foo«", {{1, 1}, {1, 5}}},
+                   {:interpolation,
+                    [{:eol, {3, 18, 1}}, {:int, {4, 13, 2}, '2'}, {:eol, {4, 14, 1}}],
+                    {{3, 18}, {5, 11}}},
+                   {:literal, "»bar", {{5, 11}, {5, 15}}}
+                 ],
+                 {3, 11}
+               },
+               {:eol, '\n', []},
+               {:eol, '\n', []}
+             ]
+    end
   end
 end

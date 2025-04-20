@@ -30,6 +30,9 @@ defmodule Lexical.RemoteControl.CodeAction.Handlers.ReplaceRemoteFunction do
     [:quick_fix]
   end
 
+  @impl CodeAction.Handler
+  def trigger_kind, do: :all
+
   @spec to_code_actions(Document.t(), non_neg_integer(), module(), String.t(), [atom()]) ::
           [CodeAction.t()]
   defp to_code_actions(%Document{} = doc, line_number, module, function, suggestions) do

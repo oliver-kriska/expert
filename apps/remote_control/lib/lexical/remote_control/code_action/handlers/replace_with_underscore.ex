@@ -29,6 +29,9 @@ defmodule Lexical.RemoteControl.CodeAction.Handlers.ReplaceWithUnderscore do
     [:quick_fix]
   end
 
+  @impl CodeAction.Handler
+  def trigger_kind, do: :all
+
   @spec to_changes(Document.t(), non_neg_integer(), String.t() | atom) ::
           {:ok, Changes.t()} | :error
   defp to_changes(%Document{} = document, line_number, variable_name) do
