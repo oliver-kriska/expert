@@ -1,0 +1,18 @@
+defmodule Foo do
+  def bar() do
+    ~S"""
+    multi line
+    """
+  end
+
+  def baz() do
+    ~S"single line"
+  end
+end
+
+# multi line -> +1 to line to get to start
+# single line -> +2 + length_of_sigil to start
+
+# ~ + " + length_of_sigil
+# 1 + 1 + length_of_sigil
+# 2 + length_of_sigil
