@@ -13,7 +13,7 @@ Lexical supports the following versions of Elixir and Erlang:
 | ----------- |----------------- | ------ |
 |  25         | `>= 25.0`        |        |
 |  26         | `>= 26.0.2`      |        |
-|  27         | `>= 27.0`        | Will use dramatically more memory due to a bug in Erlang's ETS table compression  |
+|  27         | `>= 27.0`        | `27.0` - `27.0.1` Will use dramatically more memory due to a bug in Erlang's ETS table compression  |
 
 | Elixir   | Version Range  | Notes    |
 | -------- | -------------- | -------- |
