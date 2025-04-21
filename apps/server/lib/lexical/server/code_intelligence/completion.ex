@@ -37,28 +37,38 @@ defmodule Lexical.Server.CodeIntelligence.Completion do
       {:ok, %{detected_contexts: %{embedded_sigil: true}} = _env} ->
         {:ok, path} = Lexical.Ast.path_at(analysis, position)
 
+        # Line and column point here:
+        # |~CSS""""""
         [
-          {sigil, [_end_of_expression, _delimiter, line: line, column: column],
+          {sigil, [_end_of_expression, delimiter: delimiter, line: line, column: column],
            [{:<<>>, _, [embedded_content]}, _]}
           | _
         ] = path
+
+        "sigil_" <> lang = Atom.to_string(sigil)
+
+        # starting position of embedded content
+        {line, column} =
+          case String.length(delimiter) do
+            1 -> {line, column + 2 + String.length(lang)}
+            3 -> {line + 1, column}
+          end
 
         Logger.info("#{sigil} path: #{inspect(path)}")
         Logger.info("#{sigil} content: \"#{embedded_content}\"")
         Logger.info("Cursor position in file: #{inspect(position)}")
         Logger.info("Sigil position in file: [line: #{line}, column: #{column}]")
 
-        # Subtract the cursor's position from the start of the sigil's position,
-        # accounting for inline or heredoc formatting.
+        # embedded_position = absolute_position - start_of_embedded_content
 
         line = position.line - line
         character = position.character - column
 
         Logger.info("virtual doc position: [line: #{line}, column: #{column}]")
 
-        "sigil_" <> lang = Atom.to_string(sigil)
-
-        {:ok, {:redirect, %{language: lang, content: embedded_content, line: line, character: character}}}
+        {:ok,
+         {:redirect,
+          %{language: lang, content: embedded_content, line: line, character: character}}}
 
       {:ok, env} ->
         completions = completions(project, env, context)
