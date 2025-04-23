@@ -4,7 +4,7 @@
       name: "default",
       files: %{
         included: ["lib/", "src/", "web/", "apps/"],
-        excluded: ["apps/remote_control/test/fixtures/**/*.ex", "apps/common/lib/future/**/*.ex"]
+        excluded: ["apps/engine/test/fixtures/**/*.ex", "apps/forge/lib/future/**/*.ex"]
       },
       plugins: [],
       requires: [],

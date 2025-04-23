@@ -1,4 +1,4 @@
-name: Release Lexical
+name: Release Expert
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
 jobs:
   release:
     runs-on: ubuntu-latest
-    name: Build and release Lexical
+    name: Build and release Expert
     permissions:
       contents: write
     steps:
@@ -43,12 +43,12 @@ jobs:
 
       - name: Archive release
         run: |
-          cp lexical.zip lexical-${{ github.ref_name }}.zip
+          cp expert.zip expert-${{ github.ref_name }}.zip
 
       - name: Publish release
         uses: ncipollo/release-action@v1
         with:
-          artifacts: lexical*.zip
+          artifacts: expert*.zip
           makeLatest: true
           generateReleaseNotes: false
           allowUpdates: true

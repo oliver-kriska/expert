@@ -3,9 +3,9 @@
 
 <img alt="Lexical logo: Lexi the lynx" src="assets/lexi-logo.svg" width="150" height="200" align="right"/>
 
-# Lexical
+# Expert
 
-Lexical is a next-generation language server for the Elixir programming language.
+Expert is a next-generation language server for the Elixir programming language.
 
 <br><br><br>
 
@@ -154,7 +154,7 @@ language server. This allows you to investigate processes, make
 changes to the running code, or run `:observer`.
 
 While in the debugging shell, all the functions in
-`Lexical.Server.IEx.Helpers` are imported for you, and some common
+`Expert.IEx.Helpers` are imported for you, and some common
 modules, like `Lexical.Project` and `Lexical.Document` are
 aliased.
 

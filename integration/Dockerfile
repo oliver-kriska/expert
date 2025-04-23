@@ -1,7 +1,7 @@
-# Used to build a clean container for testing the Lexical boot sequence.
+# Used to build a clean container for testing the Expert boot sequence.
 #
-# Build: docker build -t lx -f integration/Dockerfile .
-# Run:   docker run -it lx
+# Build: docker build -t xp -f integration/Dockerfile .
+# Run:   docker run -it xp
 
 ARG SYS_ELIXIR_VERSION=1.15.7
 ARG SYS_ERLANG_VERSION=26.2.1
@@ -22,7 +22,7 @@ RUN apt-get install -y \
   openssl \
   libssl-dev
 
-WORKDIR /lexical
+WORKDIR /expert
 
 COPY integration/boot/set_up_mise.sh integration/boot/set_up_mise.sh
 RUN integration/boot/set_up_mise.sh
@@ -33,7 +33,7 @@ RUN integration/boot/set_up_asdf.sh
 COPY mix_*.exs .
 COPY apps apps
 
-WORKDIR /lexical/apps/server
+WORKDIR /expert/apps/expert
 
 RUN mix local.hex --force
 RUN mix deps.get

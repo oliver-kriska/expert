@@ -1,4 +1,4 @@
-defmodule Lexical.LanguageServer.MixProject do
+defmodule Expert.LanguageServer.MixProject do
   use Mix.Project
 
   def project do
@@ -9,7 +9,7 @@ defmodule Lexical.LanguageServer.MixProject do
       deps: deps(),
       aliases: aliases(),
       docs: docs(),
-      name: "Lexical",
+      name: "Expert",
       consolidate_protocols: Mix.env() != :test
     ]
   end
@@ -33,20 +33,20 @@ defmodule Lexical.LanguageServer.MixProject do
       ),
       filter_modules: fn mod_name, _ ->
         case Module.split(mod_name) do
-          ["Lexical", "Protocol", "Requests" | _] -> true
-          ["Lexical", "Protocol", "Notifications" | _] -> true
-          ["Lexical", "Protocol", "Responses" | _] -> true
-          ["Lexical", "Protocol" | _] -> false
+          ["Expert", "Protocol", "Requests" | _] -> true
+          ["Expert", "Protocol", "Notifications" | _] -> true
+          ["Expert", "Protocol", "Responses" | _] -> true
+          ["Expert", "Protocol" | _] -> false
           _ -> true
         end
       end,
       groups_for_modules: [
-        Core: ~r/Lexical.^(RemoteControl|Protocol|Server)/,
-        "Remote Control": ~r/Lexical.RemoteControl/,
-        "Protocol Requests": ~r/Lexical.Protocol.Requests/,
-        "Protocol Notifications": ~r/Lexical.Protocol.Notifications/,
-        "Protocol Responses": ~r/Lexical.Protocol.Responses/,
-        Server: ~r/Lexical.Server/
+        Core: ~r/Expert.^(RemoteControl|Protocol|Server)/,
+        "Remote Control": ~r/Expert.RemoteControl/,
+        "Protocol Requests": ~r/Expert.Protocol.Requests/,
+        "Protocol Notifications": ~r/Expert.Protocol.Notifications/,
+        "Protocol Responses": ~r/Expert.Protocol.Responses/,
+        Server: ~r/Expert.Server/
       ]
     ]
   end

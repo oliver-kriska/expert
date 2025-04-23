@@ -114,10 +114,10 @@ jobs:
         uses: actions/cache@v3
         with:
           path: "priv/plts"
-          key: lexical-plts-2-${{ env.DEFAULT_OTP }}-${{ env.DEFAULT_ELIXIR }}-${{ hashFiles('apps/**/mix.lock' ) }}-${{ github.run_id }}
+          key: expert-plts-2-${{ env.DEFAULT_OTP }}-${{ env.DEFAULT_ELIXIR }}-${{ hashFiles('apps/**/mix.lock' ) }}-${{ github.run_id }}
           restore-keys: |
-            lexical-plts-2-${{ env.DEFAULT_OTP }}-${{ env.DEFAULT_ELIXIR }}-${{ hashFiles('apps/**/mix.lock') }}-
-            lexical-plts-2-${{ env.DEFAULT_OTP }}-${{ env.DEFAULT_ELIXIR }}-
+            expert-plts-2-${{ env.DEFAULT_OTP }}-${{ env.DEFAULT_ELIXIR }}-${{ hashFiles('apps/**/mix.lock') }}-
+            expert-plts-2-${{ env.DEFAULT_OTP }}-${{ env.DEFAULT_ELIXIR }}-
 
       # Step: Download project dependencies. If unchanged, uses
       # the cached version.
@@ -215,7 +215,7 @@ jobs:
         with:
           context: .
           file: ./integration/Dockerfile
-          tags: lx
+          tags: xp
           # GitHub Actions cache
           # https://docs.docker.com/build/ci/github-actions/cache/
           cache-from: type=gha
