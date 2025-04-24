@@ -9,11 +9,12 @@ defmodule Expert.CodeIntelligence.CompletionTest do
 
   describe "excluding modules from expert dependencies" do
     test "expert modules are removed", %{project: project} do
-      assert [] = complete(project, "Exper|t")
+      assert [] = complete(project, "Expert|")
     end
 
     test "Expert submodules are removed", %{project: project} do
-      assert [] = complete(project, "Expert.RemoteContro|l")
+      assert [] = complete(project, "Engin|e")
+      assert [] = complete(project, "Forg|e")
     end
 
     test "Expert functions are removed", %{project: project} do
