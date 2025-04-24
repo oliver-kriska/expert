@@ -20,7 +20,7 @@ end)
   |> Code.append_path()
 end)
 
-XPert.Boot.start()
+XPExpert.Boot.start()
 
 if System.get_env("XP_HALT_AFTER_BOOT") do
   require Logger

@@ -69,10 +69,6 @@ defmodule Mix.Tasks.Namespace.Module do
     String.contains?(candidate, append_trailing_period(root_module))
   end
 
-  defp namespace("Expert") do
-    "#{@namespace_prefix}ert"
-  end
-
   defp namespace(orig) do
     @namespace_prefix <> orig
   end
