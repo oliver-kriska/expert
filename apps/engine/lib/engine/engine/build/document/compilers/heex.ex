@@ -2,10 +2,10 @@ defmodule Engine.Build.Document.Compilers.HEEx do
   @moduledoc """
   A compiler for .heex files
   """
-  alias Forge.Document
-  alias Forge.Plugin.V1.Diagnostic.Result
   alias Engine.Build.Document.Compiler
   alias Engine.Build.Document.Compilers
+  alias Forge.Document
+  alias Forge.Plugin.V1.Diagnostic.Result
   require Logger
 
   @behaviour Compiler

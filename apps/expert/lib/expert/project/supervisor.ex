@@ -1,11 +1,11 @@
 defmodule Expert.Project.Supervisor do
-  alias Forge.Project
   alias Engine.ProjectNodeSupervisor
   alias Expert.Project.Diagnostics
   alias Expert.Project.Intelligence
   alias Expert.Project.Node
   alias Expert.Project.Progress
   alias Expert.Project.SearchListener
+  alias Forge.Project
 
   use Supervisor
 

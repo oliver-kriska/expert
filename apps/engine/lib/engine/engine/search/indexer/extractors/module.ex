@@ -3,16 +3,15 @@ defmodule Engine.Search.Indexer.Extractors.Module do
   Extracts module references and definitions from AST
   """
 
-  alias Forge.Ast
-  alias Forge.Document.Position
-  alias Forge.Document.Range
-  alias Forge.ProcessCache
-  alias Engine
   alias Engine.Search.Indexer.Entry
   alias Engine.Search.Indexer.Metadata
   alias Engine.Search.Indexer.Source.Block
   alias Engine.Search.Indexer.Source.Reducer
   alias Engine.Search.Subject
+  alias Forge.Ast
+  alias Forge.Document.Position
+  alias Forge.Document.Range
+  alias Forge.ProcessCache
 
   require Logger
 

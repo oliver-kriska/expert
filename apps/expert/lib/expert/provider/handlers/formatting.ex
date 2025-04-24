@@ -1,9 +1,8 @@
 defmodule Expert.Provider.Handlers.Formatting do
-  alias Forge.Document.Changes
+  alias Expert.Configuration
   alias Expert.Protocol.Requests
   alias Expert.Protocol.Responses
-  alias Engine
-  alias Expert.Configuration
+  alias Forge.Document.Changes
 
   require Logger
 

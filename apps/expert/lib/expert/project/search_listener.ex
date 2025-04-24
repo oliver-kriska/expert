@@ -1,11 +1,10 @@
 defmodule Expert.Project.SearchListener do
-  alias Forge.Formats
-  alias Forge.Project
+  alias Engine.Api
   alias Expert.Protocol.Id
   alias Expert.Protocol.Requests
-  alias Engine.Api
-  alias Expert
   alias Expert.Window
+  alias Forge.Formats
+  alias Forge.Project
 
   import Api.Messages
 

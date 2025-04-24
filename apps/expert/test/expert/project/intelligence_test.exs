@@ -1,9 +1,8 @@
 defmodule Expert.Project.IntelligenceTest do
-  alias Engine
   alias Engine.Api.Messages
+  alias Engine.Test.Fixtures
   alias Expert.Project.Intelligence
   alias Expert.Test.DispatchFake
-  alias Engine.Test.Fixtures
 
   use ExUnit.Case
   use Patch

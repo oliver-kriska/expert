@@ -1,10 +1,9 @@
 defmodule Engine.Build.StateTest do
-  alias Forge.Document
-  alias Forge.Project
-  alias Engine
   alias Engine.Build
   alias Engine.Build.State
   alias Engine.Plugin
+  alias Forge.Document
+  alias Forge.Project
 
   import Engine.Test.Fixtures
 

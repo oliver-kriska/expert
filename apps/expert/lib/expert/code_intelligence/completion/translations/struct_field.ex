@@ -1,10 +1,10 @@
 defmodule Expert.CodeIntelligence.Completion.Translations.StructField do
-  alias Future.Code, as: Code
-  alias Forge.Ast.Env
   alias Engine.Completion.Candidate
   alias Expert.CodeIntelligence.Completion.SortScope
   alias Expert.CodeIntelligence.Completion.Translatable
   alias Expert.CodeIntelligence.Completion.Translations
+  alias Forge.Ast.Env
+  alias Future.Code, as: Code
 
   defimpl Translatable, for: Candidate.StructField do
     def translate(field, builder, %Env{} = env) do

@@ -1,12 +1,10 @@
 defmodule Expert.Project.ProgressTest do
-  alias Expert.Protocol.Notifications
-  alias Expert.Protocol.Requests
-  alias Engine
-  alias Engine
   alias Expert.Configuration
   alias Expert.Project
-  alias Expert.Transport
+  alias Expert.Protocol.Notifications
+  alias Expert.Protocol.Requests
   alias Expert.Test.DispatchFake
+  alias Expert.Transport
 
   import Engine.Test.Fixtures
   import Engine.Api.Messages

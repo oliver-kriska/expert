@@ -1,9 +1,9 @@
 defmodule Engine.CodeAction.Handlers.RemoveUnusedAliasTest do
+  alias Engine.CodeAction.Diagnostic
+  alias Engine.CodeAction.Handlers.RemoveUnusedAlias
   alias Forge.Ast
   alias Forge.Document
   alias Forge.Document.Range
-  alias Engine.CodeAction.Diagnostic
-  alias Engine.CodeAction.Handlers.RemoveUnusedAlias
 
   import Forge.Test.CursorSupport
   import Forge.Test.CodeSigil

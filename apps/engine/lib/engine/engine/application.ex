@@ -1,8 +1,6 @@
 defmodule Engine.Application do
   @moduledoc false
 
-  alias Engine
-
   use Application
   require Logger
 

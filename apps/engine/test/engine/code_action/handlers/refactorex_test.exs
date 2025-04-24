@@ -1,8 +1,8 @@
 defmodule Engine.CodeAction.Handlers.RefactorexTest do
   use Engine.Test.CodeMod.Case
 
-  alias Forge.Document
   alias Engine.CodeAction.Handlers.Refactorex
+  alias Forge.Document
 
   import Forge.Test.RangeSupport
   import Forge.Test.CodeSigil

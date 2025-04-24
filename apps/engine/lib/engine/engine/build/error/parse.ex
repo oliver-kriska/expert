@@ -1,8 +1,8 @@
 defmodule Engine.Build.Error.Parse do
+  alias Engine.Build.Error.Location
   alias Forge.Document
   alias Forge.Document.Range
   alias Forge.Plugin.V1.Diagnostic.Result
-  alias Engine.Build.Error.Location
 
   @elixir_source "Elixir"
 

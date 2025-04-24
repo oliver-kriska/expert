@@ -21,6 +21,9 @@ defmodule Engine.CodeAction.Handlers.RemoveUnusedAlias do
   normalizer and possibly fix sourceror, so until then, this is what we have.
   """
 
+  alias Engine.Analyzer
+  alias Engine.CodeAction
+  alias Engine.CodeAction.Diagnostic
   alias Forge.Ast
   alias Forge.Ast.Analysis
   alias Forge.Document
@@ -28,9 +31,6 @@ defmodule Engine.CodeAction.Handlers.RemoveUnusedAlias do
   alias Forge.Document.Edit
   alias Forge.Document.Position
   alias Forge.Document.Range
-  alias Engine.Analyzer
-  alias Engine.CodeAction
-  alias Engine.CodeAction.Diagnostic
   alias Sourceror.Zipper
 
   import Record

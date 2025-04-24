@@ -1,5 +1,4 @@
 defmodule Engine.ProgressTest do
-  alias Engine
   alias Engine.Progress
 
   import Engine.Api.Messages

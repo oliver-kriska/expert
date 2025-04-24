@@ -4,7 +4,7 @@ defmodule Expert.Application do
   @moduledoc false
 
   alias Forge.Document
-  alias Expert
+
   alias Expert.TaskQueue
   alias Expert.Transport
 

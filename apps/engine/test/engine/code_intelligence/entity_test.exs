@@ -1,6 +1,6 @@
 defmodule Engine.CodeIntelligence.EntityTest do
-  alias Forge.Document
   alias Engine.CodeIntelligence.Entity
+  alias Forge.Document
 
   import ExUnit.CaptureIO
   import Forge.Test.CodeSigil

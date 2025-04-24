@@ -1,6 +1,6 @@
 defmodule Engine.Build.Project do
   alias Forge.Project
-  alias Engine
+
   alias Engine.Build
   alias Engine.Build.Isolation
   alias Engine.Plugin

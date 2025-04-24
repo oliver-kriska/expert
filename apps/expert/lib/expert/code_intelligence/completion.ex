@@ -1,17 +1,16 @@
 defmodule Expert.CodeIntelligence.Completion do
-  alias Future.Code, as: Code
-  alias Forge.Ast.Analysis
-  alias Forge.Ast.Env
-  alias Forge.Document.Position
-  alias Forge.Project
-  alias Expert.Protocol.Types.Completion
-  alias Expert.Protocol.Types.InsertTextFormat
-  alias Engine
   alias Engine.Completion.Candidate
   alias Expert.CodeIntelligence.Completion.Builder
   alias Expert.CodeIntelligence.Completion.Translatable
   alias Expert.Configuration
   alias Expert.Project.Intelligence
+  alias Expert.Protocol.Types.Completion
+  alias Expert.Protocol.Types.InsertTextFormat
+  alias Forge.Ast.Analysis
+  alias Forge.Ast.Env
+  alias Forge.Document.Position
+  alias Forge.Project
+  alias Future.Code, as: Code
   alias Mix.Tasks.Namespace
 
   require InsertTextFormat

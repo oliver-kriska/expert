@@ -1,8 +1,8 @@
 defmodule Expert.Protocol.ResponseTest do
-  alias Forge.Document
   alias Expert.Proto
   alias Expert.Proto.Convert
   alias Expert.Protocol.Types
+  alias Forge.Document
 
   use ExUnit.Case
 

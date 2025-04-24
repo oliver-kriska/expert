@@ -1,8 +1,8 @@
 defmodule Engine.Search.Indexer.Extractors.Variable do
-  alias Forge.Ast
   alias Engine.Analyzer
   alias Engine.Search.Indexer.Entry
   alias Engine.Search.Indexer.Source.Reducer
+  alias Forge.Ast
 
   @defs [:def, :defmacro, :defp, :defmacrop]
 

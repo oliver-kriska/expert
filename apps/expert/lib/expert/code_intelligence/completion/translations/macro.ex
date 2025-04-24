@@ -1,14 +1,14 @@
 defmodule Expert.CodeIntelligence.Completion.Translations.Macro do
-  alias Forge.Ast
-  alias Forge.Ast.Env
-  alias Forge.Document
-  alias Forge.Document.Position
   alias Engine.Completion.Candidate
   alias Expert.CodeIntelligence.Completion.SortScope
   alias Expert.CodeIntelligence.Completion.Translatable
   alias Expert.CodeIntelligence.Completion.Translations
   alias Expert.CodeIntelligence.Completion.Translations.Callable
   alias Expert.CodeIntelligence.Completion.Translations.Struct
+  alias Forge.Ast
+  alias Forge.Ast.Env
+  alias Forge.Document
+  alias Forge.Document.Position
 
   @snippet_macros ~w(def defp defmacro defmacrop defimpl defmodule defprotocol defguard defguardp defexception test use)
   @unhelpful_macros ~w(:: alias! in and or destructure)

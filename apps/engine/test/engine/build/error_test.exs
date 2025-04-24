@@ -1,8 +1,8 @@
 defmodule Engine.Build.ErrorTest do
-  alias Forge.Document
   alias Engine.Build
   alias Engine.Build.CaptureServer
   alias Engine.ModuleMappings
+  alias Forge.Document
   require Logger
 
   import Forge.Test.DiagnosticSupport

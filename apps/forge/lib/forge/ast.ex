@@ -66,12 +66,12 @@ defmodule Forge.Ast do
 
   """
 
-  alias Future.Code, as: Code
   alias Forge.Ast.Analysis
   alias Forge.Document
   alias Forge.Document.Edit
   alias Forge.Document.Position
   alias Forge.Document.Range
+  alias Future.Code, as: Code
   alias Sourceror.Zipper
 
   require Logger

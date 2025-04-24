@@ -1,8 +1,7 @@
 defmodule Engine.CodeIntelligence.DefinitionTest do
-  alias Forge.Document
-  alias Engine
   alias Engine.ProjectNodeSupervisor
   alias Engine.Search
+  alias Forge.Document
 
   import Engine.Api.Messages
   import Forge.Test.CodeSigil

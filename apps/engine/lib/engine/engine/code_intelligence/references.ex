@@ -1,14 +1,14 @@
 defmodule Engine.CodeIntelligence.References do
-  alias Forge.Ast.Analysis
-  alias Forge.Document
-  alias Forge.Document.Location
-  alias Forge.Document.Position
   alias Engine.Analyzer
   alias Engine.CodeIntelligence.Entity
   alias Engine.CodeIntelligence.Variable
   alias Engine.Search.Indexer.Entry
   alias Engine.Search.Store
   alias Engine.Search.Subject
+  alias Forge.Ast.Analysis
+  alias Forge.Document
+  alias Forge.Document.Location
+  alias Forge.Document.Position
 
   require Logger
 

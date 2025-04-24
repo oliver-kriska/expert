@@ -1,11 +1,11 @@
 defmodule Engine.Build.Document.Compilers.EExTest do
-  alias Forge.Document
-  alias Forge.Plugin.V1.Diagnostic.Result
   alias Engine.Build
   alias Engine.Build.CaptureServer
   alias Engine.Build.Document.Compilers
   alias Engine.Dispatch
   alias Engine.ModuleMappings
+  alias Forge.Document
+  alias Forge.Plugin.V1.Diagnostic.Result
 
   use ExUnit.Case
 

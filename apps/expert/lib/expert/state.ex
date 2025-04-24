@@ -1,5 +1,4 @@
 defmodule Expert.State do
-  alias Forge.Document
   alias Expert.Protocol.Id
   alias Expert.Protocol.Notifications
   alias Expert.Protocol.Notifications.DidChange
@@ -23,13 +22,14 @@ defmodule Expert.State do
   alias Expert.Protocol.Types.FileSystemWatcher
   alias Expert.Protocol.Types.Registration
   alias Expert.Protocol.Types.TextDocument
-  alias Engine
+
   alias Engine.Api
   alias Expert.CodeIntelligence
   alias Expert.Configuration
   alias Expert.Project
   alias Expert.Provider.Handlers
   alias Expert.Transport
+  alias Forge.Document
 
   require CodeAction.Kind
   require Logger

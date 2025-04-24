@@ -1,9 +1,9 @@
 defmodule Forge.Project.Diagnostics.StateTest do
+  alias Expert.Project.Diagnostics.State
   alias Forge.Document
   alias Forge.Document.Edit
   alias Forge.Plugin.V1.Diagnostic
   alias Forge.Project
-  alias Expert.Project.Diagnostics.State
 
   import Engine.Test.Fixtures
 

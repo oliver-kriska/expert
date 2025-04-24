@@ -1,9 +1,9 @@
 defmodule Engine.Search.Indexer.MetadataTest do
+  alias Engine.Search.Indexer.Metadata
   alias Forge.Ast
   alias Forge.Document
   alias Forge.Document.Position
   alias Forge.Document.Range
-  alias Engine.Search.Indexer.Metadata
 
   use ExUnit.Case
 

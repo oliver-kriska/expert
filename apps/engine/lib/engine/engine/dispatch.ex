@@ -6,7 +6,7 @@ defmodule Engine.Dispatch do
   itself via a call to `register_listener`, while a process must implement the
   `Engine.Dispatch.Handler` behaviour and add the module to the @handlers module attribute.
   """
-  alias Engine
+
   alias Engine.Dispatch.Handlers
   alias Engine.Dispatch.PubSub
   import Engine.Api.Messages

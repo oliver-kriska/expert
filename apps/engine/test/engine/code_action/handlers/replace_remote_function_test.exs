@@ -1,7 +1,7 @@
 defmodule Engine.CodeAction.Handlers.ReplaceRemoteFunctionTest do
-  alias Forge.Document
   alias Engine.CodeAction.Diagnostic
   alias Engine.CodeAction.Handlers.ReplaceRemoteFunction
+  alias Forge.Document
 
   use Engine.Test.CodeMod.Case
 

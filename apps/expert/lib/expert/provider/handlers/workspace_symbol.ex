@@ -1,12 +1,12 @@
 defmodule Expert.Provider.Handlers.WorkspaceSymbol do
+  alias Engine.Api
+  alias Engine.CodeIntelligence.Symbols
+  alias Expert.Configuration
   alias Expert.Protocol.Requests.WorkspaceSymbol
   alias Expert.Protocol.Responses
   alias Expert.Protocol.Types.Location
   alias Expert.Protocol.Types.Symbol.Kind, as: SymbolKind
   alias Expert.Protocol.Types.Workspace.Symbol
-  alias Engine.Api
-  alias Engine.CodeIntelligence.Symbols
-  alias Expert.Configuration
 
   require SymbolKind
 

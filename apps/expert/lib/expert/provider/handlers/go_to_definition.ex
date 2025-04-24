@@ -1,7 +1,7 @@
 defmodule Expert.Provider.Handlers.GoToDefinition do
   alias Expert.Protocol.Requests.GoToDefinition
   alias Expert.Protocol.Responses
-  alias Engine
+
   alias Expert.Configuration
 
   require Logger

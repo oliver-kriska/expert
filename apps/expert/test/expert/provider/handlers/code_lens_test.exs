@@ -1,12 +1,10 @@
 defmodule Expert.Provider.Handlers.CodeLensTest do
-  alias Forge.Document
-  alias Forge.Project
   alias Expert.Proto.Convert
   alias Expert.Protocol.Requests.CodeLens
   alias Expert.Protocol.Types
-  alias Engine
-  alias Expert
   alias Expert.Provider.Handlers
+  alias Forge.Document
+  alias Forge.Project
 
   import Expert.Test.Protocol.Fixtures.LspProtocol
   import Engine.Api.Messages

@@ -1,7 +1,7 @@
 defmodule Engine.Plugin do
   alias Forge.Document
   alias Forge.Project
-  alias Engine
+
   alias Engine.Api.Messages
   alias Engine.Plugin.Runner
 

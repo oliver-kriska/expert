@@ -1,11 +1,11 @@
 defmodule Engine.CodeAction.Handlers.OrganizeAliases do
+  alias Engine.CodeAction
+  alias Engine.CodeMod
   alias Forge.Ast.Analysis
   alias Forge.Ast.Analysis.Scope
   alias Forge.Document
   alias Forge.Document.Changes
   alias Forge.Document.Range
-  alias Engine.CodeAction
-  alias Engine.CodeMod
 
   require Logger
 

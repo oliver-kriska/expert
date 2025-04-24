@@ -1,10 +1,10 @@
 defmodule Engine.CodeAction.Handlers.ReplaceWithUnderscore do
+  alias Engine.CodeAction
+  alias Engine.CodeAction.Diagnostic
   alias Forge.Ast
   alias Forge.Document
   alias Forge.Document.Changes
   alias Forge.Document.Range
-  alias Engine.CodeAction
-  alias Engine.CodeAction.Diagnostic
   alias Sourceror.Zipper
 
   @behaviour CodeAction.Handler

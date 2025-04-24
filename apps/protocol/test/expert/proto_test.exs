@@ -1,10 +1,10 @@
 defmodule Expert.ProtoTest do
-  alias Forge.Document
   alias Expert.Proto
   alias Expert.Proto.Convert
   alias Expert.Proto.LspTypes
   alias Expert.Protocol.Types
   alias Expert.Test.Protocol.Fixtures.LspProtocol
+  alias Forge.Document
 
   import LspProtocol
 

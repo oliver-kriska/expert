@@ -1,13 +1,13 @@
 defmodule Engine.Analyzer do
+  alias Engine.Analyzer.Aliases
+  alias Engine.Analyzer.Imports
+  alias Engine.Analyzer.Requires
+  alias Engine.Analyzer.Uses
   alias Forge.Ast
   alias Forge.Ast.Analysis
   alias Forge.Ast.Analysis.Require
   alias Forge.Ast.Analysis.Use
   alias Forge.Document.Position
-  alias Engine.Analyzer.Aliases
-  alias Engine.Analyzer.Imports
-  alias Engine.Analyzer.Requires
-  alias Engine.Analyzer.Uses
 
   require Logger
 

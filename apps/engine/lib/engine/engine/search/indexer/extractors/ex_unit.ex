@@ -1,13 +1,13 @@
 defmodule Engine.Search.Indexer.Extractors.ExUnit do
+  alias Engine.Analyzer
+  alias Engine.Search.Indexer.Entry
+  alias Engine.Search.Indexer.Metadata
+  alias Engine.Search.Indexer.Source.Reducer
   alias Forge.Ast
   alias Forge.Ast.Analysis
   alias Forge.Document.Position
   alias Forge.Document.Range
   alias Forge.Formats
-  alias Engine.Analyzer
-  alias Engine.Search.Indexer.Entry
-  alias Engine.Search.Indexer.Metadata
-  alias Engine.Search.Indexer.Source.Reducer
 
   require Logger
 

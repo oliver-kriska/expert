@@ -1,11 +1,10 @@
 defmodule Engine.Build.State do
   alias Elixir.Features
-  alias Forge.Document
-  alias Forge.Project
-  alias Engine
   alias Engine.Api.Messages
   alias Engine.Build
   alias Engine.Plugin
+  alias Forge.Document
+  alias Forge.Project
   alias Forge.VM.Versions
 
   require Logger

@@ -3,7 +3,6 @@ defmodule Engine.CodeAction.Handlers.Refactorex do
   alias Forge.Document.Changes
   alias Forge.Document.Range
 
-  alias Engine
   alias Engine.CodeAction
   alias Engine.CodeMod
 

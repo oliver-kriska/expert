@@ -1,14 +1,13 @@
 defmodule Expert.Provider.Handlers.CodeLens do
+  alias Expert.Configuration
+  alias Expert.Protocol.Requests
+  alias Expert.Protocol.Responses
+  alias Expert.Protocol.Types.CodeLens
+  alias Expert.Provider.Handlers
   alias Forge.Document
   alias Forge.Document.Position
   alias Forge.Document.Range
   alias Forge.Project
-  alias Expert.Protocol.Requests
-  alias Expert.Protocol.Responses
-  alias Expert.Protocol.Types.CodeLens
-  alias Engine
-  alias Expert.Configuration
-  alias Expert.Provider.Handlers
 
   import Document.Line
   require Logger

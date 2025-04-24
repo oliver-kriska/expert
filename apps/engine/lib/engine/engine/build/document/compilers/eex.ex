@@ -2,11 +2,11 @@ defmodule Engine.Build.Document.Compilers.EEx do
   @moduledoc """
   A compiler for .eex files
   """
-  alias Forge.Document
-  alias Forge.Plugin.V1.Diagnostic.Result
   alias Engine.Build
   alias Engine.Build.Document.Compiler
   alias Engine.Build.Document.Compilers
+  alias Forge.Document
+  alias Forge.Plugin.V1.Diagnostic.Result
 
   @behaviour Compiler
 

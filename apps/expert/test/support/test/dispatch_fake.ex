@@ -1,5 +1,4 @@
 defmodule Expert.Test.DispatchFake do
-  alias Engine
   alias Engine.Dispatch
 
   defmacro __using__(_) do

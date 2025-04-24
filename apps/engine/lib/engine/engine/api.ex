@@ -5,7 +5,7 @@ defmodule Engine.Api do
   alias Forge.Document.Position
   alias Forge.Document.Range
   alias Forge.Project
-  alias Engine
+
   alias Engine.CodeIntelligence
 
   require Logger

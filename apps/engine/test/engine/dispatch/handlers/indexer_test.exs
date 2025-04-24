@@ -1,6 +1,6 @@
 defmodule Engine.Dispatch.Handlers.IndexingTest do
   alias Forge.Document
-  alias Engine
+
   alias Engine.Api
   alias Engine.Commands
   alias Engine.Dispatch.Handlers.Indexing

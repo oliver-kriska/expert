@@ -1,12 +1,12 @@
 defmodule Expert.Provider.Handlers.DocumentSymbols do
-  alias Forge.Document
+  alias Engine.Api
+  alias Engine.CodeIntelligence.Symbols
+  alias Expert.Configuration
   alias Expert.Protocol.Requests.DocumentSymbols
   alias Expert.Protocol.Responses
   alias Expert.Protocol.Types.Document.Symbol
   alias Expert.Protocol.Types.Symbol.Kind, as: SymbolKind
-  alias Engine.Api
-  alias Engine.CodeIntelligence.Symbols
-  alias Expert.Configuration
+  alias Forge.Document
 
   require SymbolKind
 

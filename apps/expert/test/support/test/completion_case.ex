@@ -1,13 +1,12 @@
 defmodule Expert.Test.Expert.CompletionCase do
-  alias Forge.Ast
-  alias Forge.Document
-  alias Forge.Project
+  alias Expert.CodeIntelligence.Completion
   alias Expert.Protocol.Types.Completion.Context, as: CompletionContext
   alias Expert.Protocol.Types.Completion.Item, as: CompletionItem
   alias Expert.Protocol.Types.Completion.List, as: CompletionList
-  alias Engine
-  alias Expert
-  alias Expert.CodeIntelligence.Completion
+
+  alias Forge.Ast
+  alias Forge.Document
+  alias Forge.Project
   alias Forge.Test.CodeSigil
 
   use ExUnit.CaseTemplate

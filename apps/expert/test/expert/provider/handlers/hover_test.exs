@@ -1,15 +1,15 @@
 defmodule Expert.Provider.Handlers.HoverTest do
-  alias Forge.Document
-  alias Forge.Document.Position
+  alias Engine.Api.Messages
+  alias Engine.Test.Fixtures
+
   alias Expert.Proto.Convert
   alias Expert.Protocol.Requests
   alias Expert.Protocol.Types
-  alias Engine
-  alias Engine.Api.Messages
-  alias Expert
   alias Expert.Provider.Handlers
-  alias Engine.Test.Fixtures
   alias Expert.Test.Protocol.Fixtures.LspProtocol
+
+  alias Forge.Document
+  alias Forge.Document.Position
 
   import Forge.Test.CodeSigil
   import Forge.Test.CursorSupport

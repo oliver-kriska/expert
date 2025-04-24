@@ -7,6 +7,8 @@ defmodule Expert.Protocol.Conversions do
   the line contains non-ascii characters. If it's a pure ascii line, then the positions
   are the same in both utf-8 and utf-16, since they reference characters and not bytes.
   """
+  alias Expert.Protocol.Types.Position, as: LSPosition
+  alias Expert.Protocol.Types.Range, as: LSRange
   alias Forge.CodeUnit
   alias Forge.Document
   alias Forge.Document.Line
@@ -14,8 +16,6 @@ defmodule Expert.Protocol.Conversions do
   alias Forge.Document.Position, as: ElixirPosition
   alias Forge.Document.Range, as: ElixirRange
   alias Forge.Math
-  alias Expert.Protocol.Types.Position, as: LSPosition
-  alias Expert.Protocol.Types.Range, as: LSRange
 
   import Line
 

@@ -4,9 +4,9 @@ defmodule Engine.Build.Document.Compilers.Elixir do
   """
 
   alias Elixir.Features
-  alias Forge.Document
   alias Engine.Build
   alias Engine.Build.Document.Compilers
+  alias Forge.Document
 
   @behaviour Build.Document.Compiler
 

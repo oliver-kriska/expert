@@ -1,10 +1,10 @@
 defmodule Engine.Plugin.Runner do
   @moduledoc false
 
-  alias Forge.Document
-  alias Forge.Project
   alias Engine.Module.Loader
   alias Engine.Plugin.Runner
+  alias Forge.Document
+  alias Forge.Project
 
   require Logger
 

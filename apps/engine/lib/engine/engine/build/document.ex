@@ -1,8 +1,8 @@
 defmodule Engine.Build.Document do
-  alias Forge.Document
   alias Engine.Build
   alias Engine.Build.Document.Compilers
   alias Engine.Build.Isolation
+  alias Forge.Document
 
   @compilers [Compilers.Config, Compilers.Elixir, Compilers.EEx, Compilers.HEEx, Compilers.NoOp]
 

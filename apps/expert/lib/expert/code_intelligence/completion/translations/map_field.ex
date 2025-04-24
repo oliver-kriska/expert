@@ -1,7 +1,7 @@
 defmodule Expert.CodeIntelligence.Completion.Translations.MapField do
-  alias Forge.Ast.Env
   alias Engine.Completion.Candidate
   alias Expert.CodeIntelligence.Completion.Translatable
+  alias Forge.Ast.Env
 
   defimpl Translatable, for: Candidate.MapField do
     def translate(%Candidate.MapField{} = map_field, builder, %Env{} = env) do

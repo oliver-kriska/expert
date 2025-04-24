@@ -1,6 +1,6 @@
 defmodule Engine.CodeMod.AliasesTest do
   alias Forge.Ast
-  alias Engine
+
   alias Engine.CodeMod.Aliases
 
   import Forge.Test.CursorSupport

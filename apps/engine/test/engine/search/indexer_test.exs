@@ -1,8 +1,8 @@
 defmodule Engine.Search.IndexerTest do
-  alias Forge.Project
   alias Engine.Dispatch
   alias Engine.Search.Indexer
   alias Engine.Search.Indexer.Entry
+  alias Forge.Project
 
   use ExUnit.Case
   use Patch

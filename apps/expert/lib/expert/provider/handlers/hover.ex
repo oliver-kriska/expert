@@ -1,16 +1,15 @@
 defmodule Expert.Provider.Handlers.Hover do
+  alias Engine.CodeIntelligence.Docs
+  alias Expert.Configuration
+  alias Expert.Protocol.Requests
+  alias Expert.Protocol.Responses
+  alias Expert.Protocol.Types.Hover
+  alias Expert.Provider.Markdown
   alias Forge.Ast
   alias Forge.Ast.Analysis
   alias Forge.Document
   alias Forge.Document.Position
   alias Forge.Project
-  alias Expert.Protocol.Requests
-  alias Expert.Protocol.Responses
-  alias Expert.Protocol.Types.Hover
-  alias Engine
-  alias Engine.CodeIntelligence.Docs
-  alias Expert.Configuration
-  alias Expert.Provider.Markdown
 
   require Logger
 

@@ -1,13 +1,12 @@
 defmodule Engine.Search.Indexer.Extractors.FunctionReference do
-  alias Forge.Ast
-  alias Forge.Document.Position
-  alias Forge.Document.Range
-  alias Engine
   alias Engine.Search.Indexer.Entry
   alias Engine.Search.Indexer.Extractors.FunctionDefinition
   alias Engine.Search.Indexer.Metadata
   alias Engine.Search.Indexer.Source.Reducer
   alias Engine.Search.Subject
+  alias Forge.Ast
+  alias Forge.Document.Position
+  alias Forge.Document.Range
 
   require Logger
 

@@ -1,9 +1,9 @@
 defmodule Engine.CodeAction do
+  alias Engine.CodeAction.Diagnostic
+  alias Engine.CodeAction.Handlers
   alias Forge.Document
   alias Forge.Document.Changes
   alias Forge.Document.Range
-  alias Engine.CodeAction.Diagnostic
-  alias Engine.CodeAction.Handlers
 
   defstruct [:title, :kind, :changes, :uri]
 

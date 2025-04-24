@@ -1,11 +1,9 @@
 defmodule Expert.Provider.Handlers.GoToDefinitionTest do
-  alias Forge.Document
-  alias Forge.Document.Location
   alias Expert.Proto.Convert
   alias Expert.Protocol.Requests.GoToDefinition
-  alias Engine
-  alias Expert
   alias Expert.Provider.Handlers
+  alias Forge.Document
+  alias Forge.Document.Location
 
   import Expert.Test.Protocol.Fixtures.LspProtocol
   import Engine.Api.Messages

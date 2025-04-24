@@ -4,7 +4,7 @@ defmodule Engine.CodeAction.Handlers.ReplaceRemoteFunction do
   alias Forge.Document.Changes
   alias Forge.Document.Edit
   alias Forge.Document.Range
-  alias Engine
+
   alias Engine.CodeAction
   alias Engine.CodeAction.Diagnostic
   alias Engine.Modules

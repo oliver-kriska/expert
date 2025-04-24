@@ -1,12 +1,11 @@
 defmodule Expert.Provider.Handlers.Commands do
-  alias Forge.Project
+  alias Expert.Configuration
   alias Expert.Protocol.Requests
   alias Expert.Protocol.Responses
   alias Expert.Protocol.Types
   alias Expert.Protocol.Types.ErrorCodes
-  alias Engine
-  alias Expert.Configuration
   alias Expert.Window
+  alias Forge.Project
 
   require ErrorCodes
   require Logger

@@ -1,7 +1,7 @@
 defmodule Engine.Build.Error.ParseTest do
+  alias Engine.Build
   alias Forge.Document
   alias Forge.Plugin.V1.Diagnostic
-  alias Engine.Build
 
   alias Engine.Build.CaptureServer
   alias Engine.Dispatch

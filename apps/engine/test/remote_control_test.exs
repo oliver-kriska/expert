@@ -1,7 +1,6 @@
 defmodule EngineTest do
   alias Forge.Document
   alias Forge.Project
-  alias Engine
 
   use ExUnit.Case
   use Forge.Test.EventualAssertions

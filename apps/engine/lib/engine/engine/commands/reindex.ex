@@ -1,10 +1,10 @@
 defmodule Engine.Commands.Reindex do
   defmodule State do
+    alias Engine.Search
+    alias Engine.Search.Indexer
     alias Forge.Ast.Analysis
     alias Forge.Document
     alias Forge.ProcessCache
-    alias Engine.Search
-    alias Engine.Search.Indexer
 
     require Logger
     require ProcessCache
@@ -72,7 +72,7 @@ defmodule Engine.Commands.Reindex do
 
   alias Forge.Document
   alias Forge.Project
-  alias Engine
+
   alias Engine.Api
   alias Engine.Search
 

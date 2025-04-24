@@ -1,8 +1,8 @@
 defmodule Engine.CodeMod.DiffTest do
+  alias Engine.CodeMod.Diff
   alias Forge.Document
   alias Forge.Document.Edit
   alias Forge.Document.Range
-  alias Engine.CodeMod.Diff
 
   use Engine.Test.CodeMod.Case
   use Forge.Test.PositionSupport

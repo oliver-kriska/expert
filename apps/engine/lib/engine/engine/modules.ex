@@ -3,8 +3,8 @@ defmodule Engine.Modules do
   Utilities for dealing with modules on the remote control node
   """
 
-  alias Future.Code.Typespec
   alias Engine.Module.Loader
+  alias Future.Code.Typespec
 
   @typedoc "Module documentation record as defined by EEP-48"
   @type docs_v1 :: tuple()

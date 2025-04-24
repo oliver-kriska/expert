@@ -3,7 +3,7 @@ defmodule Expert.Provider.Handlers.CodeAction do
   alias Expert.Protocol.Responses
   alias Expert.Protocol.Types
   alias Expert.Protocol.Types.Workspace
-  alias Engine
+
   alias Engine.CodeAction
   alias Expert.Configuration
 

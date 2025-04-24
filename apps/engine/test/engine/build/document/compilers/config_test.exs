@@ -1,6 +1,6 @@
 defmodule Engine.Build.Document.Compilers.ConfigTest do
-  alias Forge.Document
   alias Engine.Build.Document.Compilers
+  alias Forge.Document
 
   use ExUnit.Case
   import Forge.Test.CodeSigil

@@ -1,10 +1,10 @@
 defmodule Expert.Provider.Handlers.FindReferences do
-  alias Forge.Ast
-  alias Forge.Document
-  alias Expert.Protocol.Requests.FindReferences
-  alias Expert.Protocol.Responses
   alias Engine.Api
   alias Expert.Configuration
+  alias Expert.Protocol.Requests.FindReferences
+  alias Expert.Protocol.Responses
+  alias Forge.Ast
+  alias Forge.Document
 
   require Logger
 

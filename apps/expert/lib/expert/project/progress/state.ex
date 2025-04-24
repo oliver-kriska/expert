@@ -1,11 +1,11 @@
 defmodule Expert.Project.Progress.State do
-  alias Forge.Project
-  alias Expert.Protocol.Id
-  alias Expert.Protocol.Requests
   alias Expert.Configuration
   alias Expert.Project.Progress.Percentage
   alias Expert.Project.Progress.Value
+  alias Expert.Protocol.Id
+  alias Expert.Protocol.Requests
   alias Expert.Transport
+  alias Forge.Project
 
   import Engine.Api.Messages
 

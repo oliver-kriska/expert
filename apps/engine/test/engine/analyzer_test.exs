@@ -1,7 +1,7 @@
 defmodule Engine.AnalyzerTest do
+  alias Engine.Analyzer
   alias Forge.Ast
   alias Forge.Ast.Analysis
-  alias Engine.Analyzer
 
   import Forge.Test.CodeSigil
   import Forge.Test.CursorSupport

@@ -1,8 +1,8 @@
 defmodule Expert.CodeIntelligence.Completion.BuilderTest do
+  alias Expert.CodeIntelligence.Completion.SortScope
+  alias Expert.Protocol.Types.Completion.Item, as: CompletionItem
   alias Forge.Ast
   alias Forge.Ast.Env
-  alias Expert.Protocol.Types.Completion.Item, as: CompletionItem
-  alias Expert.CodeIntelligence.Completion.SortScope
 
   use ExUnit.Case, async: true
 

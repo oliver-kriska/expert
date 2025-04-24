@@ -4,7 +4,6 @@ defmodule Engine.Port do
   """
 
   alias Forge.Project
-  alias Engine
 
   @type open_opt ::
           {:env, list()}

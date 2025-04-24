@@ -1,7 +1,7 @@
 defmodule Engine.Commands.ReindexTest do
-  alias Forge.Document
   alias Engine.Commands.Reindex
   alias Engine.Search
+  alias Forge.Document
 
   import Forge.Test.EventualAssertions
   import Engine.Test.Fixtures

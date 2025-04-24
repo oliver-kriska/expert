@@ -12,7 +12,7 @@ defmodule Expert.Project.Node do
   end
 
   alias Forge.Project
-  alias Engine
+
   alias Expert.Project.Progress
 
   require Logger

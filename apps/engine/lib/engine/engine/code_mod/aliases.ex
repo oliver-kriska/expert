@@ -7,7 +7,7 @@ defmodule Engine.CodeMod.Aliases do
   alias Forge.Document.Edit
   alias Forge.Document.Position
   alias Forge.Document.Range
-  alias Engine
+
   alias Sourceror.Zipper
 
   @doc """

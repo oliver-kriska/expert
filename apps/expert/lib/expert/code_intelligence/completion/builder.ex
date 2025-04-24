@@ -10,15 +10,15 @@ defmodule Expert.CodeIntelligence.Completion.Builder do
   replacement range will be determined by the preceding token.
   """
 
-  alias Future.Code, as: Code
+  alias Expert.CodeIntelligence.Completion.SortScope
+  alias Expert.Protocol.Types.Completion
+  alias Expert.Protocol.Types.Markup.Content
   alias Forge.Ast.Env
   alias Forge.Document
   alias Forge.Document.Edit
   alias Forge.Document.Position
   alias Forge.Document.Range
-  alias Expert.Protocol.Types.Completion
-  alias Expert.Protocol.Types.Markup.Content
-  alias Expert.CodeIntelligence.Completion.SortScope
+  alias Future.Code, as: Code
 
   @doc "Fields found in `t:Expert.Protocol.Types.Completion.Item.t()`"
   @type item_opts :: keyword()

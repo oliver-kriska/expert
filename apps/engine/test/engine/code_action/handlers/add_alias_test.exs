@@ -4,7 +4,7 @@ defmodule Engine.CodeAction.Handlers.AddAliasTest do
   alias Forge.Document
   alias Forge.Document.Line
   alias Forge.Document.Range
-  alias Engine
+
   alias Engine.CodeAction.Handlers.AddAlias
   alias Engine.Search.Store
 

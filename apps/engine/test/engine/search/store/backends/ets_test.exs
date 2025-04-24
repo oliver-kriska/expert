@@ -1,11 +1,11 @@
 defmodule Engine.Search.Store.Backend.EtsTest do
-  alias Forge.Project
   alias Engine.Dispatch
   alias Engine.Search.Store
   alias Engine.Search.Store.Backends
   alias Engine.Test.Entry
-  alias Forge.Test.EventualAssertions
   alias Engine.Test.Fixtures
+  alias Forge.Project
+  alias Forge.Test.EventualAssertions
 
   use ExUnit.Case, async: false
 

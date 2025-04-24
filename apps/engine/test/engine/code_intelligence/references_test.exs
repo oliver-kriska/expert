@@ -1,7 +1,7 @@
 defmodule Engine.CodeIntelligence.ReferencesTest do
   alias Forge.Document
   alias Forge.Document.Location
-  alias Engine
+
   alias Engine.CodeIntelligence.References
   alias Engine.Search
   alias Engine.Search.Store.Backends

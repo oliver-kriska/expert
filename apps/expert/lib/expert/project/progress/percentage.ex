@@ -2,9 +2,9 @@ defmodule Expert.Project.Progress.Percentage do
   @moduledoc """
   The backing data structure for percentage based progress reports
   """
-  alias Forge.Math
   alias Expert.Protocol.Notifications
   alias Expert.Protocol.Types.WorkDone
+  alias Forge.Math
 
   @enforce_keys [:token, :kind, :max]
   defstruct [:token, :kind, :title, :message, :max, current: 0]

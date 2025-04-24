@@ -1,13 +1,11 @@
 defmodule Expert.Provider.Handlers.FindReferencesTest do
-  alias Forge.Ast.Analysis
-  alias Forge.Document
-  alias Forge.Document.Location
   alias Expert.Proto.Convert
   alias Expert.Protocol.Requests.FindReferences
   alias Expert.Protocol.Responses
-  alias Engine
-  alias Expert
   alias Expert.Provider.Handlers
+  alias Forge.Ast.Analysis
+  alias Forge.Document
+  alias Forge.Document.Location
 
   import Expert.Test.Protocol.Fixtures.LspProtocol
   import Engine.Test.Fixtures

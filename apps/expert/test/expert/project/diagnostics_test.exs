@@ -1,11 +1,9 @@
 defmodule Expert.Project.DiagnosticsTest do
+  alias Expert.Protocol.Notifications.PublishDiagnostics
+  alias Expert.Test.DispatchFake
+  alias Expert.Transport
   alias Forge.Document
   alias Forge.Plugin.V1.Diagnostic
-  alias Expert.Protocol.Notifications.PublishDiagnostics
-  alias Engine
-  alias Expert
-  alias Expert.Transport
-  alias Expert.Test.DispatchFake
 
   use ExUnit.Case
   use Patch

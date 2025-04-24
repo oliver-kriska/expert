@@ -7,7 +7,7 @@ defmodule Engine.Bootstrap do
   point, it's safe to start the project, as we should have all the code present to compile the system.
   """
   alias Forge.Project
-  alias Engine
+
   require Logger
 
   def init(%Project{} = project, document_store_entropy, app_configs) do

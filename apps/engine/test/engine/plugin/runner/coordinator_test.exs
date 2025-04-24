@@ -1,7 +1,7 @@
 defmodule Engine.Plugin.Runner.CoordinatorTest do
+  alias Engine.Plugin.Runner
   alias Forge.Document
   alias Forge.Project
-  alias Engine.Plugin.Runner
 
   use ExUnit.Case, async: false
   import Forge.Test.EventualAssertions

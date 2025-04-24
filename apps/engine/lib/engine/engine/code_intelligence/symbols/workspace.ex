@@ -13,9 +13,9 @@ defmodule Engine.CodeIntelligence.Symbols.Workspace do
     end
   end
 
+  alias Engine.Search.Indexer.Entry
   alias Forge.Document
   alias Forge.Formats
-  alias Engine.Search.Indexer.Entry
 
   defstruct [:name, :type, :link, container_name: nil]
 

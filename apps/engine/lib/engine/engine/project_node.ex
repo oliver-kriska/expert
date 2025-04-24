@@ -1,6 +1,5 @@
 defmodule Engine.ProjectNode do
   alias Forge.Project
-  alias Engine
   require Logger
 
   defmodule State do
@@ -104,8 +103,8 @@ defmodule Engine.ProjectNode do
     end
   end
 
-  alias Forge.Document
   alias Engine.ProjectNodeSupervisor
+  alias Forge.Document
   use GenServer
 
   def start(project, paths) do

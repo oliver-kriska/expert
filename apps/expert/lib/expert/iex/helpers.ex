@@ -1,18 +1,17 @@
 defmodule Expert.IEx.Helpers do
+  alias Engine.Search
+  alias Expert.CodeIntelligence
+  alias Expert.Protocol.Types.Completion
   alias Forge.Ast
   alias Forge.Document
   alias Forge.Document.Position
   alias Forge.Project
-  alias Expert.Protocol.Types.Completion
-  alias Engine
-  alias Engine.Search
-  alias Expert.CodeIntelligence
 
   defmacro __using__(_) do
     quote do
       alias Forge.Document
       alias Forge.Document.Position
-      alias Engine
+
       alias Engine.Search
       import unquote(__MODULE__)
 

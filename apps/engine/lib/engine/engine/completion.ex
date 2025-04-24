@@ -3,7 +3,7 @@ defmodule Engine.Completion do
   alias Forge.Ast.Env
   alias Forge.Document
   alias Forge.Document.Position
-  alias Engine
+
   alias Engine.CodeMod.Format
   alias Engine.Completion.Candidate
 

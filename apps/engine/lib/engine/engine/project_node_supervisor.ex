@@ -1,7 +1,8 @@
 defmodule Engine.ProjectNodeSupervisor do
-  alias Forge.Project
-  alias Engine.ProjectNode
   use DynamicSupervisor
+
+  alias Engine.ProjectNode
+  alias Forge.Project
 
   @dialyzer {:no_return, start_link: 1}
 

@@ -1,8 +1,8 @@
 defmodule Engine.Plugin.Runner.Coordinator do
   @moduledoc false
 
-  alias Forge.Formats
   alias Engine.Plugin.Runner.Coordinator.State
+  alias Forge.Formats
 
   require Logger
   use GenServer

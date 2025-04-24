@@ -38,8 +38,8 @@ defmodule WithSigils do
 end
 
 defmodule Engine.Ast.Analysis.ImportsTest do
-  alias Forge.Ast
   alias Engine.Analyzer
+  alias Forge.Ast
   alias Parent.Child.ImportedModule
   import Forge.Test.CursorSupport
   import Forge.Test.CodeSigil

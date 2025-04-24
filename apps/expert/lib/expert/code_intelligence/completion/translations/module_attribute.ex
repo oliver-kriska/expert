@@ -1,11 +1,11 @@
 defmodule Expert.CodeIntelligence.Completion.Translations.ModuleAttribute do
-  alias Forge.Ast
-  alias Forge.Ast.Env
-  alias Forge.Document.Position
   alias Engine.Completion.Candidate
   alias Expert.CodeIntelligence.Completion.SortScope
   alias Expert.CodeIntelligence.Completion.Translatable
   alias Expert.CodeIntelligence.Completion.Translations
+  alias Forge.Ast
+  alias Forge.Ast.Env
+  alias Forge.Document.Position
 
   defimpl Translatable, for: Candidate.ModuleAttribute do
     def translate(attribute, builder, %Env{} = env) do

@@ -1,6 +1,6 @@
 defmodule Engine.Build.Document.Compilers.ElixirTest do
-  alias Forge.Document
   alias Engine.Build.Document.Compilers
+  alias Forge.Document
 
   use ExUnit.Case
   import Compilers.Elixir

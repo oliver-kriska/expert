@@ -1,12 +1,12 @@
 defmodule Expert.Provider.Handlers.Completion do
-  alias Forge.Ast
-  alias Forge.Document
-  alias Forge.Document.Position
+  alias Expert.CodeIntelligence
+  alias Expert.Configuration
   alias Expert.Protocol.Requests
   alias Expert.Protocol.Responses
   alias Expert.Protocol.Types.Completion
-  alias Expert.CodeIntelligence
-  alias Expert.Configuration
+  alias Forge.Ast
+  alias Forge.Document
+  alias Forge.Document.Position
 
   require Logger
 

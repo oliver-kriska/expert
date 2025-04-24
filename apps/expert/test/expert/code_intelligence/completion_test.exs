@@ -1,8 +1,8 @@
 defmodule Expert.CodeIntelligence.CompletionTest do
-  alias Expert.Protocol.Types.Completion
-  alias Expert.Protocol.Types.Completion.Item, as: CompletionItem
   alias Engine.Completion.Candidate
   alias Expert.CodeIntelligence.Completion.SortScope
+  alias Expert.Protocol.Types.Completion
+  alias Expert.Protocol.Types.Completion.Item, as: CompletionItem
 
   use Expert.Test.Expert.CompletionCase
   use Patch

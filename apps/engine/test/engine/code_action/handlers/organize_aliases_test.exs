@@ -1,7 +1,7 @@
 defmodule Engine.CodeAction.Handlers.OrganizeAliasesTest do
   alias Forge.Document
   alias Forge.Document.Range
-  alias Engine
+
   alias Engine.CodeAction.Handlers.OrganizeAliases
 
   import Forge.Test.CursorSupport

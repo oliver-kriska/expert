@@ -1,12 +1,12 @@
 defmodule Engine.BuildTest do
   alias Elixir.Features
-  alias Forge.Document
-  alias Forge.Plugin.V1.Diagnostic
-  alias Forge.Project
-  alias Engine
+
   alias Engine.Api.Messages
   alias Engine.Build
   alias Engine.ProjectNodeSupervisor
+  alias Forge.Document
+  alias Forge.Plugin.V1.Diagnostic
+  alias Forge.Project
 
   import Messages
   import Engine.Test.Fixtures

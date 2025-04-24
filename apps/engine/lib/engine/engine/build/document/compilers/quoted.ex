@@ -1,9 +1,9 @@
 defmodule Engine.Build.Document.Compilers.Quoted do
   alias Elixir.Features
-  alias Forge.Ast
-  alias Forge.Document
   alias Engine.Build
   alias Engine.ModuleMappings
+  alias Forge.Ast
+  alias Forge.Document
 
   import Engine.Build.CaptureIO, only: [capture_io: 2]
 

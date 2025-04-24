@@ -1,11 +1,11 @@
 defmodule Expert.TaskQueueTest do
+  alias Engine.Test.Fixtures
+  alias Expert.Configuration
   alias Expert.Protocol.Notifications
   alias Expert.Protocol.Requests
-  alias Expert.Configuration
   alias Expert.Provider.Handlers
   alias Expert.TaskQueue
   alias Expert.Transport
-  alias Engine.Test.Fixtures
 
   use ExUnit.Case
   use Patch

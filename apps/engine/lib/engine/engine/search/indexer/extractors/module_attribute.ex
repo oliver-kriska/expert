@@ -3,12 +3,12 @@ defmodule Engine.Search.Indexer.Extractors.ModuleAttribute do
   Extracts module attribute definitions and references from AST
   """
 
-  alias Forge.Document.Position
-  alias Forge.Document.Range
   alias Engine.Analyzer
   alias Engine.Search.Indexer.Entry
   alias Engine.Search.Indexer.Source.Reducer
   alias Engine.Search.Subject
+  alias Forge.Document.Position
+  alias Forge.Document.Range
 
   require Logger
 

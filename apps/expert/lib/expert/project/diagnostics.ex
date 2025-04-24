@@ -1,11 +1,10 @@
 defmodule Expert.Project.Diagnostics do
-  alias Forge.Formats
-  alias Forge.Project
-  alias Expert.Protocol.Notifications.PublishDiagnostics
-  alias Engine
   alias Engine.Api.Messages
   alias Expert.Project.Diagnostics.State
+  alias Expert.Protocol.Notifications.PublishDiagnostics
   alias Expert.Transport
+  alias Forge.Formats
+  alias Forge.Project
 
   import Messages
   require Logger

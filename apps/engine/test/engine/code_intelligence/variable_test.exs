@@ -1,6 +1,6 @@
 defmodule Engine.CodeIntelligence.VariableTest do
-  alias Forge.Ast
   alias Engine.CodeIntelligence.Variable
+  alias Forge.Ast
 
   use ExUnit.Case
 

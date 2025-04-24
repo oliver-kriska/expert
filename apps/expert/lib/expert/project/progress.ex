@@ -1,6 +1,6 @@
 defmodule Expert.Project.Progress do
-  alias Forge.Project
   alias Expert.Project.Progress.State
+  alias Forge.Project
 
   import Engine.Api.Messages
 

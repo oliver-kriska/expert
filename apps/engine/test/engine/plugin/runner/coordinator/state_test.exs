@@ -1,8 +1,8 @@
 defmodule Engine.Plugin.Coordinator.StateTest do
-  alias Forge.Document
-  alias Forge.Plugin.V1
   alias Engine.Plugin.Runner
   alias Engine.Plugin.Runner.Coordinator.State
+  alias Forge.Document
+  alias Forge.Plugin.V1
 
   use ExUnit.Case
 

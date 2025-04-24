@@ -1,7 +1,7 @@
 defmodule Engine.Search.Store.Backends.Ets.SchemaTest do
-  alias Forge.Project
   alias Engine.Search.Store.Backends.Ets.Schema
   alias Engine.Search.Store.Backends.Ets.Wal
+  alias Forge.Project
 
   import Engine.Test.Fixtures
   import Wal, only: :macros

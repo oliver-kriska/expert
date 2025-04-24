@@ -58,8 +58,8 @@ defmodule Expert.Project.Intelligence do
     end
   end
 
-  alias Forge.Project
   alias Engine.Api
+  alias Forge.Project
 
   use GenServer
   import Api.Messages

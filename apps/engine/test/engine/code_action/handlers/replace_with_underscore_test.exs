@@ -1,7 +1,7 @@
 defmodule Engine.CodeAction.Handlers.ReplaceWithUnderscoreTest do
-  alias Forge.Document
   alias Engine.CodeAction.Diagnostic
   alias Engine.CodeAction.Handlers.ReplaceWithUnderscore
+  alias Forge.Document
 
   use Engine.Test.CodeMod.Case
 

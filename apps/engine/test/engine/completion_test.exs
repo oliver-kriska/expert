@@ -1,8 +1,8 @@
 defmodule Engine.CompletionTest do
+  alias Engine.Completion
   alias Forge.Ast
   alias Forge.Ast.Env
   alias Forge.Document
-  alias Engine.Completion
 
   import Forge.Test.CodeSigil
   import Forge.Test.CursorSupport

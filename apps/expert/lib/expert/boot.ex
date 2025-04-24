@@ -4,8 +4,8 @@ defmodule Expert.Boot do
 
   Packaging will ensure that config.exs and runtime.exs will be visible to the `:code` module
   """
-  alias Future.Code
   alias Forge.VM.Versions
+  alias Future.Code
   require Logger
 
   # halt/1 will generate a "no local return" error, which is exactly right, but that's it's _job_

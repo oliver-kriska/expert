@@ -1,8 +1,8 @@
 defmodule Forge.DocumentTest do
-  alias Forge.Document
   alias Expert.Protocol.Types.Position
   alias Expert.Protocol.Types.Range
   alias Expert.Protocol.Types.TextEdit
+  alias Forge.Document
 
   alias Expert.Protocol.Types.TextDocument.ContentChangeEvent.TextDocumentContentChangeEvent,
     as: RangedContentChange

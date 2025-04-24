@@ -3,15 +3,15 @@ defmodule Expert.Configuration do
   Encapsulates expert configuration options and client capability support.
   """
 
-  alias Forge.Project
+  alias Expert.Configuration.Support
+  alias Expert.Dialyzer
   alias Expert.Protocol.Id
   alias Expert.Protocol.Notifications.DidChangeConfiguration
   alias Expert.Protocol.Requests
   alias Expert.Protocol.Requests.RegisterCapability
   alias Expert.Protocol.Types.ClientCapabilities
   alias Expert.Protocol.Types.Registration
-  alias Expert.Configuration.Support
-  alias Expert.Dialyzer
+  alias Forge.Project
 
   defstruct project: nil,
             support: nil,

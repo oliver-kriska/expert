@@ -7,7 +7,7 @@ defmodule Engine.CodeAction.Handlers.AddAlias do
   alias Forge.Document.Position
   alias Forge.Document.Range
   alias Forge.Formats
-  alias Engine
+
   alias Engine.Analyzer
   alias Engine.CodeAction
   alias Engine.CodeIntelligence.Entity

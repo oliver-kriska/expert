@@ -1,10 +1,10 @@
 defmodule Expert.CodeIntelligence.Completion.Translations.Callback do
-  alias Forge.Ast.Env
-  alias Forge.Document
   alias Engine.Completion.Candidate.Callback
   alias Expert.CodeIntelligence.Completion.Builder
   alias Expert.CodeIntelligence.Completion.SortScope
   alias Expert.CodeIntelligence.Completion.Translatable
+  alias Forge.Ast.Env
+  alias Forge.Document
 
   defimpl Translatable, for: Callback do
     def translate(callback, _builder, %Env{} = env) do

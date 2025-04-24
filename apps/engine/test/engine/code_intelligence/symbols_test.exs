@@ -1,8 +1,8 @@
 defmodule Engine.CodeIntelligence.SymbolsTest do
-  alias Forge.Document
   alias Engine.CodeIntelligence.Symbols
   alias Engine.Search.Indexer.Extractors
   alias Engine.Search.Indexer.Source
+  alias Forge.Document
 
   use ExUnit.Case
   use Patch

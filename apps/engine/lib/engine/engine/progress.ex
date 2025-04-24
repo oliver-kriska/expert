@@ -1,6 +1,4 @@
 defmodule Engine.Progress do
-  alias Engine
-
   import Engine.Api.Messages
 
   @type label :: String.t()

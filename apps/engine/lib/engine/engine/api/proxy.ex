@@ -32,7 +32,7 @@ defmodule Engine.Api.Proxy do
 
   alias Forge.Document
   alias Forge.Document.Changes
-  alias Engine
+
   alias Engine.Api.Messages
   alias Engine.Api.Proxy.BufferingState
   alias Engine.Api.Proxy.DrainingState

@@ -24,7 +24,7 @@ defmodule Mix.Tasks.Namespace do
     "protocol" => "Expert",
     "engine" => "Engine",
     "expert" => "Expert",
-    "forge" => "Forge",
+    "forge" => "Forge"
   }
 
   @deps_apps Engine.MixProject.project()

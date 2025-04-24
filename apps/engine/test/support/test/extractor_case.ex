@@ -1,6 +1,6 @@
 defmodule Engine.Test.ExtractorCase do
-  alias Forge.Document
   alias Engine.Search.Indexer
+  alias Forge.Document
 
   use ExUnit.CaseTemplate
   import Forge.Test.CodeSigil

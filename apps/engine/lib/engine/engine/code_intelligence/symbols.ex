@@ -1,11 +1,11 @@
 defmodule Engine.CodeIntelligence.Symbols do
-  alias Forge.Document
-  alias Forge.Document.Range
   alias Engine.CodeIntelligence.Symbols
   alias Engine.Search
   alias Engine.Search.Indexer
   alias Engine.Search.Indexer.Entry
   alias Engine.Search.Indexer.Extractors
+  alias Forge.Document
+  alias Forge.Document.Range
 
   @block_types [
     :ex_unit_describe,

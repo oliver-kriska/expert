@@ -1,7 +1,7 @@
 defmodule Engine.Search.Indexer.Source do
+  alias Engine.Search.Indexer
   alias Forge.Ast
   alias Forge.Document
-  alias Engine.Search.Indexer
 
   require Logger
 

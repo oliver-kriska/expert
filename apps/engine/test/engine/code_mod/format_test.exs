@@ -1,11 +1,10 @@
 # credo:disable-for-this-file Credo.Check.Readability.RedundantBlankLines
 defmodule Engine.CodeMod.FormatTest do
-  alias Forge.Document
-  alias Forge.Project
-  alias Engine
   alias Engine.Api.Messages
   alias Engine.Build
   alias Engine.CodeMod.Format
+  alias Forge.Document
+  alias Forge.Project
 
   use Engine.Test.CodeMod.Case, enable_ast_conversion: false
   use Patch
