@@ -7,7 +7,7 @@ defmodule Lexical.Protocol.MixProject do
       app: :protocol,
       env: Mix.env(),
       version: "0.7.2",
-      elixir: "~> 1.13",
+      elixir: "~> 1.15",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       dialyzer: Mix.Dialyzer.config(add_apps: [:jason]),

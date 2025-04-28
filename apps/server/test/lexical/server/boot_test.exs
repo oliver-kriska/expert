@@ -7,8 +7,8 @@ defmodule Lexical.Server.BootTest do
 
   describe "detect_errors/0" do
     test "returns empty list when all checks succeed" do
-      patch_runtime_versions("1.14.5", "25.0")
-      patch_compiled_versions("1.14.5", "25.0")
+      patch_runtime_versions("1.15.8", "25.0")
+      patch_compiled_versions("1.15.8", "25.0")
 
       assert [] = Boot.detect_errors()
     end
@@ -22,8 +22,8 @@ defmodule Lexical.Server.BootTest do
     end
 
     test "includes error when runtime erlang is incompatible" do
-      patch_runtime_versions("1.13.4", "23.0")
-      patch_compiled_versions("1.13.4", "23.0")
+      patch_runtime_versions("1.15.8", "23.0")
+      patch_compiled_versions("1.15.8", "23.0")
 
       assert [error] = Boot.detect_errors()
       assert error =~ "FATAL: Lexical is not compatible with Erlang/OTP 23.0.0"
@@ -31,7 +31,7 @@ defmodule Lexical.Server.BootTest do
 
     test "includes multiple errors when runtime elixir and erlang are incompatible" do
       patch_runtime_versions("1.15.2", "26.0.0")
-      patch_compiled_versions("1.15.6", "26.1")
+      patch_compiled_versions("1.15.8", "26.1")
 
       assert [elixir_error, erlang_error] = Boot.detect_errors()
       assert elixir_error =~ "FATAL: Lexical is not compatible with Elixir 1.15.2"
