@@ -17,7 +17,7 @@ defmodule Expert.MixProject do
 
   def application do
     [
-      extra_applications: [:logger, :runtime_tools, :kernel, :erts],
+      extra_applications: [:logger, :runtime_tools, :kernel, :erts, :observer],
       mod: {Expert.Application, []}
     ]
   end

@@ -21,11 +21,13 @@ defmodule Expert.Provider.Handlers.Hover do
       ) do
     document = Document.Container.context_document(params, nil)
 
+    project = Project.project_for_document(config.projects, request.document)
+
     maybe_hover =
       with {:ok, _document, %Ast.Analysis{} = analysis} <-
              Document.Store.fetch(document.uri, :analysis),
-           {:ok, entity, range} <- resolve_entity(config.project, analysis, params.position),
-           {:ok, markdown} <- hover_content(entity, config.project) do
+           {:ok, entity, range} <- resolve_entity(project, analysis, params.position),
+           {:ok, markdown} <- hover_content(entity, project) do
         content = Markdown.to_content(markdown)
         %Structures.Hover{contents: content, range: range}
       else

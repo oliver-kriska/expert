@@ -56,7 +56,7 @@ defmodule Expert.Provider.Handlers.CodeLensTest do
   end
 
   def handle(request, project) do
-    config = Expert.Configuration.new(project: project)
+    config = Expert.Configuration.new(projects: [project])
     Handlers.CodeLens.handle(request, config)
   end
 

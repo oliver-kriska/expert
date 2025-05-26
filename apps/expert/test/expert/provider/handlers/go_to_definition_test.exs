@@ -52,7 +52,7 @@ defmodule Expert.Provider.Handlers.GoToDefinitionTest do
   end
 
   def handle(request, project) do
-    config = Expert.Configuration.new(project: project)
+    config = Expert.Configuration.new(projects: [project])
     Handlers.GoToDefinition.handle(request, config)
   end
 

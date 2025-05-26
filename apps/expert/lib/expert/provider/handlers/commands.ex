@@ -33,8 +33,9 @@ defmodule Expert.Provider.Handlers.Commands do
     response =
       case params.command do
         @reindex_name ->
-          Logger.info("Reindex #{Project.name(config.project)}")
-          reindex(config.project, request.id)
+          project_names = Enum.map_join(config.projects, ", ", &Project.name/1)
+          Logger.info("Reindex #{project_names}")
+          reindex_all(config.projects, request.id)
 
         invalid ->
           message = "#{invalid} is not a valid command"
@@ -44,16 +45,25 @@ defmodule Expert.Provider.Handlers.Commands do
     {:reply, response}
   end
 
-  defp reindex(%Project{} = project, request_id) do
-    case Engine.Api.reindex(project) do
-      :ok ->
-        %Response{id: request_id, result: "ok"}
+  defp reindex_all(projects, request_id) do
+    result =
+      Enum.reduce_while(projects, :ok, fn project, _ ->
+        case Engine.Api.reindex(project) do
+          :ok ->
+            {:cont, :ok}
 
-      error ->
-        Window.show_error_message("Indexing #{Project.name(project)} failed")
-        Logger.error("Indexing command failed due to #{inspect(error)}")
+          error ->
+            Window.show_error_message("Indexing #{Project.name(project)} failed")
+            Logger.error("Indexing command failed due to #{inspect(error)}")
 
-        internal_error(request_id, "Could not reindex: #{error}")
+            {:halt, internal_error(request_id, "Could not reindex: #{error}")}
+        end
+      end)
+
+    if result == :ok do
+      %Response{id: request_id, result: "ok"}
+    else
+      result
     end
   end
 

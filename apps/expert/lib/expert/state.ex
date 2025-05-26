@@ -47,9 +47,14 @@ defmodule Expert.State do
         _ -> nil
       end
 
+    root_path = Lexical.Document.Path.from_uri(event.root_uri)
+
+    root_path
+    |> Lexical.Workspace.new()
+    |> Lexical.Workspace.set_workspace()
+
     config = Configuration.new(event.root_uri, event.capabilities, client_name)
     new_state = %__MODULE__{state | configuration: config, initialized?: true}
-    Logger.info("Starting project at uri #{config.project.root_uri}")
 
     event_id
     |> initialize_result()
@@ -60,7 +65,12 @@ defmodule Expert.State do
 
     Transport.write(registrations())
 
-    Project.Supervisor.start(config.project)
+    for project <- config.projects do
+      Logger.info("Starting project at uri #{project.root_uri}")
+      result = Project.Supervisor.start(project)
+      Logger.info("result: #{inspect(result)}")
+    end
+
     {:ok, new_state}
   end
 
@@ -137,11 +147,11 @@ defmodule Expert.State do
   def apply(%__MODULE__{} = state, %Notifications.TextDocumentDidChange{params: event}) do
     uri = event.text_document.uri
     version = event.text_document.version
-    project = state.configuration.project
+    project = Forge.Project.project_for_uri(state.configuration.projects, uri)
 
     case Document.Store.get_and_update(
            uri,
-           &Document.apply_content_changes(&1, version, event.content_changes)
+           &Document.apply_content_changes(&1, version, event.lsp.content_changes)
          ) do
       {:ok, updated_source} ->
         updated_message =
@@ -153,7 +163,7 @@ defmodule Expert.State do
           )
 
         Api.broadcast(project, updated_message)
-        Api.compile_document(state.configuration.project, updated_source)
+        Api.compile_document(project, updated_source)
         {:ok, state}
 
       error ->
@@ -198,10 +208,11 @@ defmodule Expert.State do
 
   def apply(%__MODULE__{} = state, %Notifications.TextDocumentDidSave{params: event}) do
     uri = event.text_document.uri
+    project = Lexical.Project.project_for_uri(state.configuration.projects, uri)
 
     case Document.Store.save(uri) do
       :ok ->
-        Api.schedule_compile(state.configuration.project, false)
+        Api.schedule_compile(project, false)
         {:ok, state}
 
       error ->
@@ -223,9 +234,8 @@ defmodule Expert.State do
   end
 
   def apply(%__MODULE__{} = state, %Notifications.WorkspaceDidChangeWatchedFiles{params: event}) do
-    project = state.configuration.project
-
-    Enum.each(event.changes, fn %Structures.FileEvent{} = change ->
+    for project <- state.configuration.projects,
+        change <- event.changes do
       event = filesystem_event(project: Project, uri: change.uri, event_type: change.type)
       Engine.Api.broadcast(project, event)
     end)

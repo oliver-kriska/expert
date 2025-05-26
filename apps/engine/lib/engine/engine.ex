@@ -119,7 +119,15 @@ defmodule Engine do
   end
 
   def manager_node_name(%Project{} = project) do
-    :"manager-#{Project.name(project)}-#{Project.entropy(project)}@127.0.0.1"
+    workspace = Lexical.Workspace.get_workspace()
+
+    workspace_name =
+      case workspace do
+        nil -> Project.name(project)
+        _ -> Lexical.Workspace.name(workspace)
+      end
+
+    :"manager-#{workspace_name}-#{Project.entropy(project)}@127.0.0.1"
   end
 
   defp start_net_kernel(%Project{} = project) do

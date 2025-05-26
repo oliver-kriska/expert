@@ -11,14 +11,14 @@ defmodule Expert.Configuration do
   alias GenLSP.Requests
   alias GenLSP.Structures
 
-  defstruct project: nil,
+  defstruct projects: [],
             support: nil,
             client_name: nil,
             additional_watched_extensions: nil,
             dialyzer_enabled?: false
 
   @type t :: %__MODULE__{
-          project: Project.t() | nil,
+          projects: [Project.t()],
           support: support | nil,
           client_name: String.t() | nil,
           additional_watched_extensions: [String.t()] | nil,
@@ -32,15 +32,43 @@ defmodule Expert.Configuration do
   @spec new(Forge.uri(), map(), String.t() | nil) :: t
   def new(root_uri, %Structures.ClientCapabilities{} = client_capabilities, client_name) do
     support = Support.new(client_capabilities)
-    project = Project.new(root_uri)
+    projects = find_projects(root_uri)
 
-    %__MODULE__{support: support, project: project, client_name: client_name}
+    %__MODULE__{support: support, projects: projects, client_name: client_name}
     |> tap(&set/1)
   end
 
   @spec new(keyword()) :: t
   def new(attrs \\ []) do
     struct!(__MODULE__, [support: Support.new()] ++ attrs)
+  end
+
+  defp find_projects(root_uri) do
+    root_path = Lexical.Document.Path.from_uri(root_uri)
+    root_mix_exs = Path.join(root_path, "mix.exs")
+
+    projects =
+      if File.exists?(root_mix_exs) do
+        [Project.new(root_uri)]
+      else
+        find_multiroot_projects(root_path)
+      end
+
+    if projects == [], do: [Project.new(root_uri)], else: projects
+  end
+
+  defp find_multiroot_projects(root_path) do
+    mix_exs_blob = Path.join([root_path, "**", "mix.exs"])
+
+    for mix_exs_path <- Path.wildcard(mix_exs_blob),
+        "deps" not in Path.split(mix_exs_path) do
+      project_uri =
+        mix_exs_path
+        |> Path.dirname()
+        |> Lexical.Document.Path.to_uri()
+
+      Project.new(project_uri)
+    end
   end
 
   defp set(%__MODULE__{} = config) do

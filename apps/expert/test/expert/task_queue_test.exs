@@ -14,7 +14,7 @@ defmodule Expert.TaskQueueTest do
   use Forge.Test.EventualAssertions
 
   setup_all do
-    {:ok, config: Configuration.new(project: Fixtures.project())}
+    {:ok, config: Configuration.new(projects: [Fixtures.project()])}
   end
 
   setup do
