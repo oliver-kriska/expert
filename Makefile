@@ -1,7 +1,5 @@
 poncho_dirs = common lexical_credo proto protocol remote_control server
 
-dialyzer_dirs= lexical_shared lexical_plugin
-
 compile.all: compile.poncho
 
 dialyzer.all: compile.poncho dialyzer.poncho
@@ -39,3 +37,6 @@ dialyzer.plt.poncho:
 
 dialyzer.poncho: compile.poncho compile.protocols.poncho
 	$(foreach dir, $(poncho_dirs), cd apps/$(dir) && mix dialyzer && cd ../..;)
+
+package:
+	cd apps/server && mix package
