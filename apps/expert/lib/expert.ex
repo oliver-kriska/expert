@@ -1,22 +1,22 @@
 defmodule Expert do
   alias Expert.Proto.Convert
-  alias Expert.Protocol.Notifications
-  alias Expert.Protocol.Requests
   alias Expert.Provider.Handlers
   alias Expert.State
   alias Expert.TaskQueue
+  alias GenLSP.Notifications
+  alias GenLSP.Requests
 
   require Logger
 
   use GenServer
 
   @server_specific_messages [
-    Notifications.DidChange,
-    Notifications.DidChangeConfiguration,
-    Notifications.DidChangeWatchedFiles,
-    Notifications.DidClose,
-    Notifications.DidOpen,
-    Notifications.DidSave,
+    Notifications.TextDocumentDidChange,
+    Notifications.WorkspaceDidChangeConfiguration,
+    Notifications.WorkspaceDidChangeWatchedFiles,
+    Notifications.TextDocumentDidClose,
+    Notifications.TextDocumentDidOpen,
+    Notifications.TextDocumentDidSave,
     Notifications.Exit,
     Notifications.Initialized,
     Requests.Shutdown
@@ -102,12 +102,12 @@ defmodule Expert do
     end
   end
 
-  def handle_message(%Requests.Cancel{} = cancel_request, %State{} = state) do
+  def handle_message(%Protocol.Requests.Cancel{} = cancel_request, %State{} = state) do
     TaskQueue.cancel(cancel_request)
     {:ok, state}
   end
 
-  def handle_message(%Notifications.Cancel{} = cancel_notification, %State{} = state) do
+  def handle_message(%Protocol.Notifications.Cancel{} = cancel_notification, %State{} = state) do
     TaskQueue.cancel(cancel_notification)
     {:ok, state}
   end
@@ -131,8 +131,10 @@ defmodule Expert do
 
   def handle_message(%_{} = request, %State{} = state) do
     with {:ok, handler} <- fetch_handler(request),
-         {:ok, req} <- Convert.to_native(request) do
-      TaskQueue.add(request.id, {handler, :handle, [req, state.configuration]})
+         {:ok, request} <- Convert.to_native(request) do
+      # Logger.info("Handling request: #{inspect(request, pretty: true)}")
+
+      TaskQueue.add(request.id, {handler, :handle, [request, state.configuration]})
     else
       {:error, {:unhandled, _}} ->
         Logger.info("Unhandled request: #{request.method}")
@@ -161,31 +163,31 @@ defmodule Expert do
   # credo:disable-for-next-line Credo.Check.Refactor.CyclomaticComplexity
   defp fetch_handler(%_{} = request) do
     case request do
-      %Requests.FindReferences{} ->
+      %Requests.TextDocumentReferences{} ->
         {:ok, Handlers.FindReferences}
 
-      %Requests.Formatting{} ->
+      %Requests.TextDocumentFormatting{} ->
         {:ok, Handlers.Formatting}
 
-      %Requests.CodeAction{} ->
+      %Requests.TextDocumentCodeAction{} ->
         {:ok, Handlers.CodeAction}
 
-      %Requests.CodeLens{} ->
+      %Requests.TextDocumentCodeLens{} ->
         {:ok, Handlers.CodeLens}
 
-      %Requests.Completion{} ->
+      %Requests.TextDocumentCompletion{} ->
         {:ok, Handlers.Completion}
 
-      %Requests.GoToDefinition{} ->
+      %Requests.TextDocumentDefinition{} ->
         {:ok, Handlers.GoToDefinition}
 
-      %Requests.Hover{} ->
+      %Requests.TextDocumentHover{} ->
         {:ok, Handlers.Hover}
 
-      %Requests.ExecuteCommand{} ->
+      %Requests.WorkspaceExecuteCommand{} ->
         {:ok, Handlers.Commands}
 
-      %Requests.DocumentSymbols{} ->
+      %Requests.TextDocumentDocumentSymbol{} ->
         {:ok, Handlers.DocumentSymbols}
 
       %Requests.WorkspaceSymbol{} ->

@@ -1,4 +1,5 @@
 defmodule Engine.CodeAction.Handlers.ReplaceRemoteFunction do
+  alias GenLSP.Enumerations.CodeActionKind
   alias Forge.Ast
   alias Forge.Document
   alias Forge.Document.Changes
@@ -27,7 +28,7 @@ defmodule Engine.CodeAction.Handlers.ReplaceRemoteFunction do
 
   @impl CodeAction.Handler
   def kinds do
-    [:quick_fix]
+    [CodeActionKind.quick_fix()]
   end
 
   @impl CodeAction.Handler

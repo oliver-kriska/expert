@@ -45,6 +45,7 @@ defmodule Expert.MixProject do
       Mix.Dialyzer.dependency(),
       {:elixir_sense,
        github: "elixir-lsp/elixir_sense", ref: "73ce7e0d239342fb9527d7ba567203e77dbb9b25"},
+      {:gen_lsp, "~> 0.10"},
       {:jason, "~> 1.4"},
       {:logger_file_backend, "~> 0.0", only: [:dev, :prod]},
       {:patch, "~> 0.15", runtime: false, only: [:dev, :test]},

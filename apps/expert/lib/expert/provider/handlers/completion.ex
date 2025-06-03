@@ -1,25 +1,34 @@
 defmodule Expert.Provider.Handlers.Completion do
   alias Expert.CodeIntelligence
   alias Expert.Configuration
-  alias Expert.Protocol.Requests
-  alias Expert.Protocol.Responses
-  alias Expert.Protocol.Types.Completion
+  alias Expert.Protocol.Response
   alias Forge.Ast
   alias Forge.Document
   alias Forge.Document.Position
+  alias GenLSP.Requests
+  alias GenLSP.Structures
+  alias GenLSP.Structures.CompletionContext
+  alias GenLSP.Enumerations.CompletionTriggerKind
 
   require Logger
 
-  def handle(%Requests.Completion{} = request, %Configuration{} = config) do
+  def handle(
+        %Requests.TextDocumentCompletion{
+          params: %Structures.CompletionParams{} = params
+        } = request,
+        %Configuration{} = config
+      ) do
+    document = Document.Container.context_document(params, nil)
+
     completions =
       CodeIntelligence.Completion.complete(
         config.project,
-        document_analysis(request.document, request.position),
-        request.position,
-        request.context || Completion.Context.new(trigger_kind: :invoked)
+        document_analysis(document, params.position),
+        params.position,
+        params.context || %CompletionContext{trigger_kind: CompletionTriggerKind.invoked()}
       )
 
-    response = Responses.Completion.new(request.id, completions)
+    response = %Response{id: request.id, result: completions}
     {:reply, response}
   end
 

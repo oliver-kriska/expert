@@ -1,10 +1,10 @@
 defmodule Expert.Project.SearchListener do
   alias Engine.Api
   alias Expert.Protocol.Id
-  alias Expert.Protocol.Requests
   alias Expert.Window
   alias Forge.Formats
   alias Forge.Project
+  alias GenLSP.Requests
 
   import Api.Messages
 
@@ -48,7 +48,7 @@ defmodule Expert.Project.SearchListener do
   end
 
   defp send_code_lens_refresh do
-    request = Requests.CodeLensRefresh.new(id: Id.next())
+    request = %Requests.WorkspaceCodeLensRefresh{id: Id.next()}
     Expert.server_request(request)
   end
 end

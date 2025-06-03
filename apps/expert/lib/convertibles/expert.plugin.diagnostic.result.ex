@@ -1,6 +1,6 @@
 defimpl Forge.Convertible, for: Forge.Plugin.V1.Diagnostic.Result do
-  alias Expert.Protocol.Conversions
-  alias Expert.Protocol.Types
+  alias GenLSP.Structures
+  alias GenLSP.Enumerations.DiagnosticSeverity
   alias Forge.Document
   alias Forge.Document.Position
   alias Forge.Document.Range
@@ -10,16 +10,21 @@ defimpl Forge.Convertible, for: Forge.Plugin.V1.Diagnostic.Result do
 
   def to_lsp(%Diagnostic.Result{} = diagnostic) do
     with {:ok, lsp_range} <- lsp_range(diagnostic) do
-      proto_diagnostic = %Types.Diagnostic{
+      proto_diagnostic = %Structures.Diagnostic{
         message: diagnostic.message,
         range: lsp_range,
-        severity: diagnostic.severity,
+        severity: map_severity(diagnostic.severity),
         source: diagnostic.source
       }
 
       {:ok, proto_diagnostic}
     end
   end
+
+  defp map_severity(:error), do: DiagnosticSeverity.error()
+  defp map_severity(:warning), do: DiagnosticSeverity.warning()
+  defp map_severity(:information), do: DiagnosticSeverity.information()
+  defp map_severity(:hint), do: DiagnosticSeverity.hint()
 
   def to_native(%Diagnostic.Result{} = diagnostic, _) do
     {:ok, diagnostic}
@@ -28,10 +33,10 @@ defimpl Forge.Convertible, for: Forge.Plugin.V1.Diagnostic.Result do
   defp lsp_range(%Diagnostic.Result{position: %Position{} = position}) do
     with {:ok, lsp_start_pos} <- Conversions.to_lsp(position) do
       range =
-        Types.Range.new(
+        %Structures.Range{
           start: lsp_start_pos,
-          end: Types.Position.new(line: lsp_start_pos.line + 1, character: 0)
-        )
+          end: %Structures.Position{line: lsp_start_pos.line + 1, character: 0}
+        }
 
       {:ok, range}
     end

@@ -11,13 +11,13 @@ defmodule Expert.CodeIntelligence.Completion.Builder do
   """
 
   alias Expert.CodeIntelligence.Completion.SortScope
-  alias Expert.Protocol.Types.Completion
-  alias Expert.Protocol.Types.Markup.Content
   alias Forge.Ast.Env
   alias Forge.Document
   alias Forge.Document.Edit
   alias Forge.Document.Position
   alias Forge.Document.Range
+  alias GenLSP.Structures.CompletionItem
+  alias GenLSP.Structures.MarkupContent
   alias Future.Code, as: Code
 
   @doc "Fields found in `t:Expert.Protocol.Types.Completion.Item.t()`"
@@ -27,19 +27,19 @@ defmodule Expert.CodeIntelligence.Completion.Builder do
 
   @type line_range :: {start_character :: pos_integer, end_character :: pos_integer}
 
-  @spec snippet(Env.t(), String.t(), item_opts) :: Completion.Item.t()
+  @spec snippet(Env.t(), String.t(), item_opts) :: CompletionItem.t()
   def snippet(%Env{} = env, text, options \\ []) do
     range = prefix_range(env)
     text_edit_snippet(env, text, range, options)
   end
 
-  @spec plain_text(Env.t(), String.t(), item_opts) :: Completion.Item.t()
+  @spec plain_text(Env.t(), String.t(), item_opts) :: CompletionItem.t()
   def plain_text(%Env{} = env, text, options \\ []) do
     range = prefix_range(env)
     text_edit(env, text, range, options)
   end
 
-  @spec text_edit(Env.t(), String.t(), line_range, item_opts) :: Completion.Item.t()
+  @spec text_edit(Env.t(), String.t(), line_range, item_opts) :: CompletionItem.t()
   def text_edit(%Env{} = env, text, {start_char, end_char}, options \\ []) do
     line_number = env.position.line
 
@@ -51,14 +51,15 @@ defmodule Expert.CodeIntelligence.Completion.Builder do
 
     edits = Document.Changes.new(env.document, Edit.new(text, range))
 
-    options
-    |> Keyword.put(:text_edit, edits)
-    |> Completion.Item.new()
+    options = Keyword.put(options, :text_edit, edits)
+
+    CompletionItem
+    |> struct(options)
     |> markdown_docs()
     |> set_sort_scope(SortScope.default())
   end
 
-  @spec text_edit_snippet(Env.t(), String.t(), line_range, item_opts) :: Completion.Item.t()
+  @spec text_edit_snippet(Env.t(), String.t(), line_range, item_opts) :: CompletionItem.t()
   def text_edit_snippet(%Env{} = env, text, {start_char, end_char}, options \\ []) do
     snippet = String.trim_trailing(text, "\n")
     line_number = env.position.line
@@ -71,10 +72,13 @@ defmodule Expert.CodeIntelligence.Completion.Builder do
 
     edits = Document.Changes.new(env.document, Edit.new(snippet, range))
 
-    options
-    |> Keyword.put(:text_edit, edits)
-    |> Keyword.put(:insert_text_format, :snippet)
-    |> Completion.Item.new()
+    option =
+      options
+      |> Keyword.put(:text_edit, edits)
+      |> Keyword.put(:insert_text_format, :snippet)
+
+    CompletionItem
+    |> struct(option)
     |> markdown_docs()
     |> set_sort_scope(SortScope.default())
   end
@@ -84,10 +88,10 @@ defmodule Expert.CodeIntelligence.Completion.Builder do
   def fallback("", fallback), do: fallback
   def fallback(detail, _), do: detail
 
-  @spec set_sort_scope(Completion.Item.t(), sort_scope :: String.t()) :: Completion.Item.t()
+  @spec set_sort_scope(CompletionItem.t(), sort_scope :: String.t()) :: CompletionItem.t()
   def set_sort_scope(item, default \\ SortScope.default())
 
-  def set_sort_scope(%Completion.Item{} = item, sort_scope)
+  def set_sort_scope(%CompletionItem{} = item, sort_scope)
       when is_binary(sort_scope) do
     stripped_sort_text =
       item.sort_text
@@ -95,7 +99,7 @@ defmodule Expert.CodeIntelligence.Completion.Builder do
       |> strip_sort_text()
 
     sort_text = "0#{sort_scope}_#{stripped_sort_text}"
-    %Completion.Item{item | sort_text: sort_text}
+    %CompletionItem{item | sort_text: sort_text}
   end
 
   # private
@@ -176,10 +180,10 @@ defmodule Expert.CodeIntelligence.Completion.Builder do
     String.replace(sort_text, @sort_prefix_re, "")
   end
 
-  defp markdown_docs(%Completion.Item{} = item) do
+  defp markdown_docs(%CompletionItem{} = item) do
     case item.documentation do
       doc when is_binary(doc) ->
-        %{item | documentation: %Content{kind: :markdown, value: doc}}
+        %{item | documentation: %MarkupContent{kind: :markdown, value: doc}}
 
       _ ->
         item

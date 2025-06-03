@@ -7,8 +7,6 @@ defmodule Expert.Protocol.Conversions do
   the line contains non-ascii characters. If it's a pure ascii line, then the positions
   are the same in both utf-8 and utf-16, since they reference characters and not bytes.
   """
-  alias Expert.Protocol.Types.Position, as: LSPosition
-  alias Expert.Protocol.Types.Range, as: LSRange
   alias Forge.CodeUnit
   alias Forge.Document
   alias Forge.Document.Line
@@ -16,6 +14,8 @@ defmodule Expert.Protocol.Conversions do
   alias Forge.Document.Position, as: ElixirPosition
   alias Forge.Document.Range, as: ElixirRange
   alias Forge.Math
+  alias GenLSP.Structures.Position, as: LSPosition
+  alias GenLSP.Structures.Range, as: LSRange
 
   import Line
 
@@ -90,7 +90,7 @@ defmodule Expert.Protocol.Conversions do
   def to_lsp(%LSRange{} = ls_range) do
     with {:ok, start_pos} <- to_lsp(ls_range.start),
          {:ok, end_pos} <- to_lsp(ls_range.end) do
-      {:ok, LSRange.new(start: start_pos, end: end_pos)}
+      {:ok, %LSRange{start: start_pos, end: end_pos}}
     end
   end
 
@@ -111,18 +111,18 @@ defmodule Expert.Protocol.Conversions do
         # allow a line one more than the document size, as long as the character is 0.
         # that means we're operating on the last line of the document
 
-        {:ok, LSPosition.new(line: document_line_number, character: 0)}
+        {:ok, %LSPosition{line: document_line_number, character: 0}}
 
       position.line > line_count ->
-        {:ok, LSPosition.new(line: line_count, character: 0)}
+        {:ok, %LSPosition{line: line_count, character: 0}}
 
       true ->
         with {:ok, lsp_character} <- extract_lsp_character(position) do
           ls_pos =
-            LSPosition.new(
+            %LSPosition{
               character: lsp_character,
               line: position.line - position.starting_index
-            )
+            }
 
           {:ok, ls_pos}
         end

@@ -1,11 +1,11 @@
 defmodule Expert.IEx.Helpers do
   alias Engine.Search
   alias Expert.CodeIntelligence
-  alias Expert.Protocol.Types.Completion
   alias Forge.Ast
   alias Forge.Document
   alias Forge.Document.Position
   alias Forge.Project
+  alias GenLSP.Structures
 
   defmacro __using__(_) do
     quote do
@@ -112,7 +112,7 @@ defmodule Expert.IEx.Helpers do
   def complete(project, %Ast.Analysis{} = analysis, line, character, context) do
     context =
       if is_nil(context) do
-        Completion.Context.new(trigger_kind: :trigger_character)
+        %Structures.CompletionContext{trigger_kind: :trigger_character}
       else
         context
       end

@@ -6,7 +6,7 @@ defmodule Expert.Test.Protocol.ConvertibleSupport do
 
   using do
     quote location: :keep do
-      alias Expert.Protocol.Types
+      alias GenLSP.Structures
       use Forge.Test.DocumentSupport
 
       def open_file_contents do
@@ -36,7 +36,7 @@ defmodule Expert.Test.Protocol.ConvertibleSupport do
 
       def valid_range(:lsp) do
         start_pos = end_pos = valid_position(:lsp)
-        Types.Range.new(start: start_pos, end: end_pos)
+        %Structures.Range{start: start_pos, end: end_pos}
       end
 
       def range(:native, start_pos, end_pos) do
@@ -44,7 +44,7 @@ defmodule Expert.Test.Protocol.ConvertibleSupport do
       end
 
       def range(:lsp, start_pos, end_pos) do
-        Types.Range.new(start: start_pos, end: end_pos)
+        %Structures.Range{start: start_pos, end: end_pos}
       end
 
       def valid_position(:native, document) do
@@ -60,7 +60,7 @@ defmodule Expert.Test.Protocol.ConvertibleSupport do
       end
 
       def position(:lsp, line, character) do
-        Types.Position.new(line: line, character: character)
+        %Structures.Position{line: line, character: character}
       end
     end
   end

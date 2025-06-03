@@ -1,33 +1,40 @@
 defmodule Expert.Provider.Handlers.Hover do
   alias Engine.CodeIntelligence.Docs
   alias Expert.Configuration
-  alias Expert.Protocol.Requests
-  alias Expert.Protocol.Responses
-  alias Expert.Protocol.Types.Hover
+  alias Expert.Protocol.Response
   alias Expert.Provider.Markdown
   alias Forge.Ast
   alias Forge.Ast.Analysis
   alias Forge.Document
   alias Forge.Document.Position
   alias Forge.Project
+  alias GenLSP.Requests
+  alias GenLSP.Structures
 
   require Logger
 
-  def handle(%Requests.Hover{} = request, %Configuration{} = config) do
+  def handle(
+        %Requests.TextDocumentHover{
+          params: %Structures.HoverParams{} = params
+        } = request,
+        %Configuration{} = config
+      ) do
+    document = Document.Container.context_document(params, nil)
+
     maybe_hover =
       with {:ok, _document, %Ast.Analysis{} = analysis} <-
-             Document.Store.fetch(request.document.uri, :analysis),
-           {:ok, entity, range} <- resolve_entity(config.project, analysis, request.position),
+             Document.Store.fetch(document.uri, :analysis),
+           {:ok, entity, range} <- resolve_entity(config.project, analysis, params.position),
            {:ok, markdown} <- hover_content(entity, config.project) do
         content = Markdown.to_content(markdown)
-        %Hover{contents: content, range: range}
+        %Structures.Hover{contents: content, range: range}
       else
         error ->
           Logger.warning("Could not resolve hover request, got: #{inspect(error)}")
           nil
       end
 
-    {:reply, Responses.Hover.new(request.id, maybe_hover)}
+    {:reply, %Response{id: request.id, result: maybe_hover}}
   end
 
   defp resolve_entity(%Project{} = project, %Analysis{} = analysis, %Position{} = position) do

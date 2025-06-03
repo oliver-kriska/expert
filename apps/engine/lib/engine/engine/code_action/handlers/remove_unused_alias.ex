@@ -21,6 +21,7 @@ defmodule Engine.CodeAction.Handlers.RemoveUnusedAlias do
   normalizer and possibly fix sourceror, so until then, this is what we have.
   """
 
+  alias GenLSP.Enumerations
   alias Engine.Analyzer
   alias Engine.CodeAction
   alias Engine.CodeAction.Diagnostic
@@ -63,7 +64,7 @@ defmodule Engine.CodeAction.Handlers.RemoveUnusedAlias do
 
   @impl CodeAction.Handler
   def kinds do
-    [:source]
+    [Enumerations.CodeActionKind.source()]
   end
 
   @impl CodeAction.Handler

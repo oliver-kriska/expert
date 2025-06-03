@@ -2,42 +2,43 @@ defmodule Expert.Provider.Handlers.WorkspaceSymbol do
   alias Engine.Api
   alias Engine.CodeIntelligence.Symbols
   alias Expert.Configuration
-  alias Expert.Protocol.Requests.WorkspaceSymbol
-  alias Expert.Protocol.Responses
-  alias Expert.Protocol.Types.Location
-  alias Expert.Protocol.Types.Symbol.Kind, as: SymbolKind
-  alias Expert.Protocol.Types.Workspace.Symbol
+  alias Expert.Protocol.Response
+  alias GenLSP.Requests
+  alias GenLSP.Structures
 
   require SymbolKind
 
   require Logger
 
-  def handle(%WorkspaceSymbol{} = request, %Configuration{} = config) do
+  def handle(
+        %Requests.WorkspaceSymbol{params: %Structures.WorkspaceSymbolParams{} = params} = request,
+        %Configuration{} = config
+      ) do
     symbols =
-      if String.length(request.query) > 1 do
+      if String.length(params.query) > 1 do
         config.project
-        |> Api.workspace_symbols(request.query)
+        |> Api.workspace_symbols(params.query)
         |> tap(fn symbols -> Logger.info("syms #{inspect(Enum.take(symbols, 5))}") end)
         |> Enum.map(&to_response/1)
       else
         []
       end
 
-    response = Responses.WorkspaceSymbol.new(request.id, symbols)
+    response = %Response{id: request.id, result: symbols}
     {:reply, response}
   end
 
   def to_response(%Symbols.Workspace{} = root) do
-    Symbol.new(
+    %Structures.WorkspaceSymbol{
       kind: to_kind(root.type),
       location: to_location(root.link),
       name: root.name,
       container_name: root.container_name
-    )
+    }
   end
 
   defp to_location(%Symbols.Workspace.Link{} = link) do
-    Location.new(uri: link.uri, range: link.detail_range)
+    %Structures.Location{uri: link.uri, range: link.detail_range}
   end
 
   defp to_kind(:struct), do: :struct

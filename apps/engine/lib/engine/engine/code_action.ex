@@ -5,6 +5,8 @@ defmodule Engine.CodeAction do
   alias Forge.Document.Changes
   alias Forge.Document.Range
 
+  require Logger
+
   defstruct [:title, :kind, :changes, :uri]
 
   @type code_action_kind ::

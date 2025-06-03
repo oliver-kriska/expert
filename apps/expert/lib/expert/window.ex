@@ -1,13 +1,13 @@
 defmodule Expert.Window do
   alias Expert.Protocol.Id
-  alias Expert.Protocol.Notifications.LogMessage
-  alias Expert.Protocol.Notifications.ShowMessage
-  alias Expert.Protocol.Requests
-  alias Expert.Protocol.Types
   alias Expert.Transport
+  alias GenLSP.Notifications
+  alias GenLSP.Requests
+  alias GenLSP.Structures
+  alias GenLSP.Enumerations
 
   @type level :: :error | :warning | :info | :log
-  @type message_result :: {:errory, term()} | {:ok, nil} | {:ok, Types.Message.ActionItem.t()}
+  @type message_result :: {:errory, term()} | {:ok, nil} | {:ok, Structures.MessageActionItem.t()}
   @type on_response_callback :: (message_result() -> any())
   @type message :: String.t()
   @type action :: String.t()
@@ -16,7 +16,7 @@ defmodule Expert.Window do
 
   @spec log(level, message()) :: :ok
   def log(level, message) when level in @levels and is_binary(message) do
-    log_message = apply(LogMessage, level, [message])
+    log_message = log_message(level, message)
     Transport.write(log_message)
     :ok
   end
@@ -29,14 +29,38 @@ defmodule Expert.Window do
 
   @spec show(level(), message()) :: :ok
   def show(level, message) when level in @levels and is_binary(message) do
-    show_message = apply(ShowMessage, level, [message])
+    show_message = show_message(level, message)
     Transport.write(show_message)
     :ok
   end
 
+  for type <- @levels do
+    def log_message(unquote(type), message) when is_binary(message) do
+      %Notifications.WindowLogMessage{
+        params: %Structures.ShowMessageParams{
+          message: message,
+          type: Enumerations.MessageType.unquote(type)
+        }
+      }
+    end
+
+    def show_message(unquote(type), message) when is_binary(message) do
+      %Notifications.WindowShowMessage{
+        params: %Structures.ShowMessageParams{
+          message: message,
+          type: Enumerations.MessageType.unquote(type)
+        }
+      }
+    end
+  end
+
   @spec show_message(level(), message()) :: :ok
   def show_message(level, message) do
-    request = Requests.ShowMessageRequest.new(id: Id.next(), message: message, type: level)
+    request = %Requests.WindowShowMessageRequest{
+      id: Id.next(),
+      params: %Structures.ShowMessageRequestParams{message: message, type: level}
+    }
+
     Expert.server_request(request)
   end
 
@@ -73,16 +97,18 @@ defmodule Expert.Window do
       when is_function(on_response, 1) do
     action_items =
       Enum.map(actions, fn action_string ->
-        Types.Message.ActionItem.new(title: action_string)
+        %Structures.MessageActionItem{title: action_string}
       end)
 
     request =
-      Requests.ShowMessageRequest.new(
+      %Requests.WindowShowMessageRequest{
         id: Id.next(),
-        message: message,
-        actions: action_items,
-        type: level
-      )
+        params: %Structures.ShowMessageRequestParams{
+          message: message,
+          actions: action_items,
+          type: level
+        }
+      }
 
     Expert.server_request(request, fn _request, response -> on_response.(response) end)
   end

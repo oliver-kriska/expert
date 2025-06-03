@@ -1,6 +1,6 @@
 defmodule Expert.Project.Progress.Value do
-  alias Expert.Protocol.Notifications
-  alias Expert.Protocol.Types.WorkDone
+  alias GenLSP.Notifications
+  alias GenLSP.Structures
 
   @enforce_keys [:token, :kind]
   defstruct [:token, :kind, :title, :message]
@@ -23,23 +23,29 @@ defmodule Expert.Project.Progress.Value do
   end
 
   def to_protocol(%__MODULE__{kind: :begin} = value) do
-    Notifications.Progress.new(
-      token: value.token,
-      value: WorkDone.Progress.Begin.new(kind: "begin", title: value.title)
-    )
+    %Notifications.DollarProgress{
+      params: %Structures.ProgressParams{
+        token: value.token,
+        value: %Structures.WorkDoneProgressBegin{kind: "begin", title: value.title}
+      }
+    }
   end
 
   def to_protocol(%__MODULE__{kind: :report} = value) do
-    Notifications.Progress.new(
-      token: value.token,
-      value: WorkDone.Progress.Report.new(kind: "report", message: value.message)
-    )
+    %Notifications.DollarProgress{
+      params: %Structures.ProgressParams{
+        token: value.token,
+        value: %Structures.WorkDoneProgressReport{kind: "report", message: value.message}
+      }
+    }
   end
 
   def to_protocol(%__MODULE__{kind: :end} = value) do
-    Notifications.Progress.new(
-      token: value.token,
-      value: WorkDone.Progress.End.new(kind: "end", message: value.message)
-    )
+    %Notifications.DollarProgress{
+      params: %Structures.ProgressParams{
+        token: value.token,
+        value: %Structures.WorkDoneProgressEnd{kind: "end", message: value.message}
+      }
+    }
   end
 end

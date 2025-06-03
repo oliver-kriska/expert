@@ -1,12 +1,12 @@
 defmodule Expert.Provider.Handlers.CodeLensTest do
   alias Expert.Proto.Convert
-  alias Expert.Protocol.Requests.CodeLens
-  alias Expert.Protocol.Types
+  alias Expert.Protocol.Id
   alias Expert.Provider.Handlers
   alias Forge.Document
   alias Forge.Project
+  alias GenLSP.Requests.TextDocumentCodeLens
+  alias GenLSP.Structures
 
-  import Expert.Test.Protocol.Fixtures.LspProtocol
   import Engine.Api.Messages
   import Engine.Test.Fixtures
   import Forge.Test.RangeSupport
@@ -42,12 +42,15 @@ defmodule Expert.Provider.Handlers.CodeLensTest do
   def build_request(path) do
     uri = Document.Path.ensure_uri(path)
 
-    params = [
-      text_document: [uri: uri]
-    ]
+    with {:ok, _} <- Document.Store.open_temporary(uri) do
+      req =
+        %TextDocumentCodeLens{
+          id: Id.next(),
+          params: %Structures.CodeLensParams{
+            text_document: %Structures.TextDocumentIdentifier{uri: uri}
+          }
+        }
 
-    with {:ok, _} <- Document.Store.open_temporary(uri),
-         {:ok, req} <- build(CodeLens, params) do
       Convert.to_native(req)
     end
   end
@@ -67,7 +70,7 @@ defmodule Expert.Provider.Handlers.CodeLensTest do
       {:ok, request} = build_request(mix_exs_path)
       {:reply, %{result: lenses}} = handle(request, project)
 
-      assert [%Types.CodeLens{} = code_lens] = lenses
+      assert [%Structures.CodeLens{} = code_lens] = lenses
 
       assert extract(mix_exs, code_lens.range) =~ "def project"
       assert code_lens.command == Handlers.Commands.reindex_command(project)

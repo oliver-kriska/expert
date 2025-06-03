@@ -1,13 +1,12 @@
 defmodule Expert.Test.Expert.CompletionCase do
   alias Expert.CodeIntelligence.Completion
-  alias Expert.Protocol.Types.Completion.Context, as: CompletionContext
-  alias Expert.Protocol.Types.Completion.Item, as: CompletionItem
-  alias Expert.Protocol.Types.Completion.List, as: CompletionList
-
   alias Forge.Ast
   alias Forge.Document
   alias Forge.Project
   alias Forge.Test.CodeSigil
+  alias GenLSP.Structures.CompletionContext
+  alias GenLSP.Structures.CompletionItem
+  alias GenLSP.Structures.CompletionList
 
   use ExUnit.CaseTemplate
   import Forge.Test.CursorSupport
@@ -67,12 +66,12 @@ defmodule Expert.Test.Expert.CompletionCase do
 
     context =
       if is_binary(trigger_character) do
-        CompletionContext.new(
-          trigger_kind: :trigger_character,
+        %CompletionContext{
+          trigger_kind: 2,
           trigger_character: trigger_character
-        )
+        }
       else
-        CompletionContext.new(trigger_kind: :invoked)
+        %CompletionContext{trigger_kind: 1}
       end
 
     analysis = Ast.analyze(document)

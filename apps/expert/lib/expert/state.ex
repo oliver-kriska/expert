@@ -1,28 +1,6 @@
 defmodule Expert.State do
   alias Expert.Protocol.Id
-  alias Expert.Protocol.Notifications
-  alias Expert.Protocol.Notifications.DidChange
-  alias Expert.Protocol.Notifications.DidChangeConfiguration
-  alias Expert.Protocol.Notifications.DidClose
-  alias Expert.Protocol.Notifications.DidOpen
-  alias Expert.Protocol.Notifications.DidSave
-  alias Expert.Protocol.Notifications.Exit
-  alias Expert.Protocol.Notifications.Initialized
-  alias Expert.Protocol.Requests.Initialize
-  alias Expert.Protocol.Requests.RegisterCapability
-  alias Expert.Protocol.Requests.Shutdown
-  alias Expert.Protocol.Responses
-  alias Expert.Protocol.Types
-  alias Expert.Protocol.Types.CodeAction
-  alias Expert.Protocol.Types.CodeLens
-  alias Expert.Protocol.Types.Completion
-  alias Expert.Protocol.Types.DidChangeWatchedFiles
-  alias Expert.Protocol.Types.ExecuteCommand
-  alias Expert.Protocol.Types.FileEvent
-  alias Expert.Protocol.Types.FileSystemWatcher
-  alias Expert.Protocol.Types.Registration
-  alias Expert.Protocol.Types.TextDocument
-
+  alias Expert.Protocol.Response
   alias Engine.Api
   alias Expert.CodeIntelligence
   alias Expert.Configuration
@@ -30,8 +8,11 @@ defmodule Expert.State do
   alias Expert.Provider.Handlers
   alias Expert.Transport
   alias Forge.Document
+  alias GenLSP.Enumerations
+  alias GenLSP.Requests
+  alias GenLSP.Notifications
+  alias GenLSP.Structures
 
-  require CodeAction.Kind
   require Logger
 
   import Api.Messages
@@ -42,22 +23,23 @@ defmodule Expert.State do
             in_flight_requests: %{}
 
   @supported_code_actions [
-    :quick_fix,
-    :refactor,
-    :refactor_extract,
-    :refactor_inline,
-    :refactor_rewrite,
-    :source,
-    :source_fix_all,
-    :source_organize_imports
+    Enumerations.CodeActionKind.quick_fix(),
+    Enumerations.CodeActionKind.refactor(),
+    Enumerations.CodeActionKind.refactor_extract(),
+    Enumerations.CodeActionKind.refactor_inline(),
+    Enumerations.CodeActionKind.refactor_rewrite(),
+    Enumerations.CodeActionKind.source(),
+    Enumerations.CodeActionKind.source_fix_all(),
+    Enumerations.CodeActionKind.source_organize_imports()
   ]
 
   def new do
     %__MODULE__{}
   end
 
-  def initialize(%__MODULE__{initialized?: false} = state, %Initialize{
-        lsp: %Initialize.LSP{} = event
+  def initialize(%__MODULE__{initialized?: false} = state, %Requests.Initialize{
+        id: event_id,
+        params: %Structures.InitializeParams{} = event
       }) do
     client_name =
       case event.client_info do
@@ -69,8 +51,11 @@ defmodule Expert.State do
     new_state = %__MODULE__{state | configuration: config, initialized?: true}
     Logger.info("Starting project at uri #{config.project.root_uri}")
 
-    event.id
+    event_id
     |> initialize_result()
+    |> tap(fn result ->
+      Logger.info("Sending initialize result: #{inspect(result)}", limit: :infinity)
+    end)
     |> Transport.write()
 
     Transport.write(registrations())
@@ -79,7 +64,7 @@ defmodule Expert.State do
     {:ok, new_state}
   end
 
-  def initialize(%__MODULE__{initialized?: true}, %Initialize{}) do
+  def initialize(%__MODULE__{initialized?: true}, %Requests.Initialize{}) do
     {:error, :already_initialized}
   end
 
@@ -125,7 +110,7 @@ defmodule Expert.State do
     {:error, :not_initialized}
   end
 
-  def apply(%__MODULE__{shutdown_received?: true} = state, %Exit{}) do
+  def apply(%__MODULE__{shutdown_received?: true} = state, %Notifications.Exit{}) do
     Logger.warning("Received an Exit notification. Halting the server in 150ms")
     :timer.apply_after(50, System, :halt, [0])
     {:ok, state}
@@ -136,7 +121,7 @@ defmodule Expert.State do
     {:error, :shutting_down}
   end
 
-  def apply(%__MODULE__{} = state, %DidChangeConfiguration{} = event) do
+  def apply(%__MODULE__{} = state, %Notifications.WorkspaceDidChangeConfiguration{} = event) do
     case Configuration.on_change(state.configuration, event) do
       {:ok, config} ->
         {:ok, %__MODULE__{state | configuration: config}}
@@ -149,7 +134,7 @@ defmodule Expert.State do
     {:ok, state}
   end
 
-  def apply(%__MODULE__{} = state, %DidChange{lsp: event}) do
+  def apply(%__MODULE__{} = state, %Notifications.TextDocumentDidChange{params: event}) do
     uri = event.text_document.uri
     version = event.text_document.version
     project = state.configuration.project
@@ -176,13 +161,13 @@ defmodule Expert.State do
     end
   end
 
-  def apply(%__MODULE__{} = state, %DidOpen{} = did_open) do
-    %TextDocument.Item{
+  def apply(%__MODULE__{} = state, %Notifications.TextDocumentDidOpen{} = did_open) do
+    %Structures.TextDocumentItem{
       text: text,
       uri: uri,
       version: version,
       language_id: language_id
-    } = did_open.lsp.text_document
+    } = did_open.params.text_document
 
     case Document.Store.open(uri, text, version, language_id) do
       :ok ->
@@ -195,7 +180,7 @@ defmodule Expert.State do
     end
   end
 
-  def apply(%__MODULE__{} = state, %DidClose{lsp: event}) do
+  def apply(%__MODULE__{} = state, %Notifications.TextDocumentDidClose{params: event}) do
     uri = event.text_document.uri
 
     case Document.Store.close(uri) do
@@ -211,7 +196,7 @@ defmodule Expert.State do
     end
   end
 
-  def apply(%__MODULE__{} = state, %DidSave{lsp: event}) do
+  def apply(%__MODULE__{} = state, %Notifications.TextDocumentDidSave{params: event}) do
     uri = event.text_document.uri
 
     case Document.Store.save(uri) do
@@ -225,22 +210,22 @@ defmodule Expert.State do
     end
   end
 
-  def apply(%__MODULE__{} = state, %Initialized{}) do
+  def apply(%__MODULE__{} = state, %Notifications.Initialized{}) do
     Logger.info("Expert Initialized")
     {:ok, %__MODULE__{state | initialized?: true}}
   end
 
-  def apply(%__MODULE__{} = state, %Shutdown{} = shutdown) do
-    Transport.write(Responses.Shutdown.new(id: shutdown.id))
+  def apply(%__MODULE__{} = state, %Requests.Shutdown{} = shutdown) do
+    Transport.write(%Response{id: shutdown.id})
     Logger.error("Shutting down")
 
     {:ok, %__MODULE__{state | shutdown_received?: true}}
   end
 
-  def apply(%__MODULE__{} = state, %Notifications.DidChangeWatchedFiles{lsp: event}) do
+  def apply(%__MODULE__{} = state, %Notifications.WorkspaceDidChangeWatchedFiles{params: event}) do
     project = state.configuration.project
 
-    Enum.each(event.changes, fn %FileEvent{} = change ->
+    Enum.each(event.changes, fn %Structures.FileEvent{} = change ->
       event = filesystem_event(project: Project, uri: change.uri, event_type: change.type)
       Engine.Api.broadcast(project, event)
     end)
@@ -254,7 +239,12 @@ defmodule Expert.State do
   end
 
   defp registrations do
-    RegisterCapability.new(id: Id.next(), registrations: [file_watcher_registration()])
+    %Requests.ClientRegisterCapability{
+      id: Id.next(),
+      params: %Structures.RegistrationParams{
+        registrations: [file_watcher_registration()]
+      }
+    }
   end
 
   @did_changed_watched_files_id "-42"
@@ -263,33 +253,44 @@ defmodule Expert.State do
     extension_glob = "{" <> Enum.join(@watched_extensions, ",") <> "}"
 
     watchers = [
-      FileSystemWatcher.new(glob_pattern: "**/mix.lock"),
-      FileSystemWatcher.new(glob_pattern: "**/*.#{extension_glob}")
+      %Structures.FileSystemWatcher{glob_pattern: "**/mix.lock"},
+      %Structures.FileSystemWatcher{glob_pattern: "**/*.#{extension_glob}"}
     ]
 
-    Registration.new(
+    %Structures.Registration{
       id: @did_changed_watched_files_id,
       method: "workspace/didChangeWatchedFiles",
-      register_options: DidChangeWatchedFiles.Registration.Options.new(watchers: watchers)
-    )
+      register_options: %Structures.DidChangeWatchedFilesRegistrationOptions{watchers: watchers}
+    }
   end
 
   def initialize_result(event_id) do
     sync_options =
-      TextDocument.Sync.Options.new(open_close: true, change: :incremental, save: true)
+      %Structures.TextDocumentSyncOptions{
+        open_close: true,
+        change: Enumerations.TextDocumentSyncKind.incremental(),
+        save: true
+      }
 
     code_action_options =
-      CodeAction.Options.new(code_action_kinds: @supported_code_actions, resolve_provider: false)
+      %Structures.CodeActionOptions{
+        code_action_kinds: @supported_code_actions,
+        resolve_provider: false
+      }
 
-    code_lens_options = CodeLens.Options.new(resolve_provider: false)
+    code_lens_options = %Structures.CodeLensOptions{resolve_provider: false}
 
-    command_options = ExecuteCommand.Registration.Options.new(commands: Handlers.Commands.names())
+    command_options = %Structures.ExecuteCommandOptions{
+      commands: Handlers.Commands.names()
+    }
 
     completion_options =
-      Completion.Options.new(trigger_characters: CodeIntelligence.Completion.trigger_characters())
+      %Structures.CompletionOptions{
+        trigger_characters: CodeIntelligence.Completion.trigger_characters()
+      }
 
     server_capabilities =
-      Types.ServerCapabilities.new(
+      %Structures.ServerCapabilities{
         code_action_provider: code_action_options,
         code_lens_provider: code_lens_options,
         completion_provider: completion_options,
@@ -301,18 +302,17 @@ defmodule Expert.State do
         references_provider: true,
         text_document_sync: sync_options,
         workspace_symbol_provider: true
-      )
+      }
 
     result =
-      Types.Initialize.Result.new(
+      %Structures.InitializeResult{
         capabilities: server_capabilities,
-        server_info:
-          Types.Initialize.Result.ServerInfo.new(
-            name: "Expert",
-            version: "0.0.1"
-          )
-      )
+        server_info: %{
+          name: "Expert",
+          version: "0.0.1"
+        }
+      }
 
-    Responses.InitializeResult.new(event_id, result)
+    %Response{id: event_id, result: result}
   end
 end

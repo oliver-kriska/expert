@@ -1,4 +1,5 @@
 defmodule Engine.CodeAction.Handlers.AddAlias do
+  alias GenLSP.Enumerations.CodeActionKind
   alias Forge.Ast
   alias Forge.Ast.Analysis
   alias Forge.Ast.Analysis.Alias
@@ -41,7 +42,7 @@ defmodule Engine.CodeAction.Handlers.AddAlias do
 
   @impl CodeAction.Handler
   def kinds do
-    [:quick_fix]
+    [CodeActionKind.quick_fix()]
   end
 
   @impl CodeAction.Handler

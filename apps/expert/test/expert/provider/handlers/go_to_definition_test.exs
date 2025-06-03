@@ -1,11 +1,11 @@
 defmodule Expert.Provider.Handlers.GoToDefinitionTest do
   alias Expert.Proto.Convert
-  alias Expert.Protocol.Requests.GoToDefinition
   alias Expert.Provider.Handlers
   alias Forge.Document
   alias Forge.Document.Location
+  alias GenLSP.Requests.TextDocumentDefinition
+  alias GenLSP.Structures
 
-  import Expert.Test.Protocol.Fixtures.LspProtocol
   import Engine.Api.Messages
   import Engine.Test.Fixtures
 
@@ -38,13 +38,15 @@ defmodule Expert.Provider.Handlers.GoToDefinitionTest do
   def build_request(path, line, char) do
     uri = Document.Path.ensure_uri(path)
 
-    params = [
-      text_document: [uri: uri],
-      position: [line: line, character: char]
-    ]
+    with {:ok, _} <- Document.Store.open_temporary(uri) do
+      req = %TextDocumentDefinition{
+        id: Lexical.Protocol.Id.next(),
+        params: %Structures.DefinitionParams{
+          text_document: %Structures.TextDocumentIdentifier{uri: uri},
+          position: %Structures.Position{line: line, character: char}
+        }
+      }
 
-    with {:ok, _} <- Document.Store.open_temporary(uri),
-         {:ok, req} <- build(GoToDefinition, params) do
       Convert.to_native(req)
     end
   end

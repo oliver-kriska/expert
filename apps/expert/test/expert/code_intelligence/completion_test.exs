@@ -1,8 +1,8 @@
 defmodule Expert.CodeIntelligence.CompletionTest do
   alias Engine.Completion.Candidate
   alias Expert.CodeIntelligence.Completion.SortScope
-  alias Expert.Protocol.Types.Completion
-  alias Expert.Protocol.Types.Completion.Item, as: CompletionItem
+  alias GenLSP.Structures.CompletionItem
+  alias GenLSP.Structures.CompletionList
 
   use Expert.Test.Expert.CompletionCase
   use Patch
@@ -62,7 +62,7 @@ defmodule Expert.CodeIntelligence.CompletionTest do
 
   describe "ignoring things" do
     test "returns an incomplete completion list when the context is empty", %{project: project} do
-      assert %Completion.List{is_incomplete: true, items: []} =
+      assert %CompletionList{is_incomplete: true, items: []} =
                complete(project, " ", as_list: false)
     end
 

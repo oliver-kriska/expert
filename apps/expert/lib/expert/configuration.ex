@@ -6,12 +6,10 @@ defmodule Expert.Configuration do
   alias Expert.Configuration.Support
   alias Expert.Dialyzer
   alias Expert.Protocol.Id
-  alias Expert.Protocol.Notifications.DidChangeConfiguration
-  alias Expert.Protocol.Requests
-  alias Expert.Protocol.Requests.RegisterCapability
-  alias Expert.Protocol.Types.ClientCapabilities
-  alias Expert.Protocol.Types.Registration
   alias Forge.Project
+  alias GenLSP.Notifications.WorkspaceDidChangeConfiguration
+  alias GenLSP.Requests
+  alias GenLSP.Structures
 
   defstruct project: nil,
             support: nil,
@@ -32,7 +30,7 @@ defmodule Expert.Configuration do
   @dialyzer {:nowarn_function, set_dialyzer_enabled: 2}
 
   @spec new(Forge.uri(), map(), String.t() | nil) :: t
-  def new(root_uri, %ClientCapabilities{} = client_capabilities, client_name) do
+  def new(root_uri, %Structures.ClientCapabilities{} = client_capabilities, client_name) do
     support = Support.new(client_capabilities)
     project = Project.new(root_uri)
 
@@ -68,7 +66,7 @@ defmodule Expert.Configuration do
 
   @spec default(t | nil) ::
           {:ok, t}
-          | {:ok, t, Requests.RegisterCapability.t()}
+          | {:ok, t, Requests.ClientRegisterCapability.t()}
   def default(nil) do
     {:ok, default_config()}
   end
@@ -84,8 +82,8 @@ defmodule Expert.Configuration do
     apply_config_change(old_config, default_config())
   end
 
-  def on_change(%__MODULE__{} = old_config, %DidChangeConfiguration{} = change) do
-    apply_config_change(old_config, change.lsp.settings)
+  def on_change(%__MODULE__{} = old_config, %WorkspaceDidChangeConfiguration{} = change) do
+    apply_config_change(old_config, change.params.settings)
   end
 
   defp default_config do
@@ -125,13 +123,16 @@ defmodule Expert.Configuration do
     watchers = Enum.map(extensions, fn ext -> %{"globPattern" => "**/*#{ext}"} end)
 
     registration =
-      Registration.new(
+      %Structures.Registration{
         id: request_id,
         method: "workspace/didChangeWatchedFiles",
         register_options: %{"watchers" => watchers}
-      )
+      }
 
-    request = RegisterCapability.new(id: register_id, registrations: [registration])
+    request = %Requests.ClientRegisterCapability{
+      id: register_id,
+      params: %Structures.RegistrationParams{registrations: [registration]}
+    }
 
     {:ok, old_config, request}
   end

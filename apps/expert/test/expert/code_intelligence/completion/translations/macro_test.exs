@@ -1,5 +1,5 @@
 defmodule Expert.CodeIntelligence.Completion.Translations.MacroTest do
-  alias Expert.Protocol.Types.Completion
+  alias GenLSP.Structures.CompletionItem
 
   use Expert.Test.Expert.CompletionCase
 
@@ -30,7 +30,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.MacroTest do
                |> complete("def|")
                |> fetch_completion("def ")
 
-      assert %Completion.Item{} = completion
+      assert %CompletionItem{} = completion
       assert completion.detail
     end
 
@@ -128,7 +128,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.MacroTest do
                |> complete("defp|")
                |> fetch_completion("defp ")
 
-      assert %Completion.Item{} = completion
+      assert %CompletionItem{} = completion
     end
 
     test "defp", %{project: project} do
@@ -149,7 +149,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.MacroTest do
                |> complete("defmacro|")
                |> fetch_completion("defmacro ")
 
-      assert %Completion.Item{} = completion
+      assert %CompletionItem{} = completion
       assert completion.detail
     end
 
@@ -171,7 +171,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.MacroTest do
                |> complete("defmacrop|")
                |> fetch_completion("defmacrop ")
 
-      assert %Completion.Item{} = completion
+      assert %CompletionItem{} = completion
       assert completion.detail
     end
 
@@ -194,7 +194,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.MacroTest do
                |> fetch_completion("defmodule ")
 
       assert completion.detail
-      assert %Completion.Item{} = completion
+      assert %CompletionItem{} = completion
     end
 
     test "defmodule for lib paths", %{project: project} do
@@ -305,7 +305,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.MacroTest do
                |> complete("defprotocol|")
                |> fetch_completion("defprotocol ")
 
-      assert %Completion.Item{} = completion
+      assert %CompletionItem{} = completion
       assert completion.detail
     end
 
@@ -332,7 +332,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.MacroTest do
                |> complete("defimpl|")
                |> fetch_completion("defimpl ")
 
-      assert %Completion.Item{} = completion
+      assert %CompletionItem{} = completion
     end
 
     test "defimpl returns a snippet", %{project: project} do

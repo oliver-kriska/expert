@@ -1,11 +1,13 @@
 defmodule Expert.TaskQueueTest do
   alias Engine.Test.Fixtures
   alias Expert.Configuration
-  alias Expert.Protocol.Notifications
-  alias Expert.Protocol.Requests
+  alias Expert.Protocol.Notifications, as: LxNotifications
+  alias Expert.Protocol.Requests, as: LxRequests
   alias Expert.Provider.Handlers
   alias Expert.TaskQueue
   alias Expert.Transport
+  alias GenLSP.Requests
+  alias GenLSP.Structures
 
   use ExUnit.Case
   use Patch
@@ -33,9 +35,12 @@ defmodule Expert.TaskQueueTest do
       func.(request, config)
     end)
 
-    patch(Requests.Completion, :to_elixir, fn req -> {:ok, req} end)
+    patch(Requests.TextDocumentCompletion, :to_elixir, fn req -> {:ok, req} end)
 
-    request = Requests.Completion.new(id: id, text_document: nil, position: nil, context: nil)
+    request = %Requests.TextDocumentCompletion{
+      id: id,
+      params: %Structures.CompletionParams{text_document: nil, position: nil, context: nil}
+    }
 
     {id, {Handlers.Completion, :handle, [request, config]}}
   end
@@ -88,7 +93,7 @@ defmodule Expert.TaskQueueTest do
       assert :ok = TaskQueue.add(id, mfa)
 
       {:ok, notif} =
-        Notifications.Cancel.parse(%{
+        LxNotifications.Cancel.parse(%{
           "method" => "$/cancelRequest",
           "jsonrpc" => "2.0",
           "params" => %{
@@ -108,7 +113,7 @@ defmodule Expert.TaskQueueTest do
       assert :ok = TaskQueue.add(id, mfa)
 
       {:ok, req} =
-        Requests.Cancel.parse(%{
+        LxRequests.Cancel.parse(%{
           "method" => "$/cancelRequest",
           "jsonrpc" => "2.0",
           "id" => "50",

@@ -1,4 +1,5 @@
 defmodule Engine.CodeAction.Handlers.Refactorex do
+  alias GenLSP.Enumerations
   alias Forge.Document
   alias Forge.Document.Changes
   alias Forge.Document.Range
@@ -7,6 +8,8 @@ defmodule Engine.CodeAction.Handlers.Refactorex do
   alias Engine.CodeMod
 
   alias Refactorex.Refactor
+
+  require Logger
 
   @behaviour CodeAction.Handler
 
@@ -21,9 +24,12 @@ defmodule Engine.CodeAction.Handlers.Refactorex do
         CodeAction.new(
           doc.uri,
           refactoring.title,
-          map_kind(refactoring.kind),
+          refactoring.kind,
           ast_to_changes(doc, refactoring.refactored)
         )
+      end)
+      |> tap(fn refactorings ->
+        Logger.info("Found refactorings: #{inspect(refactorings, pretty: true)}")
       end)
     else
       _ -> []
@@ -31,10 +37,10 @@ defmodule Engine.CodeAction.Handlers.Refactorex do
   end
 
   @impl CodeAction.Handler
-  def kinds, do: [:refactor]
+  def kinds, do: [Enumerations.CodeActionKind.refactor()]
 
   @impl CodeAction.Handler
-  def trigger_kind, do: :invoked
+  def trigger_kind, do: Enumerations.CodeActionTriggerKind.invoked()
 
   defp line_or_selection(_, %{start: start, end: start}), do: {:ok, start.line}
 
@@ -43,9 +49,6 @@ defmodule Engine.CodeAction.Handlers.Refactorex do
     |> Document.fragment(range.start, range.end)
     |> Sourceror.parse_string(line: start.line, column: start.character)
   end
-
-  defp map_kind("quickfix"), do: :quick_fix
-  defp map_kind(kind), do: :"#{String.replace(kind, ".", "_")}"
 
   defp ast_to_changes(doc, ast) do
     {formatter, opts} = CodeMod.Format.formatter_for_file(Engine.get_project(), doc.uri)

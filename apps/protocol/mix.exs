@@ -32,6 +32,7 @@ defmodule Expert.Protocol.MixProject do
       {:forge, path: "../forge", env: Mix.env()},
       Mix.Credo.dependency(),
       Mix.Dialyzer.dependency(),
+      {:gen_lsp, "~> 0.10"},
       {:jason, "~> 1.4", optional: true},
       {:patch, "~> 0.15", only: [:test]},
       {:proto, path: "../proto", env: Mix.env()}

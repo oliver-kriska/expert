@@ -1,4 +1,5 @@
 defmodule Engine.CodeAction.Handlers.OrganizeAliases do
+  alias GenLSP.Enumerations.CodeActionKind
   alias Engine.CodeAction
   alias Engine.CodeMod
   alias Forge.Ast.Analysis
@@ -33,7 +34,7 @@ defmodule Engine.CodeAction.Handlers.OrganizeAliases do
 
   @impl CodeAction.Handler
   def kinds do
-    [:source, :source_organize_imports]
+    [CodeActionKind.source(), CodeActionKind.source_organize_imports()]
   end
 
   @impl CodeAction.Handler

@@ -1,4 +1,5 @@
 defmodule Engine.CodeAction.Handlers.ReplaceWithUnderscore do
+  alias GenLSP.Enumerations.CodeActionKind
   alias Engine.CodeAction
   alias Engine.CodeAction.Diagnostic
   alias Forge.Ast
@@ -26,7 +27,7 @@ defmodule Engine.CodeAction.Handlers.ReplaceWithUnderscore do
 
   @impl CodeAction.Handler
   def kinds do
-    [:quick_fix]
+    [CodeActionKind.quick_fix()]
   end
 
   @impl CodeAction.Handler

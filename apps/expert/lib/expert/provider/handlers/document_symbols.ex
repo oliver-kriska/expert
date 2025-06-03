@@ -2,21 +2,20 @@ defmodule Expert.Provider.Handlers.DocumentSymbols do
   alias Engine.Api
   alias Engine.CodeIntelligence.Symbols
   alias Expert.Configuration
-  alias Expert.Protocol.Requests.DocumentSymbols
-  alias Expert.Protocol.Responses
-  alias Expert.Protocol.Types.Document.Symbol
-  alias Expert.Protocol.Types.Symbol.Kind, as: SymbolKind
+  alias Expert.Protocol.Response
   alias Forge.Document
+  alias GenLSP.Requests
+  alias GenLSP.Structures
 
-  require SymbolKind
+  def handle(%Requests.TextDocumentDocumentSymbol{} = request, %Configuration{} = config) do
+    document = Document.Container.context_document(request.params, nil)
 
-  def handle(%DocumentSymbols{} = request, %Configuration{} = config) do
     symbols =
       config.project
-      |> Api.document_symbols(request.document)
-      |> Enum.map(&to_response(&1, request.document))
+      |> Api.document_symbols(document)
+      |> Enum.map(&to_response(&1, document))
 
-    response = Responses.DocumentSymbols.new(request.id, symbols)
+    response = %Response{id: request.id, result: symbols}
 
     {:reply, response}
   end
@@ -31,14 +30,14 @@ defmodule Expert.Provider.Handlers.DocumentSymbols do
           nil
       end
 
-    Symbol.new(
+    %Structures.DocumentSymbol{
       children: children,
       detail: root.detail,
       kind: to_kind(root.type),
       name: root.name,
       range: root.range,
       selection_range: root.detail_range
-    )
+    }
   end
 
   defp to_kind(:struct), do: :struct

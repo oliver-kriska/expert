@@ -2,10 +2,10 @@ defmodule Expert.Project.Progress.State do
   alias Expert.Configuration
   alias Expert.Project.Progress.Percentage
   alias Expert.Project.Progress.Value
-  alias Expert.Protocol.Id
-  alias Expert.Protocol.Requests
   alias Expert.Transport
   alias Forge.Project
+  alias GenLSP.Requests
+  alias GenLSP.Structures
 
   import Engine.Api.Messages
 
@@ -91,7 +91,11 @@ defmodule Expert.Project.Progress.State do
 
   defp write_work_done(token) do
     if Configuration.client_supports?(:work_done_progress) do
-      progress = Requests.CreateWorkDoneProgress.new(id: Id.next(), token: token)
+      progress = %Requests.WindowWorkDoneProgressCreate{
+        id: Id.next(),
+        params: %Structures.WorkDoneProgressCreateParams{token: token}
+      }
+
       Transport.write(progress)
     end
   end

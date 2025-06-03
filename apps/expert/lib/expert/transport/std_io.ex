@@ -1,4 +1,5 @@
 defmodule Expert.Transport.StdIO do
+  alias Expert.Proto.Convert
   alias Expert.Protocol.JsonRpc
 
   require Logger
@@ -22,9 +23,17 @@ defmodule Expert.Transport.StdIO do
   def write(io_device \\ :stdio, payload)
 
   def write(io_device, %_{} = payload) do
-    with {:ok, lsp} <- Expert.Proto.Convert.to_lsp(payload),
+    with {:ok, lsp} <- encode(payload),
          {:ok, json} <- Jason.encode(lsp) do
       write(io_device, json)
+    else
+      {:error, reason} ->
+        Logger.error("""
+        Failed to encode payload: #{inspect(reason)}
+        Payload: #{inspect(payload, pretty: true)}
+        """)
+
+        {:error, reason}
     end
   end
 
@@ -54,7 +63,44 @@ defmodule Expert.Transport.StdIO do
   def write(_, []) do
   end
 
-  # private
+  defp encode(%{id: id, result: %module{} = result}) do
+    with {:ok, result} <- Convert.to_lsp(result),
+         {:ok, result} <- Schematic.dump(module.schematic(), result) do
+      {:ok,
+       %{
+         "jsonrpc" => "2.0",
+         "id" => id,
+         "result" => result
+       }}
+    end
+  end
+
+  defp encode(%{id: id, error: %module{} = error}) do
+    with {:ok, error} <- Convert.to_lsp(error),
+         {:ok, error} <- Schematic.dump(module.schematic(), error) do
+      {:ok,
+       %{
+         "jsonrpc" => "2.0",
+         "id" => id,
+         "error" => error
+       }}
+    end
+  end
+
+  defp encode(%{id: id, result: result}) do
+    {:ok,
+     %{
+       "jsonrpc" => "2.0",
+       "id" => id,
+       "result" => result
+     }}
+  end
+
+  defp encode(%module{} = request) do
+    with {:ok, request} <- Convert.to_lsp(request) do
+      Schematic.dump(module.schematic(), request)
+    end
+  end
 
   defp loop(buffer, device, callback) do
     case IO.binread(device, :line) do
@@ -63,7 +109,8 @@ defmodule Expert.Transport.StdIO do
 
         with {:ok, content_length} <- content_length(headers),
              {:ok, data} <- read_body(device, content_length),
-             {:ok, message} <- JsonRpc.decode(data) do
+             {:ok, json} <- Jason.decode(data),
+             {:ok, message} <- decode(json) do
           callback.(message)
         else
           {:error, :empty_response} ->
@@ -82,6 +129,25 @@ defmodule Expert.Transport.StdIO do
       line ->
         loop([line | buffer], device, callback)
     end
+  end
+
+  defp decode(%{"id" => _id, "result" => nil}) do
+    {:error, :empty_response}
+  end
+
+  defp decode(%{"id" => _id, "result" => _result} = response) do
+    # this is due to a client -> server message, but we can't decode it properly yet.
+    # since we can't match up the response type to the message.
+
+    {:ok, response}
+  end
+
+  defp decode(%{"method" => _, "id" => _id} = request) do
+    GenLSP.Requests.new(request)
+  end
+
+  defp decode(%{"method" => _} = notification) do
+    GenLSP.Notifications.new(notification)
   end
 
   defp content_length(headers) do
