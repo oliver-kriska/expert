@@ -5,8 +5,6 @@ defmodule Expert.Provider.Handlers.CodeAction do
   alias GenLSP.Requests
   alias GenLSP.Structures
 
-  require Logger
-
   def handle(
         %Requests.TextDocumentCodeAction{params: %Structures.CodeActionParams{} = params} =
           request,
@@ -27,8 +25,6 @@ defmodule Expert.Provider.Handlers.CodeAction do
 
     results = Enum.map(code_actions, &to_result/1)
     reply = %Response{id: request.id, result: results}
-
-    Logger.info("Found code actions: #{inspect(reply, pretty: true)}")
 
     {:reply, reply}
   end

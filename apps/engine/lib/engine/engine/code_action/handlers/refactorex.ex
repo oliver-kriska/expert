@@ -9,8 +9,6 @@ defmodule Engine.CodeAction.Handlers.Refactorex do
 
   alias Refactorex.Refactor
 
-  require Logger
-
   @behaviour CodeAction.Handler
 
   @impl CodeAction.Handler
@@ -27,9 +25,6 @@ defmodule Engine.CodeAction.Handlers.Refactorex do
           refactoring.kind,
           ast_to_changes(doc, refactoring.refactored)
         )
-      end)
-      |> tap(fn refactorings ->
-        Logger.info("Found refactorings: #{inspect(refactorings, pretty: true)}")
       end)
     else
       _ -> []

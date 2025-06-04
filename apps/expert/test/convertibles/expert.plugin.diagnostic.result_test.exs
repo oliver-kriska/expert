@@ -1,6 +1,7 @@
 defmodule Expert.Convertibles.Forge.Plugin.V1.Diagnostic.ResultTest do
   alias Forge.Document
   alias Forge.Plugin.V1.Diagnostic
+  alias GenLSP.Enumerations.DiagnosticSeverity
   alias GenLSP.Structures
   use Expert.Test.Protocol.ConvertibleSupport
 
@@ -32,7 +33,7 @@ defmodule Expert.Convertibles.Forge.Plugin.V1.Diagnostic.ResultTest do
       assert {:ok, %Structures.Diagnostic{} = converted} = to_lsp(plugin_diagnostic(uri, 1), uri)
 
       assert converted.message == "Broken!"
-      assert converted.severity == :error
+      assert converted.severity == DiagnosticSeverity.error()
       assert converted.source == "Elixir"
       assert converted.range == range(:lsp, position(:lsp, 0, 0), position(:lsp, 1, 0))
     end

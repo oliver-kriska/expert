@@ -7,6 +7,7 @@ defmodule Expert.Test.Expert.CompletionCase do
   alias GenLSP.Structures.CompletionContext
   alias GenLSP.Structures.CompletionItem
   alias GenLSP.Structures.CompletionList
+  alias GenLSP.Enumerations.CompletionTriggerKind
 
   use ExUnit.CaseTemplate
   import Forge.Test.CursorSupport
@@ -67,11 +68,11 @@ defmodule Expert.Test.Expert.CompletionCase do
     context =
       if is_binary(trigger_character) do
         %CompletionContext{
-          trigger_kind: 2,
+          trigger_kind: CompletionTriggerKind.trigger_character(),
           trigger_character: trigger_character
         }
       else
-        %CompletionContext{trigger_kind: 1}
+        %CompletionContext{trigger_kind: CompletionTriggerKind.invoked()}
       end
 
     analysis = Ast.analyze(document)

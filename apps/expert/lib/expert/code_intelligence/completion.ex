@@ -11,6 +11,7 @@ defmodule Expert.CodeIntelligence.Completion do
   alias GenLSP.Structures.CompletionContext
   alias GenLSP.Structures.CompletionList
   alias GenLSP.Structures.CompletionItem
+  alias GenLSP.Enumerations.CompletionTriggerKind
   alias Future.Code, as: Code
   alias Mix.Tasks.Namespace
 
@@ -338,24 +339,25 @@ defmodule Expert.CodeIntelligence.Completion do
     false
   end
 
-  defp applies_to_context?(%Project{} = project, result, %CompletionContext{
-         trigger_kind: 2,
-         trigger_character: "%"
-       }) do
-    case result do
-      %Candidate.Module{} = result ->
-        Intelligence.defines_struct?(project, result.full_name, from: :child, to: :child)
+  defp applies_to_context?(%Project{} = project, result, %CompletionContext{} = context) do
+    struct_completion? =
+      context.trigger_kind == CompletionTriggerKind.trigger_character() and
+        context.trigger_character == "%"
 
-      %Candidate.Struct{} ->
-        true
+    if struct_completion? do
+      case result do
+        %Candidate.Module{} = result ->
+          Intelligence.defines_struct?(project, result.full_name, from: :child, to: :child)
 
-      _other ->
-        false
+        %Candidate.Struct{} ->
+          true
+
+        _other ->
+          false
+      end
+    else
+      true
     end
-  end
-
-  defp applies_to_context?(_project, _result, _context) do
-    true
   end
 
   defp maybe_to_completion_list(items \\ [])

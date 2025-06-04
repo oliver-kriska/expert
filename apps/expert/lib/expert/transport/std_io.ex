@@ -26,14 +26,6 @@ defmodule Expert.Transport.StdIO do
     with {:ok, lsp} <- encode(payload),
          {:ok, json} <- Jason.encode(lsp) do
       write(io_device, json)
-    else
-      {:error, reason} ->
-        Logger.error("""
-        Failed to encode payload: #{inspect(reason)}
-        Payload: #{inspect(payload, pretty: true)}
-        """)
-
-        {:error, reason}
     end
   end
 

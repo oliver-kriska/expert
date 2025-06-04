@@ -24,6 +24,9 @@ defmodule Expert.Provider.Handlers.WorkspaceSymbol do
       end
 
     response = %Response{id: request.id, result: symbols}
+
+    Logger.info("WorkspaceSymbol results: #{inspect(response, pretty: true)}")
+
     {:reply, response}
   end
 

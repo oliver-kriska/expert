@@ -38,7 +38,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.ModuleOrBehaviourTest 
     test "behaviours should emit a completion", %{project: project} do
       assert {:ok, completion} =
                project
-               |> complete("GenS|")
+               |> complete("GenSer|")
                |> fetch_completion(kind: :module)
 
       assert completion.kind == :module

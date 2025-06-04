@@ -5,6 +5,7 @@ defmodule Expert.IEx.Helpers do
   alias Forge.Document
   alias Forge.Document.Position
   alias Forge.Project
+  alias GenLSP.Enumerations.CompletionTriggerKind
   alias GenLSP.Structures
 
   defmacro __using__(_) do
@@ -112,7 +113,7 @@ defmodule Expert.IEx.Helpers do
   def complete(project, %Ast.Analysis{} = analysis, line, character, context) do
     context =
       if is_nil(context) do
-        %Structures.CompletionContext{trigger_kind: :trigger_character}
+        %Structures.CompletionContext{trigger_kind: CompletionTriggerKind.trigger_character()}
       else
         context
       end
