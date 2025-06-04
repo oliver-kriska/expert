@@ -1,23 +1,27 @@
 defmodule Expert.Provider.Handlers.Formatting do
   alias Expert.Configuration
-  alias Expert.Protocol.Requests
-  alias Expert.Protocol.Responses
+  alias Expert.Protocol.Response
   alias Forge.Document.Changes
+  alias GenLSP.Requests
+  alias GenLSP.Structures
 
   require Logger
 
-  def handle(%Requests.Formatting{} = request, %Configuration{} = config) do
-    document = request.document
+  def handle(
+        %Requests.TextDocumentFormatting{params: %Structures.DocumentFormattingParams{} = params} =
+          request,
+        %Configuration{} = config
+      ) do
+    document = Lexical.Document.Container.context_document(params, nil)
 
     case Engine.Api.format(config.project, document) do
       {:ok, %Changes{} = document_edits} ->
-        response = Responses.Formatting.new(request.id, document_edits)
-        Logger.info("Response #{inspect(response)}")
+        response = %Response{id: request.id, result: document_edits}
         {:reply, response}
 
       {:error, reason} ->
         Logger.error("Formatter failed #{inspect(reason)}")
-        {:reply, Responses.Formatting.new(request.id, nil)}
+        {:reply, %Response{id: request.id, result: nil}}
     end
   end
 end
