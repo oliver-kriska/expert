@@ -3,10 +3,9 @@ defmodule Expert.Provider.Handlers.WorkspaceSymbol do
   alias Engine.CodeIntelligence.Symbols
   alias Expert.Configuration
   alias Expert.Protocol.Response
+  alias GenLSP.Enumerations.SymbolKind
   alias GenLSP.Requests
   alias GenLSP.Structures
-
-  require SymbolKind
 
   require Logger
 
@@ -41,18 +40,18 @@ defmodule Expert.Provider.Handlers.WorkspaceSymbol do
     %Structures.Location{uri: link.uri, range: link.detail_range}
   end
 
-  defp to_kind(:struct), do: :struct
-  defp to_kind(:module), do: :module
-  defp to_kind({:protocol, _}), do: :module
-  defp to_kind({:xp_protocol, _}), do: :module
-  defp to_kind(:variable), do: :variable
-  defp to_kind({:function, _}), do: :function
-  defp to_kind(:module_attribute), do: :constant
-  defp to_kind(:ex_unit_test), do: :method
-  defp to_kind(:ex_unit_describe), do: :method
-  defp to_kind(:ex_unit_setup), do: :method
-  defp to_kind(:ex_unit_setup_all), do: :method
-  defp to_kind(:type), do: :type_parameter
-  defp to_kind(:spec), do: :interface
-  defp to_kind(:file), do: :file
+  defp to_kind(:struct), do: SymbolKind.struct()
+  defp to_kind(:module), do: SymbolKind.module()
+  defp to_kind({:protocol, _}), do: SymbolKind.module()
+  defp to_kind({:xp_protocol, _}), do: SymbolKind.module()
+  defp to_kind(:variable), do: SymbolKind.variable()
+  defp to_kind({:function, _}), do: SymbolKind.function()
+  defp to_kind(:module_attribute), do: SymbolKind.constant()
+  defp to_kind(:ex_unit_test), do: SymbolKind.method()
+  defp to_kind(:ex_unit_describe), do: SymbolKind.method()
+  defp to_kind(:ex_unit_setup), do: SymbolKind.method()
+  defp to_kind(:ex_unit_setup_all), do: SymbolKind.method()
+  defp to_kind(:type), do: SymbolKind.type_parameter()
+  defp to_kind(:spec), do: SymbolKind.interface()
+  defp to_kind(:file), do: SymbolKind.file()
 end
