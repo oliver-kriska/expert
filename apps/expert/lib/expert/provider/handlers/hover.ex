@@ -1,7 +1,7 @@
 defmodule Expert.Provider.Handlers.Hover do
   alias Engine.CodeIntelligence.Docs
   alias Expert.Configuration
-  alias Expert.Protocol.Response
+  alias Forge.Protocol.Response
   alias Expert.Provider.Markdown
   alias Forge.Ast
   alias Forge.Ast.Analysis

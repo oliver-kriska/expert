@@ -1,7 +1,7 @@
 defmodule Expert.Provider.Handlers.CodeAction do
   alias Engine.CodeAction
   alias Expert.Configuration
-  alias Expert.Protocol.Response
+  alias Forge.Protocol.Response
   alias GenLSP.Requests
   alias GenLSP.Structures
 
@@ -10,7 +10,7 @@ defmodule Expert.Provider.Handlers.CodeAction do
           request,
         %Configuration{} = config
       ) do
-    document = Lexical.Document.Container.context_document(params, nil)
+    document = Forge.Document.Container.context_document(params, nil)
     diagnostics = Enum.map(params.context.diagnostics, &to_code_action_diagnostic/1)
 
     code_actions =

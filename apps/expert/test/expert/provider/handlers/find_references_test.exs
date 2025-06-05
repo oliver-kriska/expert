@@ -1,6 +1,6 @@
 defmodule Expert.Provider.Handlers.FindReferencesTest do
   alias Expert.Proto.Convert
-  alias Expert.Protocol.Response
+  alias Forge.Protocol.Response
   alias Expert.Provider.Handlers
   alias Forge.Ast.Analysis
   alias Forge.Document
@@ -30,7 +30,7 @@ defmodule Expert.Provider.Handlers.FindReferencesTest do
 
     with {:ok, _} <- Document.Store.open_temporary(uri) do
       req = %TextDocumentReferences{
-        id: Lexical.Protocol.Id.next(),
+        id: Expert.Protocol.Id.next(),
         params: %Structures.ReferenceParams{
           context: %Structures.ReferenceContext{
             include_declaration: true

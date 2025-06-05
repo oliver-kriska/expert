@@ -1,6 +1,6 @@
 defmodule Expert.Provider.Handlers.CodeLens do
   alias Expert.Configuration
-  alias Expert.Protocol.Response
+  alias Forge.Protocol.Response
   alias Expert.Provider.Handlers
   alias Forge.Document
   alias Forge.Document.Position

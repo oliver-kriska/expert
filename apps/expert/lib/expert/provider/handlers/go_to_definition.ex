@@ -1,6 +1,6 @@
 defmodule Expert.Provider.Handlers.GoToDefinition do
   alias Expert.Configuration
-  alias Expert.Protocol.Response
+  alias Forge.Protocol.Response
   alias GenLSP.Requests
   alias GenLSP.Structures
 
@@ -12,7 +12,7 @@ defmodule Expert.Provider.Handlers.GoToDefinition do
         } = request,
         %Configuration{} = config
       ) do
-    document = Lexical.Document.Container.context_document(params, nil)
+    document = Forge.Document.Container.context_document(params, nil)
 
     case Engine.Api.definition(config.project, document, params.position) do
       {:ok, native_location} ->

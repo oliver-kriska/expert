@@ -1,8 +1,10 @@
 defmodule Expert.Provider.Handlers.Commands do
   alias Expert.Configuration
-  alias Expert.Protocol.Response
+  alias Forge.Protocol.Response
+  alias Forge.Protocol.ErrorResponse
   alias Expert.Window
   alias Forge.Project
+  alias GenLSP.Enumerations.ErrorCodes
   alias GenLSP.Requests
   alias GenLSP.Structures
 
@@ -56,6 +58,9 @@ defmodule Expert.Provider.Handlers.Commands do
   end
 
   defp internal_error(request_id, message) do
-    Responses.ExecuteCommand.error(request_id, :internal_error, message)
+    %ErrorResponse{
+      id: request_id,
+      error: %GenLSP.ErrorResponse{code: ErrorCodes.internal_error(), message: message}
+    }
   end
 end

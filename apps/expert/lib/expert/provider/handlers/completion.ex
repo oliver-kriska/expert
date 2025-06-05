@@ -1,7 +1,7 @@
 defmodule Expert.Provider.Handlers.Completion do
   alias Expert.CodeIntelligence
   alias Expert.Configuration
-  alias Expert.Protocol.Response
+  alias Forge.Protocol.Response
   alias Forge.Ast
   alias Forge.Document
   alias Forge.Document.Position

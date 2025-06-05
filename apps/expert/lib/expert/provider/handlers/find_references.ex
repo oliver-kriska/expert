@@ -1,7 +1,7 @@
 defmodule Expert.Provider.Handlers.FindReferences do
   alias Engine.Api
   alias Expert.Configuration
-  alias Expert.Protocol.Response
+  alias Forge.Protocol.Response
   alias Forge.Ast
   alias Forge.Document
   alias GenLSP.Requests.TextDocumentReferences
@@ -13,7 +13,7 @@ defmodule Expert.Provider.Handlers.FindReferences do
         %TextDocumentReferences{params: %Structures.ReferenceParams{} = params} = request,
         %Configuration{} = config
       ) do
-    document = Lexical.Document.Container.context_document(params, nil)
+    document = Forge.Document.Container.context_document(params, nil)
     include_declaration? = !!params.context.include_declaration
 
     locations =

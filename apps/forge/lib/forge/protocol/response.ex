@@ -1,4 +1,4 @@
-defmodule Lexical.Server.Protocol.Response do
+defmodule Forge.Protocol.Response do
   import Schematic
 
   defstruct [:id, :result, jsonrpc: "2.0"]

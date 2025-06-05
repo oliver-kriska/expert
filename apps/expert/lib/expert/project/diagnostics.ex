@@ -1,5 +1,6 @@
 defmodule Expert.Project.Diagnostics do
   alias Engine.Api.Messages
+  alias Expert.Project.Diagnostics.State
   alias Expert.Transport
   alias Forge.Formats
   alias Forge.Project
