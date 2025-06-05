@@ -1,5 +1,5 @@
 defmodule Expert.Window do
-  alias Expert.Protocol.Id
+  alias Forge.Protocol.Id
   alias Expert.Transport
   alias GenLSP.Notifications
   alias GenLSP.Requests
@@ -86,7 +86,7 @@ defmodule Expert.Window do
 
   Displays a message to the user in the UI and waits for a response.
   The result type handed to the callback function is a
-  `Expert.Protocol.Types.Message.ActionItem` or nil if there was no response
+  `GenLSP.Structures.MessageActionItem` or nil if there was no response
   from the user.
 
   The strings passed in as the `actions` command are displayed to the user, and when

@@ -1,5 +1,5 @@
 defmodule Expert.Transport.StdIoTest do
-  alias Expert.Protocol.JsonRpc
+  alias Forge.Protocol.JsonRpc
   alias Expert.Transport.StdIO
 
   use ExUnit.Case

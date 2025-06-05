@@ -1,6 +1,6 @@
 defmodule Expert.Provider.Handlers.CodeLensTest do
-  alias Expert.Proto.Convert
-  alias Expert.Protocol.Id
+  alias Forge.Protocol.Convert
+  alias Forge.Protocol.Id
   alias Expert.Provider.Handlers
   alias Forge.Document
   alias Forge.Project

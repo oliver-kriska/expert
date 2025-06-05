@@ -1,6 +1,6 @@
 defmodule Expert.Project.SearchListener do
   alias Engine.Api
-  alias Expert.Protocol.Id
+  alias Forge.Protocol.Id
   alias Expert.Window
   alias Forge.Formats
   alias Forge.Project

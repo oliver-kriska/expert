@@ -175,7 +175,7 @@ compile_project(:other)
 # the other project is compiled
 iex(2)> complete :other, "defmo|"
 [
-  #Protocol.Types.Completion.Item<[
+  #GenLSP.Structures.CompletionItem<[
     detail: "",
     insert_text: "defmacro ${1:name}($2) do\n  $0\nend\n",
     insert_text_format: :snippet,
@@ -183,7 +183,7 @@ iex(2)> complete :other, "defmo|"
     label: "defmacro (Define a macro)",
     sort_text: "093_defmacro (Define a macro)"
   ]>,
-  #Protocol.Types.Completion.Item<[
+  #GenLSP.Structures.CompletionItem<[
     detail: "",
     insert_text: "defmacrop ${1:name}($2) do\n  $0\nend\n",
     insert_text_format: :snippet,
@@ -191,7 +191,7 @@ iex(2)> complete :other, "defmo|"
     label: "defmacrop (Define a private macro)",
     sort_text: "094_defmacrop (Define a private macro)"
   ]>,
-  #Protocol.Types.Completion.Item<[
+  #GenLSP.Structures.CompletionItem<[
     detail: "",
     insert_text: "defmodule ${1:module name} do\n  $0\nend\n",
     insert_text_format: :snippet,

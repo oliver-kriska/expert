@@ -1,7 +1,5 @@
 defmodule Expert do
-  alias Expert.Proto.Convert
-  alias Expert.Protocol.Requests, as: XPRequests
-  alias Expert.Protocol.Notifications, as: XPNotifications
+  alias Forge.Protocol.Convert
   alias Expert.Provider.Handlers
   alias Expert.State
   alias Expert.TaskQueue
@@ -104,12 +102,7 @@ defmodule Expert do
     end
   end
 
-  def handle_message(%XPRequests.Cancel{} = cancel_request, %State{} = state) do
-    TaskQueue.cancel(cancel_request)
-    {:ok, state}
-  end
-
-  def handle_message(%XPNotifications.Cancel{} = cancel_notification, %State{} = state) do
+  def handle_message(%Notifications.DollarCancelRequest{} = cancel_notification, %State{} = state) do
     TaskQueue.cancel(cancel_notification)
     {:ok, state}
   end

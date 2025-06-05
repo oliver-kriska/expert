@@ -40,7 +40,6 @@ defmodule Expert.MixProject do
 
   defp deps do
     [
-      {:forge, path: "../forge", env: Mix.env()},
       Mix.Credo.dependency(),
       Mix.Dialyzer.dependency(),
       {:elixir_sense,
@@ -50,7 +49,6 @@ defmodule Expert.MixProject do
       {:logger_file_backend, "~> 0.0", only: [:dev, :prod]},
       {:patch, "~> 0.15", runtime: false, only: [:dev, :test]},
       {:path_glob, "~> 0.2"},
-      {:protocol, path: "../protocol", env: Mix.env()},
       {:engine, path: "../engine", env: Mix.env()},
       {:sourceror, "~> 1.9"}
     ]

@@ -1,5 +1,5 @@
 defmodule Expert.State do
-  alias Expert.Protocol.Id
+  alias Forge.Protocol.Id
   alias Forge.Protocol.Response
   alias Engine.Api
   alias Expert.CodeIntelligence

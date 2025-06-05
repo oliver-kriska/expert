@@ -1,12 +1,6 @@
 defmodule Forge.DocumentTest do
   alias Forge.Document
 
-  alias Expert.Protocol.Types.TextDocument.ContentChangeEvent.TextDocumentContentChangeEvent,
-    as: RangedContentChange
-
-  alias Expert.Protocol.Types.TextDocument.ContentChangeEvent.TextDocumentContentChangeEvent1,
-    as: TextOnlyContentChange
-
   alias GenLSP.Structures.Position
   alias GenLSP.Structures.Range
   alias GenLSP.Structures.TextEdit
@@ -87,16 +81,18 @@ defmodule Forge.DocumentTest do
 
   describe "applying protocol content change events" do
     test "applying a text only change replaces all the test" do
-      {:ok, doc} = run_changes("hello", [TextOnlyContentChange.new(text: "goodbye")])
+      {:ok, doc} =
+        run_changes("hello", [%{text: "goodbye"}])
+
       assert "goodbye" = text(doc)
     end
 
     test "applying a range event replaces the range" do
       range_change =
-        RangedContentChange.new(
+        %{
           range: new_range(0, 6, 1, 0),
           text: "people"
-        )
+        }
 
       {:ok, doc} = run_changes("hello there", [range_change])
       assert "hello people" == text(doc)

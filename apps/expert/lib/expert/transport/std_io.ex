@@ -1,6 +1,6 @@
 defmodule Expert.Transport.StdIO do
-  alias Expert.Proto.Convert
-  alias Expert.Protocol.JsonRpc
+  alias Forge.Protocol.Convert
+  alias Forge.Protocol.JsonRpc
 
   require Logger
 
@@ -101,8 +101,7 @@ defmodule Expert.Transport.StdIO do
 
         with {:ok, content_length} <- content_length(headers),
              {:ok, data} <- read_body(device, content_length),
-             {:ok, json} <- Jason.decode(data),
-             {:ok, message} <- decode(json) do
+             {:ok, message} <- JsonRpc.decode(data) do
           callback.(message)
         else
           {:error, :empty_response} ->
@@ -121,25 +120,6 @@ defmodule Expert.Transport.StdIO do
       line ->
         loop([line | buffer], device, callback)
     end
-  end
-
-  defp decode(%{"id" => _id, "result" => nil}) do
-    {:error, :empty_response}
-  end
-
-  defp decode(%{"id" => _id, "result" => _result} = response) do
-    # this is due to a client -> server message, but we can't decode it properly yet.
-    # since we can't match up the response type to the message.
-
-    {:ok, response}
-  end
-
-  defp decode(%{"method" => _, "id" => _id} = request) do
-    GenLSP.Requests.new(request)
-  end
-
-  defp decode(%{"method" => _} = notification) do
-    GenLSP.Notifications.new(notification)
   end
 
   defp content_length(headers) do
