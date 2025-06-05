@@ -1,6 +1,5 @@
 defmodule Expert.Project.SearchListener do
   alias Engine.Api
-  alias Expert.Window
   alias Forge.Formats
   alias Forge.Project
   alias Forge.Protocol.Id
@@ -32,7 +31,7 @@ defmodule Expert.Project.SearchListener do
   @impl GenServer
   def handle_info(project_reindex_requested(), %Project{} = project) do
     Logger.info("project reindex requested")
-    send_code_lens_refresh()
+    GenLSP.request(project.lsp, %Requests.WorkspaceCodeLensRefresh{id: Id.next()})
 
     {:noreply, project}
   end
@@ -40,15 +39,15 @@ defmodule Expert.Project.SearchListener do
   def handle_info(project_reindexed(elapsed_ms: elapsed), %Project{} = project) do
     message = "Reindexed #{Project.name(project)} in #{Formats.time(elapsed, unit: :millisecond)}"
     Logger.info(message)
-    send_code_lens_refresh()
+    GenLSP.request(project.lsp, %Requests.WorkspaceCodeLensRefresh{id: Id.next()})
 
-    Window.show_info_message(message)
+    GenLSP.notify(project.lsp, %GenLSP.Notifications.WindowShowMessage{
+      params: %GenLSP.Structures.ShowMessageParams{
+        type: GenLSP.Enumerations.MessageType.info(),
+        message: message
+      }
+    })
 
     {:noreply, project}
-  end
-
-  defp send_code_lens_refresh do
-    request = %Requests.WorkspaceCodeLensRefresh{id: Id.next()}
-    Expert.server_request(request)
   end
 end

@@ -2,7 +2,6 @@ defmodule Expert.Provider.Handlers.WorkspaceSymbol do
   alias Engine.Api
   alias Engine.CodeIntelligence.Symbols
   alias Expert.Configuration
-  alias Forge.Protocol.Response
   alias GenLSP.Enumerations.SymbolKind
   alias GenLSP.Requests
   alias GenLSP.Structures
@@ -10,7 +9,7 @@ defmodule Expert.Provider.Handlers.WorkspaceSymbol do
   require Logger
 
   def handle(
-        %Requests.WorkspaceSymbol{params: %Structures.WorkspaceSymbolParams{} = params} = request,
+        %Requests.WorkspaceSymbol{params: %Structures.WorkspaceSymbolParams{} = params},
         %Configuration{} = config
       ) do
     symbols =
@@ -23,11 +22,9 @@ defmodule Expert.Provider.Handlers.WorkspaceSymbol do
         []
       end
 
-    response = %Response{id: request.id, result: symbols}
+    Logger.info("WorkspaceSymbol results: #{inspect(symbols, pretty: true)}")
 
-    Logger.info("WorkspaceSymbol results: #{inspect(response, pretty: true)}")
-
-    {:reply, response}
+    {:ok, symbols}
   end
 
   def to_response(%Symbols.Workspace{} = root) do

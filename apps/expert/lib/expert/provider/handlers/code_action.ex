@@ -1,13 +1,11 @@
 defmodule Expert.Provider.Handlers.CodeAction do
   alias Engine.CodeAction
   alias Expert.Configuration
-  alias Forge.Protocol.Response
   alias GenLSP.Requests
   alias GenLSP.Structures
 
   def handle(
-        %Requests.TextDocumentCodeAction{params: %Structures.CodeActionParams{} = params} =
-          request,
+        %Requests.TextDocumentCodeAction{params: %Structures.CodeActionParams{} = params},
         %Configuration{} = config
       ) do
     document = Forge.Document.Container.context_document(params, nil)
@@ -24,9 +22,8 @@ defmodule Expert.Provider.Handlers.CodeAction do
       )
 
     results = Enum.map(code_actions, &to_result/1)
-    reply = %Response{id: request.id, result: results}
 
-    {:reply, reply}
+    {:ok, results}
   end
 
   defp to_code_action_diagnostic(%Structures.Diagnostic{} = diagnostic) do

@@ -29,10 +29,10 @@ defmodule Expert.Configuration do
 
   @dialyzer {:nowarn_function, set_dialyzer_enabled: 2}
 
-  @spec new(Forge.uri(), map(), String.t() | nil) :: t
-  def new(root_uri, %Structures.ClientCapabilities{} = client_capabilities, client_name) do
+  @spec new(Forge.uri(), map(), String.t() | nil, GenLSP.Lsp.t()) :: t
+  def new(root_uri, %Structures.ClientCapabilities{} = client_capabilities, client_name, lsp) do
     support = Support.new(client_capabilities)
-    project = Project.new(root_uri)
+    project = Project.new(lsp, root_uri)
 
     %__MODULE__{support: support, project: project, client_name: client_name}
     |> tap(&set/1)
@@ -44,6 +44,7 @@ defmodule Expert.Configuration do
   end
 
   defp set(%__MODULE__{} = config) do
+    # FIXME(mhanberg): I don't think this will work once we have workspace support
     :persistent_term.put(__MODULE__, config)
   end
 
@@ -107,15 +108,17 @@ defmodule Expert.Configuration do
     %__MODULE__{old_config | dialyzer_enabled?: enabled?}
   end
 
-  defp maybe_add_watched_extensions(%__MODULE__{} = old_config, %{
-         "additionalWatchedExtensions" => []
-       }) do
+  defp maybe_add_watched_extensions(
+         %__MODULE__{} = old_config,
+         %{"additionalWatchedExtensions" => []}
+       ) do
     {:ok, old_config}
   end
 
-  defp maybe_add_watched_extensions(%__MODULE__{} = old_config, %{
-         "additionalWatchedExtensions" => extensions
-       })
+  defp maybe_add_watched_extensions(
+         %__MODULE__{} = old_config,
+         %{"additionalWatchedExtensions" => extensions}
+       )
        when is_list(extensions) do
     register_id = Id.next()
     request_id = Id.next()

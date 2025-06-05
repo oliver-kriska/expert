@@ -63,12 +63,6 @@ Some LSP data structures cannot be trivially converted to Elixir terms.
 
 The `Lexical.Convertible` protocol helps centralize the necessary conversion logic where this is the case.
 
-### The Transport Behaviour
-
-A behaviour responsible for reading, writing, serializing, and deserializing messages between the LSP client and Lexical language server.
-
-The behaviour is defined in `Expert.Transport`, with the implementation for stdio in `Expert.Transport.StdIO`.
-
 ### The Translatable protocol and Translation modules
 
 The `Lexical.Completion.Translatable` protocol specifies how Elixir language constructs (such as behaviour callbacks) are converted into LSP constructs (such as [completion items](https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#completionItem)).

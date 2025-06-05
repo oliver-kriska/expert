@@ -177,7 +177,8 @@ defmodule Expert.IEx.Helpers do
         |> Path.expand()
 
       project_uri = "file://#{project_path}"
-      Forge.Project.new(project_uri)
+      # FIXME(mhanberg): unclear how we will get LSP struct here
+      Forge.Project.new(%GenLSP.LSP{mod: :foo}, project_uri)
     end)
   end
 

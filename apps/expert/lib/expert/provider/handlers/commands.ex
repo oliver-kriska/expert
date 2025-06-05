@@ -1,9 +1,6 @@
 defmodule Expert.Provider.Handlers.Commands do
   alias Expert.Configuration
-  alias Expert.Window
   alias Forge.Project
-  alias Forge.Protocol.ErrorResponse
-  alias Forge.Protocol.Response
   alias GenLSP.Enumerations.ErrorCodes
   alias GenLSP.Requests
   alias GenLSP.Structures
@@ -26,41 +23,43 @@ defmodule Expert.Provider.Handlers.Commands do
   end
 
   def handle(
-        %Requests.WorkspaceExecuteCommand{params: %Structures.ExecuteCommandParams{} = params} =
-          request,
+        %Requests.WorkspaceExecuteCommand{params: %Structures.ExecuteCommandParams{} = params},
         %Configuration{} = config
       ) do
     response =
       case params.command do
         @reindex_name ->
           Logger.info("Reindex #{Project.name(config.project)}")
-          reindex(config.project, request.id)
+          reindex(config.project)
 
         invalid ->
           message = "#{invalid} is not a valid command"
-          internal_error(request.id, message)
+          internal_error(message)
       end
 
     {:reply, response}
   end
 
-  defp reindex(%Project{} = project, request_id) do
+  defp reindex(%Project{} = project) do
     case Engine.Api.reindex(project) do
       :ok ->
-        %Response{id: request_id, result: "ok"}
+        {:ok, "ok"}
 
       error ->
-        Window.show_error_message("Indexing #{Project.name(project)} failed")
+        GenLSP.notify(project.lsp, %GenLSP.Notifications.WindowShowMessage{
+          params: %GenLSP.Structures.ShowMessageParams{
+            type: GenLSP.Enumerations.MessageType.error(),
+            message: "Indexing #{Project.name(project)} failed"
+          }
+        })
+
         Logger.error("Indexing command failed due to #{inspect(error)}")
 
-        internal_error(request_id, "Could not reindex: #{error}")
+        {:ok, internal_error("Could not reindex: #{error}")}
     end
   end
 
-  defp internal_error(request_id, message) do
-    %ErrorResponse{
-      id: request_id,
-      error: %GenLSP.ErrorResponse{code: ErrorCodes.internal_error(), message: message}
-    }
+  defp internal_error(message) do
+    %GenLSP.ErrorResponse{code: ErrorCodes.internal_error(), message: message}
   end
 end

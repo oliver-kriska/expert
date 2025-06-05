@@ -7,7 +7,7 @@ defmodule Forge.ProjectTest do
 
   def project do
     root = Forge.Document.Path.to_uri(__DIR__)
-    Project.new(root)
+    Project.new(%GenLSP.LSP{mod: :foo}, root)
   end
 
   describe "name/1" do

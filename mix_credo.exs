@@ -1,6 +1,7 @@
 defmodule Mix.Credo do
   def dependency do
-    {:credo, "~> 1.7", only: [:dev, :test]}
+    # {:credo, "~> 1.7", only: [:dev, :test]}
+    {:credo, github: "rrrene/credo", only: [:dev, :test]}
   end
 
   def config(opts \\ []) do

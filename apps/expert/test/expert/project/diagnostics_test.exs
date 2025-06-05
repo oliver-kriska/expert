@@ -1,6 +1,5 @@
 defmodule Expert.Project.DiagnosticsTest do
   alias Expert.Test.DispatchFake
-  alias Expert.Transport
   alias Forge.Document
   alias Forge.Plugin.V1.Diagnostic
   alias GenLSP.Notifications.TextDocumentPublishDiagnostics
@@ -39,7 +38,15 @@ defmodule Expert.Project.DiagnosticsTest do
   def with_patched_tranport(_) do
     test = self()
 
-    patch(Transport, :write, fn message ->
+    patch(GenLSP, :notify_server, fn _, message ->
+      send(test, {:transport, message})
+    end)
+
+    patch(GenLSP, :notify, fn _, message ->
+      send(test, {:transport, message})
+    end)
+
+    patch(GenLSP, :request, fn _, message ->
       send(test, {:transport, message})
     end)
 
@@ -65,9 +72,24 @@ defmodule Expert.Project.DiagnosticsTest do
         file_diagnostics(diagnostics: [diagnostic(document.uri)], uri: document.uri)
 
       Engine.Api.broadcast(project, file_diagnostics_message)
-      assert_receive {:transport, %TextDocumentPublishDiagnostics{}}
 
-      Document.Store.get_and_update(document.uri, &Document.mark_clean/1)
+      assert_receive {:transport,
+                      %TextDocumentPublishDiagnostics{
+                        params: %PublishDiagnosticsParams{
+                          diagnostics: [
+                            %Forge.Plugin.V1.Diagnostic.Result{
+                              details: nil,
+                              message: "stuff broke",
+                              position: 1,
+                              severity: :error,
+                              source: nil,
+                              uri: "file:///" <> _
+                            }
+                          ]
+                        }
+                      }}
+
+      Document.Store.get_and_update(document.uri, &{:ok, Document.mark_clean(&1)})
 
       Engine.Api.broadcast(project, project_compile_requested())
       Engine.Api.broadcast(project, project_diagnostics(diagnostics: []))

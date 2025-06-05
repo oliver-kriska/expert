@@ -7,7 +7,6 @@ defmodule Expert.Provider.Handlers.Hover do
   alias Forge.Document
   alias Forge.Document.Position
   alias Forge.Project
-  alias Forge.Protocol.Response
   alias GenLSP.Requests
   alias GenLSP.Structures
 
@@ -16,7 +15,7 @@ defmodule Expert.Provider.Handlers.Hover do
   def handle(
         %Requests.TextDocumentHover{
           params: %Structures.HoverParams{} = params
-        } = request,
+        },
         %Configuration{} = config
       ) do
     document = Document.Container.context_document(params, nil)
@@ -34,7 +33,7 @@ defmodule Expert.Provider.Handlers.Hover do
           nil
       end
 
-    {:reply, %Response{id: request.id, result: maybe_hover}}
+    {:ok, maybe_hover}
   end
 
   defp resolve_entity(%Project{} = project, %Analysis{} = analysis, %Position{} = position) do
