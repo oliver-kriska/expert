@@ -3,7 +3,7 @@ defmodule Engine.Build.Isolation do
   Runs functions in an isolated, monitored process
   """
 
-  @spec invoke((() -> term())) :: {:ok, term()} | {:error, term()}
+  @spec invoke((-> term())) :: {:ok, term()} | {:error, term()}
   def invoke(function) when is_function(function, 0) do
     me = self()
 
