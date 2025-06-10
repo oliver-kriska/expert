@@ -8,11 +8,11 @@ defmodule Expert.CodeIntelligence.Completion do
   alias Forge.Ast.Env
   alias Forge.Document.Position
   alias Forge.Project
-  alias GenLSP.Structures.CompletionContext
-  alias GenLSP.Structures.CompletionList
-  alias GenLSP.Structures.CompletionItem
-  alias GenLSP.Enumerations.CompletionTriggerKind
   alias Future.Code, as: Code
+  alias GenLSP.Enumerations.CompletionTriggerKind
+  alias GenLSP.Structures.CompletionContext
+  alias GenLSP.Structures.CompletionItem
+  alias GenLSP.Structures.CompletionList
   alias Mix.Tasks.Namespace
 
   require Logger

@@ -21,7 +21,6 @@ defmodule Engine.CodeAction.Handlers.RemoveUnusedAlias do
   normalizer and possibly fix sourceror, so until then, this is what we have.
   """
 
-  alias GenLSP.Enumerations
   alias Engine.Analyzer
   alias Engine.CodeAction
   alias Engine.CodeAction.Diagnostic
@@ -32,6 +31,7 @@ defmodule Engine.CodeAction.Handlers.RemoveUnusedAlias do
   alias Forge.Document.Edit
   alias Forge.Document.Position
   alias Forge.Document.Range
+  alias GenLSP.Enumerations
   alias Sourceror.Zipper
 
   import Record

@@ -1,7 +1,7 @@
 defmodule Expert.Provider.Handlers.Formatting do
   alias Expert.Configuration
-  alias Forge.Protocol.Response
   alias Forge.Document.Changes
+  alias Forge.Protocol.Response
   alias GenLSP.Requests
   alias GenLSP.Structures
 

@@ -11,7 +11,7 @@ defmodule Forge.Protocol.ErrorResponse do
 
   defstruct [:id, :error, jsonrpc: "2.0"]
 
-  def schematic() do
+  def schematic do
     schema(__MODULE__, %{
       id: int(),
       error: ErrorResponse.schematic(),

@@ -9,7 +9,7 @@ defmodule Forge.Protocol.Response do
           jsonrpc: String.t()
         }
 
-  def schematic() do
+  def schematic do
     schema(__MODULE__, %{
       id: int(),
       result: any(),

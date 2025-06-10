@@ -4,10 +4,10 @@ defmodule Expert.Test.Expert.CompletionCase do
   alias Forge.Document
   alias Forge.Project
   alias Forge.Test.CodeSigil
+  alias GenLSP.Enumerations.CompletionTriggerKind
   alias GenLSP.Structures.CompletionContext
   alias GenLSP.Structures.CompletionItem
   alias GenLSP.Structures.CompletionList
-  alias GenLSP.Enumerations.CompletionTriggerKind
 
   use ExUnit.CaseTemplate
   import Forge.Test.CursorSupport

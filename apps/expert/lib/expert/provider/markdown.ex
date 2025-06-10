@@ -3,8 +3,8 @@ defmodule Expert.Provider.Markdown do
   Utilities for formatting Markdown content.
   """
 
-  alias GenLSP.Structures.MarkupContent
   alias GenLSP.Enumerations
+  alias GenLSP.Structures.MarkupContent
 
   @type markdown :: String.t()
 

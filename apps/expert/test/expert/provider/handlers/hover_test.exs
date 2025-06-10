@@ -1,12 +1,10 @@
 defmodule Expert.Provider.Handlers.HoverTest do
   alias Engine.Api.Messages
   alias Engine.Test.Fixtures
-
-  alias Forge.Protocol.Convert
   alias Expert.Provider.Handlers
-
   alias Forge.Document
   alias Forge.Document.Position
+  alias Forge.Protocol.Convert
   alias GenLSP.Requests
   alias GenLSP.Structures
 

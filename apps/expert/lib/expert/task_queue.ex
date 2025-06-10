@@ -133,7 +133,7 @@ defmodule Expert.TaskQueue do
     defp map_code(:internal_error), do: ErrorCodes.internal_error()
     defp map_code(:server_not_initialized), do: ErrorCodes.server_not_initialized()
     defp map_code(:unknown_error_code), do: ErrorCodes.unknown_error_code()
-    defp map_code(:request_cancelled), do: -32800
+    defp map_code(:request_cancelled), do: -32_800
     defp map_code(code) when is_integer(code), do: code
 
     defp run_task(fun, mfa) when is_function(fun) do

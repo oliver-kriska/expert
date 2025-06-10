@@ -68,7 +68,7 @@ defmodule Expert.TaskQueueTest do
 
       assert TaskQueue.size() == 0
       # ErrorCodes.request_cancelled()
-      assert error.code == -32800
+      assert error.code == -32_800
       assert error.message == "Request cancelled"
     end
 
@@ -81,7 +81,7 @@ defmodule Expert.TaskQueueTest do
       assert_receive %{id: ^id, error: error}
       assert TaskQueue.size() == 0
       # ErrorCodes.request_cancelled()
-      assert error.code == -32800
+      assert error.code == -32_800
       assert error.message == "Request cancelled"
     end
 
@@ -105,7 +105,7 @@ defmodule Expert.TaskQueueTest do
       assert_receive %{id: ^id, error: error}
       assert TaskQueue.size() == 0
       # ErrorCodes.request_cancelled()
-      assert error.code == -32800
+      assert error.code == -32_800
       assert error.message == "Request cancelled"
     end
 
@@ -124,7 +124,7 @@ defmodule Expert.TaskQueueTest do
       assert_receive %{id: ^id, error: error}
       assert TaskQueue.size() == 0
       # ErrorCodes.request_cancelled()
-      assert error.code == -32800
+      assert error.code == -32_800
       assert error.message == "Request cancelled"
     end
 

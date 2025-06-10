@@ -6,13 +6,13 @@ defmodule Forge.Document do
   All language server documents are represented and backed by documents, which
   provide functionality for fetching lines, applying changes, and tracking versions.
   """
-  alias Forge.Protocol.Convertible
   alias Forge.Document.Edit
   alias Forge.Document.Line
   alias Forge.Document.Lines
   alias Forge.Document.Position
   alias Forge.Document.Range
   alias Forge.Math
+  alias Forge.Protocol.Convertible
 
   import Forge.Document.Line
 

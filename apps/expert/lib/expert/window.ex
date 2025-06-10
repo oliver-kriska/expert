@@ -1,10 +1,10 @@
 defmodule Expert.Window do
-  alias Forge.Protocol.Id
   alias Expert.Transport
+  alias Forge.Protocol.Id
+  alias GenLSP.Enumerations
   alias GenLSP.Notifications
   alias GenLSP.Requests
   alias GenLSP.Structures
-  alias GenLSP.Enumerations
 
   @type level :: :error | :warning | :info | :log
   @type message_result :: {:errory, term()} | {:ok, nil} | {:ok, Structures.MessageActionItem.t()}

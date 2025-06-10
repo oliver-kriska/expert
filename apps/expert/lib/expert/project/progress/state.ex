@@ -2,9 +2,9 @@ defmodule Expert.Project.Progress.State do
   alias Expert.Configuration
   alias Expert.Project.Progress.Percentage
   alias Expert.Project.Progress.Value
-  alias Forge.Protocol.Id
   alias Expert.Transport
   alias Forge.Project
+  alias Forge.Protocol.Id
   alias GenLSP.Requests
   alias GenLSP.Structures
 

@@ -1,14 +1,14 @@
 defmodule Expert.Provider.Handlers.Completion do
   alias Expert.CodeIntelligence
   alias Expert.Configuration
-  alias Forge.Protocol.Response
   alias Forge.Ast
   alias Forge.Document
   alias Forge.Document.Position
+  alias Forge.Protocol.Response
+  alias GenLSP.Enumerations.CompletionTriggerKind
   alias GenLSP.Requests
   alias GenLSP.Structures
   alias GenLSP.Structures.CompletionContext
-  alias GenLSP.Enumerations.CompletionTriggerKind
 
   require Logger
 

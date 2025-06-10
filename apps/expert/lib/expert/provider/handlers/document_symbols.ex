@@ -2,8 +2,8 @@ defmodule Expert.Provider.Handlers.DocumentSymbols do
   alias Engine.Api
   alias Engine.CodeIntelligence.Symbols
   alias Expert.Configuration
-  alias Forge.Protocol.Response
   alias Forge.Document
+  alias Forge.Protocol.Response
   alias GenLSP.Requests
   alias GenLSP.Structures
 

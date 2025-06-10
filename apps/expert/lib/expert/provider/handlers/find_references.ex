@@ -1,9 +1,9 @@
 defmodule Expert.Provider.Handlers.FindReferences do
   alias Engine.Api
   alias Expert.Configuration
-  alias Forge.Protocol.Response
   alias Forge.Ast
   alias Forge.Document
+  alias Forge.Protocol.Response
   alias GenLSP.Requests.TextDocumentReferences
   alias GenLSP.Structures
 

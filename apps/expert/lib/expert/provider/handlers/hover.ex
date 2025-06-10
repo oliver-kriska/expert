@@ -1,13 +1,13 @@
 defmodule Expert.Provider.Handlers.Hover do
   alias Engine.CodeIntelligence.Docs
   alias Expert.Configuration
-  alias Forge.Protocol.Response
   alias Expert.Provider.Markdown
   alias Forge.Ast
   alias Forge.Ast.Analysis
   alias Forge.Document
   alias Forge.Document.Position
   alias Forge.Project
+  alias Forge.Protocol.Response
   alias GenLSP.Requests
   alias GenLSP.Structures
 

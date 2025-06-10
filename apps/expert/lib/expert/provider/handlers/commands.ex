@@ -1,9 +1,9 @@
 defmodule Expert.Provider.Handlers.Commands do
   alias Expert.Configuration
-  alias Forge.Protocol.Response
-  alias Forge.Protocol.ErrorResponse
   alias Expert.Window
   alias Forge.Project
+  alias Forge.Protocol.ErrorResponse
+  alias Forge.Protocol.Response
   alias GenLSP.Enumerations.ErrorCodes
   alias GenLSP.Requests
   alias GenLSP.Structures

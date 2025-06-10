@@ -1,6 +1,6 @@
 defmodule Forge.Test.Protocol.ConvertibleSupport do
-  alias Forge.Protocol.Convertible
   alias Forge.Document
+  alias Forge.Protocol.Convertible
 
   use ExUnit.CaseTemplate
 

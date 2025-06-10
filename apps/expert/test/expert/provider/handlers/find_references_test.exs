@@ -1,10 +1,10 @@
 defmodule Expert.Provider.Handlers.FindReferencesTest do
-  alias Forge.Protocol.Convert
-  alias Forge.Protocol.Response
   alias Expert.Provider.Handlers
   alias Forge.Ast.Analysis
   alias Forge.Document
   alias Forge.Document.Location
+  alias Forge.Protocol.Convert
+  alias Forge.Protocol.Response
   alias GenLSP.Requests.TextDocumentReferences
   alias GenLSP.Structures
 

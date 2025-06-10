@@ -1,6 +1,6 @@
 defmodule Forge.Protocol.Convert do
-  alias Forge.Protocol.Convertible
   alias Forge.Document
+  alias Forge.Protocol.Convertible
 
   def to_lsp(%_{result: result} = response) do
     case Convertible.to_lsp(result) do

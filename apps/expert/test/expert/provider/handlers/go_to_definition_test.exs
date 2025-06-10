@@ -1,8 +1,8 @@
 defmodule Expert.Provider.Handlers.GoToDefinitionTest do
-  alias Forge.Protocol.Convert
   alias Expert.Provider.Handlers
   alias Forge.Document
   alias Forge.Document.Location
+  alias Forge.Protocol.Convert
   alias GenLSP.Requests.TextDocumentDefinition
   alias GenLSP.Structures
 

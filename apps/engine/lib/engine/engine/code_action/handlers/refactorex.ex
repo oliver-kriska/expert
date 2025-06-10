@@ -1,12 +1,10 @@
 defmodule Engine.CodeAction.Handlers.Refactorex do
-  alias GenLSP.Enumerations
+  alias Engine.CodeAction
+  alias Engine.CodeMod
   alias Forge.Document
   alias Forge.Document.Changes
   alias Forge.Document.Range
-
-  alias Engine.CodeAction
-  alias Engine.CodeMod
-
+  alias GenLSP.Enumerations
   alias Refactorex.Refactor
 
   @behaviour CodeAction.Handler

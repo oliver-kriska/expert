@@ -1,11 +1,11 @@
 defmodule Expert.Provider.Handlers.CodeLens do
   alias Expert.Configuration
-  alias Forge.Protocol.Response
   alias Expert.Provider.Handlers
   alias Forge.Document
   alias Forge.Document.Position
   alias Forge.Document.Range
   alias Forge.Project
+  alias Forge.Protocol.Response
   alias GenLSP.Requests
   alias GenLSP.Structures
 

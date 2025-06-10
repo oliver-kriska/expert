@@ -1,14 +1,13 @@
 defmodule Engine.CodeAction.Handlers.ReplaceRemoteFunction do
-  alias GenLSP.Enumerations.CodeActionKind
+  alias Engine.CodeAction
+  alias Engine.CodeAction.Diagnostic
+  alias Engine.Modules
   alias Forge.Ast
   alias Forge.Document
   alias Forge.Document.Changes
   alias Forge.Document.Edit
   alias Forge.Document.Range
-
-  alias Engine.CodeAction
-  alias Engine.CodeAction.Diagnostic
-  alias Engine.Modules
+  alias GenLSP.Enumerations.CodeActionKind
   alias Sourceror.Zipper
 
   @behaviour CodeAction.Handler

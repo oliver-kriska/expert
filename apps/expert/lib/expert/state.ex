@@ -1,6 +1,4 @@
 defmodule Expert.State do
-  alias Forge.Protocol.Id
-  alias Forge.Protocol.Response
   alias Engine.Api
   alias Expert.CodeIntelligence
   alias Expert.Configuration
@@ -8,9 +6,11 @@ defmodule Expert.State do
   alias Expert.Provider.Handlers
   alias Expert.Transport
   alias Forge.Document
+  alias Forge.Protocol.Id
+  alias Forge.Protocol.Response
   alias GenLSP.Enumerations
-  alias GenLSP.Requests
   alias GenLSP.Notifications
+  alias GenLSP.Requests
   alias GenLSP.Structures
 
   require Logger
@@ -54,7 +54,7 @@ defmodule Expert.State do
     event_id
     |> initialize_result()
     |> tap(fn result ->
-      Logger.info("Sending initialize result: #{inspect(result)}", limit: :infinity)
+      Logger.info("Sending initialize result: #{inspect(result)}")
     end)
     |> Transport.write()
 

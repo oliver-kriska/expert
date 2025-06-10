@@ -1,5 +1,4 @@
 defmodule Engine.CodeAction.Handlers.OrganizeAliases do
-  alias GenLSP.Enumerations.CodeActionKind
   alias Engine.CodeAction
   alias Engine.CodeMod
   alias Forge.Ast.Analysis
@@ -7,6 +6,7 @@ defmodule Engine.CodeAction.Handlers.OrganizeAliases do
   alias Forge.Document
   alias Forge.Document.Changes
   alias Forge.Document.Range
+  alias GenLSP.Enumerations.CodeActionKind
 
   require Logger
 
