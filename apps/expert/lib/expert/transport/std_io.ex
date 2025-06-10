@@ -55,9 +55,8 @@ defmodule Expert.Transport.StdIO do
   def write(_, []) do
   end
 
-  defp encode(%{id: id, result: %module{} = result}) do
-    with {:ok, result} <- Convert.to_lsp(result),
-         {:ok, result} <- Schematic.dump(module.schematic(), result) do
+  defp encode(%{id: id, result: result}) do
+    with {:ok, result} <- dump_lsp(result) do
       {:ok,
        %{
          "jsonrpc" => "2.0",
@@ -67,9 +66,8 @@ defmodule Expert.Transport.StdIO do
     end
   end
 
-  defp encode(%{id: id, error: %module{} = error}) do
-    with {:ok, error} <- Convert.to_lsp(error),
-         {:ok, error} <- Schematic.dump(module.schematic(), error) do
+  defp encode(%{id: id, error: error}) do
+    with {:ok, error} <- dump_lsp(error) do
       {:ok,
        %{
          "jsonrpc" => "2.0",
@@ -79,20 +77,33 @@ defmodule Expert.Transport.StdIO do
     end
   end
 
-  defp encode(%{id: id, result: result}) do
-    {:ok,
-     %{
-       "jsonrpc" => "2.0",
-       "id" => id,
-       "result" => result
-     }}
+  defp encode(%_{} = request) do
+    dump_lsp(request)
   end
 
-  defp encode(%module{} = request) do
-    with {:ok, request} <- Convert.to_lsp(request) do
-      Schematic.dump(module.schematic(), request)
+  defp dump_lsp(%module{} = item) do
+    with {:ok, item} <- Convert.to_lsp(item),
+         {:ok, item} <- Schematic.dump(module.schematic(), item) do
+      {:ok, item}
     end
   end
+
+  defp dump_lsp(list) when is_list(list) do
+    dump =
+      Enum.map(list, fn item ->
+        case dump_lsp(item) do
+          {:ok, dumped} -> dumped
+          {:error, reason} -> throw({:error, reason})
+        end
+      end)
+
+    {:ok, dump}
+  catch
+    {:error, reason} ->
+      {:error, reason}
+  end
+
+  defp dump_lsp(other), do: {:ok, other}
 
   defp loop(buffer, device, callback) do
     case IO.binread(device, :line) do
