@@ -41,7 +41,7 @@ defmodule Expert.Transport.StdIoTest do
     # This series of requests is specially crafted to cause the original failure. Removing
     # a single « from the string will break the setup.
     request([
-      %{method: "textDocument/doesSomething", body: "««««««««««««««««««««««"},
+      %{method: "workspace/symbol", id: 1, params: %{query: "««««««««««««««««««««««"}},
       %{method: "$/cancelRequest", id: 2},
       %{method: "$/cancelRequest", id: 3}
     ])
