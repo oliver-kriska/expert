@@ -102,7 +102,7 @@ defmodule Expert do
     end
   end
 
-  def handle_message(%Notification.DollarCancelRequest{} = cancel_notification, %State{} = state) do
+  def handle_message(%Notifications.DollarCancelRequest{} = cancel_notification, %State{} = state) do
     TaskQueue.cancel(cancel_notification)
     {:ok, state}
   end
