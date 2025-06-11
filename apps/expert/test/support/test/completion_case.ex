@@ -95,6 +95,18 @@ defmodule Expert.Test.Expert.CompletionCase do
     end
   end
 
+  def fetch_completion(completions, kind) when is_integer(kind) do
+    matcher = fn completion ->
+      Map.get(completion, :kind) == kind
+    end
+
+    case completions |> completion_items() |> Enum.filter(matcher) do
+      [] -> {:error, :not_found}
+      [found] -> {:ok, found}
+      found when is_list(found) -> {:ok, found}
+    end
+  end
+
   def fetch_completion(completions, opts) when is_list(opts) do
     matcher = fn completion ->
       Enum.reduce_while(opts, false, fn {key, value}, _ ->

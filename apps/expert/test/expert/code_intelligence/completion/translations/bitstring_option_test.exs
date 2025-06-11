@@ -1,4 +1,5 @@
 defmodule Expert.CodeIntelligence.Completion.Translations.BitstringOptionsTest do
+  alias GenLSP.Enumerations.CompletionItemKind
   use Expert.Test.Expert.CompletionCase
 
   describe "bitstring options" do
@@ -6,7 +7,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.BitstringOptionsTest d
       assert {:ok, completions} =
                project
                |> complete("<<x::|")
-               |> fetch_completion(kind: :unit)
+               |> fetch_completion(CompletionItemKind.unit())
 
       for completion <- completions,
           completed = apply_completion(completion) do
@@ -18,7 +19,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.BitstringOptionsTest d
       assert {:ok, completions} =
                project
                |> complete("<<foo::u32, x::|")
-               |> fetch_completion(kind: :unit)
+               |> fetch_completion(CompletionItemKind.unit())
 
       for completion <- completions,
           completed = apply_completion(completion) do
@@ -30,7 +31,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.BitstringOptionsTest d
       assert {:ok, completion} =
                project
                |> complete("<<x::inte|")
-               |> fetch_completion(kind: :unit)
+               |> fetch_completion(CompletionItemKind.unit())
 
       assert apply_completion(completion) == "<<x::integer"
     end
@@ -39,7 +40,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.BitstringOptionsTest d
       assert {:ok, completion} =
                project
                |> complete("<<x::in|")
-               |> fetch_completion(kind: :unit)
+               |> fetch_completion(CompletionItemKind.unit())
 
       assert apply_completion(completion) == "<<x::integer"
     end
@@ -48,7 +49,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.BitstringOptionsTest d
       assert {:ok, [utf8, utf16, utf32]} =
                project
                |> complete("<<foo::utf8, bar::ut|")
-               |> fetch_completion(kind: :unit)
+               |> fetch_completion(CompletionItemKind.unit())
 
       assert apply_completion(utf8) == "<<foo::utf8, bar::utf8"
       assert apply_completion(utf16) == "<<foo::utf8, bar::utf16"
@@ -59,7 +60,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.BitstringOptionsTest d
       assert {:ok, completion} =
                project
                |> complete("<<x::integer-siz|")
-               |> fetch_completion(kind: :unit)
+               |> fetch_completion(CompletionItemKind.unit())
 
       assert apply_completion(completion) == "<<x::integer-size"
     end
@@ -71,7 +72,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.BitstringOptionsTest d
       assert {:ok, completions} =
                project
                |> complete("<<x::big-integer-|")
-               |> fetch_completion(kind: :unit)
+               |> fetch_completion(CompletionItemKind.unit())
 
       for completion <- completions do
         assert String.starts_with?(completion, "-")
@@ -82,7 +83,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.BitstringOptionsTest d
       assert {:ok, completion} =
                project
                |> complete("<<x::big-integer-siz|")
-               |> fetch_completion(kind: :unit)
+               |> fetch_completion(CompletionItemKind.unit())
 
       assert apply_completion(completion) == "<<x::big-integer-size"
     end
@@ -91,7 +92,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.BitstringOptionsTest d
       assert {:ok, [utf8, utf16, utf32]} =
                project
                |> complete("<<foo::utf|")
-               |> fetch_completion(kind: :unit)
+               |> fetch_completion(CompletionItemKind.unit())
 
       assert apply_completion(utf8) == "<<foo::utf8"
       assert apply_completion(utf16) == "<<foo::utf16"
@@ -111,7 +112,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.BitstringOptionsTest d
       assert {:error, :not_found} =
                project
                |> complete(code)
-               |> fetch_completion(kind: :function)
+               |> fetch_completion(kind: CompletionItemKind.function())
     end
 
     test "macros are not included", %{project: project} do
@@ -127,7 +128,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.BitstringOptionsTest d
       assert {:error, :not_found} =
                project
                |> complete(code)
-               |> fetch_completion(kind: :function)
+               |> fetch_completion(kind: CompletionItemKind.function())
     end
 
     test "variables are included", %{project: project} do
@@ -139,7 +140,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.BitstringOptionsTest d
       assert {:ok, completion} =
                project
                |> complete(code)
-               |> fetch_completion(kind: :variable)
+               |> fetch_completion(kind: CompletionItemKind.variable())
 
       assert apply_completion(completion) == ~q[
         bin_length = 5

@@ -1,4 +1,7 @@
 defmodule Expert.CodeIntelligence.Completion.Translations.FunctionTest do
+  alias GenLSP.Enumerations.CompletionItemKind
+  alias GenLSP.Enumerations.InsertTextFormat
+
   use Expert.Test.Expert.CompletionCase
 
   describe "function completions" do
@@ -26,7 +29,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.FunctionTest do
       {:ok, completion} =
         project
         |> complete("Application.loaded_app|")
-        |> fetch_completion(kind: :function)
+        |> fetch_completion(kind: CompletionItemKind.function())
 
       assert apply_completion(completion) == "Application.loaded_applications()"
     end
@@ -35,14 +38,14 @@ defmodule Expert.CodeIntelligence.Completion.Translations.FunctionTest do
       assert {:error, :not_found} =
                project
                |> complete("|> Application.loaded_app|")
-               |> fetch_completion(kind: :function)
+               |> fetch_completion(kind: CompletionItemKind.function())
     end
 
     test "arity 1 omits arguments if in a pipeline", %{project: project} do
       {:ok, [completion, _]} =
         project
         |> complete("|> Enum.dedu|")
-        |> fetch_completion(kind: :function)
+        |> fetch_completion(kind: CompletionItemKind.function())
 
       assert apply_completion(completion) == "|> Enum.dedup()"
     end
@@ -51,7 +54,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.FunctionTest do
       {:ok, completion} =
         project
         |> complete("|> Enum.chunk_b|")
-        |> fetch_completion(kind: :function)
+        |> fetch_completion(kind: CompletionItemKind.function())
 
       assert apply_completion(completion) == "|> Enum.chunk_by(${1:fun})"
       assert completion.label == "chunk_by(fun)"
@@ -61,7 +64,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.FunctionTest do
       {:ok, completion} =
         project
         |> complete("Enum.dedup_b|()")
-        |> fetch_completion(kind: :function)
+        |> fetch_completion(kind: CompletionItemKind.function())
 
       assert apply_completion(completion) == "Enum.dedup_by()"
     end
@@ -84,7 +87,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.FunctionTest do
       assert {:ok, completion} =
                project
                |> complete(source)
-               |> fetch_completion(kind: :function)
+               |> fetch_completion(kind: CompletionItemKind.function())
 
       assert completion.label == "fun_1_without_parens arg"
       assert apply_completion(completion) =~ "Project.Functions.fun_1_without_parens ${1:arg}"
@@ -101,7 +104,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.FunctionTest do
       assert {:ok, completion} =
                project
                |> complete(source)
-               |> fetch_completion(kind: :function)
+               |> fetch_completion(kind: CompletionItemKind.function())
 
       assert completion.label == "fun_1_without_parens arg"
       assert apply_completion(completion) =~ "fun_1_without_parens ${1:arg}"
@@ -117,7 +120,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.FunctionTest do
       {:ok, completion} =
         project
         |> complete(source)
-        |> fetch_completion(kind: :module)
+        |> fetch_completion(kind: CompletionItemKind.module())
 
       assert completion.label == "Integer"
     end
@@ -169,9 +172,9 @@ defmodule Expert.CodeIntelligence.Completion.Translations.FunctionTest do
       {:ok, completion} =
         project
         |> complete(source)
-        |> fetch_completion(kind: :function)
+        |> fetch_completion(kind: CompletionItemKind.function())
 
-      assert completion.insert_text_format == :snippet
+      assert completion.insert_text_format == InsertTextFormat.snippet()
 
       assert apply_completion(completion) == ~q[
         Enum.map(1..10, Enum.reduce_while(${1:enumerable}, ${2:acc}, ${3:fun}))
@@ -195,7 +198,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.FunctionTest do
       assert apply_completion(capture) == "&is_map/1"
 
       assert args_capture.detail == "(Capture with arguments)"
-      assert args_capture.insert_text_format == :snippet
+      assert args_capture.insert_text_format == InsertTextFormat.snippet()
       assert apply_completion(args_capture) == "&is_map(${1:term})"
     end
 
@@ -206,7 +209,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.FunctionTest do
       assert apply_completion(is_map_key_complete) == "&is_map_key/2"
 
       assert is_map_key_args.detail == "(Capture with arguments)"
-      assert is_map_key_args.insert_text_format == :snippet
+      assert is_map_key_args.insert_text_format == InsertTextFormat.snippet()
       assert apply_completion(is_map_key_args) == "&is_map_key(${1:map}, ${2:key})"
     end
   end
@@ -216,7 +219,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.FunctionTest do
       {:ok, [arity_1, arity_2]} =
         project
         |> complete("Project.DefaultArgs.first|")
-        |> fetch_completion(kind: :function)
+        |> fetch_completion(kind: CompletionItemKind.function())
 
       assert apply_completion(arity_1) == "Project.DefaultArgs.first_arg(${1:y})"
       assert apply_completion(arity_2) == "Project.DefaultArgs.first_arg(${1:x}, ${2:y})"
@@ -226,7 +229,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.FunctionTest do
       {:ok, [arity_1, arity_2]} =
         project
         |> complete("Project.DefaultArgs.middle|")
-        |> fetch_completion(kind: :function)
+        |> fetch_completion(kind: CompletionItemKind.function())
 
       assert apply_completion(arity_1) == "Project.DefaultArgs.middle_arg(${1:a}, ${2:c})"
       assert apply_completion(arity_2) == "Project.DefaultArgs.middle_arg(${1:a}, ${2:b}, ${3:c})"
@@ -236,7 +239,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.FunctionTest do
       {:ok, [arity_1, arity_2]} =
         project
         |> complete("Project.DefaultArgs.last|")
-        |> fetch_completion(kind: :function)
+        |> fetch_completion(kind: CompletionItemKind.function())
 
       assert apply_completion(arity_1) == "Project.DefaultArgs.last_arg(${1:x})"
       assert apply_completion(arity_2) == "Project.DefaultArgs.last_arg(${1:x}, ${2:y})"
@@ -246,7 +249,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.FunctionTest do
       {:ok, [arity_1, arity_2]} =
         project
         |> complete("Project.DefaultArgs.opt|")
-        |> fetch_completion(kind: :function)
+        |> fetch_completion(kind: CompletionItemKind.function())
 
       assert apply_completion(arity_1) == "Project.DefaultArgs.options(${1:a})"
       assert apply_completion(arity_2) == "Project.DefaultArgs.options(${1:a}, ${2:opts})"
@@ -256,7 +259,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.FunctionTest do
       {:ok, [arity_1, arity_2]} =
         project
         |> complete("Project.DefaultArgs.struct|")
-        |> fetch_completion(kind: :function)
+        |> fetch_completion(kind: CompletionItemKind.function())
 
       assert apply_completion(arity_1) == "Project.DefaultArgs.struct_arg(${1:a})"
       assert apply_completion(arity_2) == "Project.DefaultArgs.struct_arg(${1:a}, ${2:b})"
@@ -266,7 +269,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.FunctionTest do
       {:ok, completion} =
         project
         |> complete("Project.DefaultArgs.pattern_match|")
-        |> fetch_completion(kind: :function)
+        |> fetch_completion(kind: CompletionItemKind.function())
 
       assert apply_completion(completion) == "Project.DefaultArgs.pattern_match_arg(${1:user})"
     end
@@ -275,7 +278,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.FunctionTest do
       {:ok, completion} =
         project
         |> complete("Project.DefaultArgs.reverse|")
-        |> fetch_completion(kind: :function)
+        |> fetch_completion(kind: CompletionItemKind.function())
 
       assert apply_completion(completion) ==
                "Project.DefaultArgs.reverse_pattern_match_arg(${1:user})"

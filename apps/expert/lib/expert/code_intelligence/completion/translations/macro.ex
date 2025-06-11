@@ -9,6 +9,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.Macro do
   alias Forge.Ast.Env
   alias Forge.Document
   alias Forge.Document.Position
+  alias GenLSP.Enumerations.CompletionItemKind
 
   @snippet_macros ~w(def defp defmacro defmacrop defimpl defmodule defprotocol defguard defguardp defexception test use)
   @unhelpful_macros ~w(:: alias! in and or destructure)
@@ -45,7 +46,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.Macro do
     env
     |> builder.snippet(snippet,
       detail: macro.spec,
-      kind: :class,
+      kind: CompletionItemKind.class(),
       label: label,
       filter_text: macro.name
     )
@@ -64,7 +65,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.Macro do
     env
     |> builder.snippet(snippet,
       detail: macro.spec,
-      kind: :class,
+      kind: CompletionItemKind.class(),
       label: label,
       filter_text: macro.name
     )
@@ -83,7 +84,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.Macro do
     env
     |> builder.snippet(snippet,
       detail: macro.spec,
-      kind: :class,
+      kind: CompletionItemKind.class(),
       label: label,
       filter_text: macro.name
     )
@@ -102,7 +103,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.Macro do
     env
     |> builder.snippet(snippet,
       detail: macro.spec,
-      kind: :class,
+      kind: CompletionItemKind.class(),
       label: label,
       filter_text: macro.name
     )
@@ -121,7 +122,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.Macro do
     env
     |> builder.snippet(snippet,
       detail: macro.spec,
-      kind: :class,
+      kind: CompletionItemKind.class(),
       label: label,
       filter_text: macro.name
     )
@@ -136,7 +137,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.Macro do
     env
     |> builder.snippet(snippet,
       detail: macro.spec,
-      kind: :class,
+      kind: CompletionItemKind.class(),
       label: label,
       filter_text: macro.name
     )
@@ -151,7 +152,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.Macro do
     env
     |> builder.snippet(snippet,
       detail: macro.spec,
-      kind: :class,
+      kind: CompletionItemKind.class(),
       label: label,
       filter_text: macro.name
     )
@@ -166,7 +167,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.Macro do
     env
     |> builder.snippet(snippet,
       detail: macro.spec,
-      kind: :class,
+      kind: CompletionItemKind.class(),
       label: label,
       filter_text: macro.name
     )
@@ -181,7 +182,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.Macro do
     env
     |> builder.snippet(snippet,
       detail: macro.spec,
-      kind: :class,
+      kind: CompletionItemKind.class(),
       label: label,
       filter_text: macro.name
     )
@@ -196,7 +197,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.Macro do
     env
     |> builder.snippet(snippet,
       detail: macro.spec,
-      kind: :class,
+      kind: CompletionItemKind.class(),
       label: label,
       filter_text: macro.name
     )
@@ -211,7 +212,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.Macro do
     env
     |> builder.snippet(snippet,
       detail: macro.spec,
-      kind: :class,
+      kind: CompletionItemKind.class(),
       label: label,
       filter_text: macro.name
     )
@@ -226,7 +227,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.Macro do
     env
     |> builder.snippet(snippet,
       detail: macro.spec,
-      kind: :class,
+      kind: CompletionItemKind.class(),
       label: label,
       filter_text: macro.name
     )
@@ -239,7 +240,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.Macro do
 
     env
     |> builder.snippet(snippet,
-      kind: :class,
+      kind: CompletionItemKind.class(),
       label: label,
       filter_text: "use"
     )
@@ -254,7 +255,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.Macro do
     env
     |> builder.snippet(snippet,
       detail: macro.spec,
-      kind: :class,
+      kind: CompletionItemKind.class(),
       label: label,
       filter_text: macro.name
     )
@@ -273,7 +274,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.Macro do
     env
     |> builder.snippet(snippet,
       detail: macro.spec,
-      kind: :class,
+      kind: CompletionItemKind.class(),
       label: label,
       filter_text: macro.name
     )
@@ -292,7 +293,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.Macro do
     env
     |> builder.snippet(snippet,
       detail: macro.spec,
-      kind: :class,
+      kind: CompletionItemKind.class(),
       label: label,
       filter_text: macro.name
     )
@@ -311,7 +312,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.Macro do
     env
     |> builder.snippet(snippet,
       detail: macro.spec,
-      kind: :class,
+      kind: CompletionItemKind.class(),
       label: label,
       filter_text: macro.name
     )
@@ -330,7 +331,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.Macro do
     env
     |> builder.snippet(snippet,
       detail: macro.spec,
-      kind: :class,
+      kind: CompletionItemKind.class(),
       label: label,
       filter_text: macro.name
     )
@@ -349,7 +350,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.Macro do
     env
     |> builder.snippet(snippet,
       detail: macro.spec,
-      kind: :class,
+      kind: CompletionItemKind.class(),
       label: label,
       filter_text: macro.name
     )
@@ -368,7 +369,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.Macro do
     env
     |> builder.snippet(snippet,
       detail: macro.spec,
-      kind: :class,
+      kind: CompletionItemKind.class(),
       label: label,
       filter_text: macro.name
     )
@@ -383,7 +384,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.Macro do
     env
     |> builder.snippet(snippet,
       detail: macro.spec,
-      kind: :class,
+      kind: CompletionItemKind.class(),
       label: label,
       filter_text: macro.name
     )
@@ -402,7 +403,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.Macro do
     env
     |> builder.snippet(snippet,
       detail: macro.spec,
-      kind: :class,
+      kind: CompletionItemKind.class(),
       label: label,
       filter_text: macro.name
     )
@@ -422,7 +423,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.Macro do
     env
     |> builder.snippet(snippet,
       detail: macro.spec,
-      kind: :class,
+      kind: CompletionItemKind.class(),
       label: label,
       filter_text: macro.name
     )
@@ -441,7 +442,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.Macro do
     env
     |> builder.snippet(snippet,
       detail: macro.spec,
-      kind: :class,
+      kind: CompletionItemKind.class(),
       label: label,
       filter_text: macro.name
     )
@@ -460,7 +461,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.Macro do
     env
     |> builder.snippet(stub_snippet,
       detail: "A stub test",
-      kind: :class,
+      kind: CompletionItemKind.class(),
       label: stub_label,
       filter_text: "test"
     )
@@ -479,7 +480,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.Macro do
     env
     |> builder.snippet(plain_snippet,
       detail: "A test",
-      kind: :class,
+      kind: CompletionItemKind.class(),
       label: plain_label,
       filter_text: "test"
     )
@@ -498,7 +499,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.Macro do
     env
     |> builder.snippet(context_snippet,
       detail: "A test that receives context",
-      kind: :class,
+      kind: CompletionItemKind.class(),
       label: context_label,
       filter_text: "test"
     )
@@ -515,7 +516,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.Macro do
     env
     |> builder.snippet(snippet,
       detail: "A describe block",
-      kind: :class,
+      kind: CompletionItemKind.class(),
       label: ~S(describe "message"),
       filter_text: "describe"
     )
@@ -529,7 +530,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.Macro do
       env
       |> builder.plain_text("__MODULE__",
         detail: macro.spec,
-        kind: :constant,
+        kind: CompletionItemKind.constant(),
         label: "__MODULE__",
         filter_text: "__MODULE__"
       )
@@ -542,7 +543,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.Macro do
     env
     |> builder.plain_text(dunder_form,
       detail: macro.spec,
-      kind: :constant,
+      kind: CompletionItemKind.constant(),
       label: dunder_form,
       filter_text: dunder_form
     )
@@ -605,7 +606,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.Macro do
     env
     |> builder.snippet(snippet,
       detail: macro.spec,
-      kind: :class,
+      kind: CompletionItemKind.class(),
       label: label,
       filter_text: macro.name
     )

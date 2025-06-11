@@ -1,4 +1,6 @@
 defmodule Expert.CodeIntelligence.Completion.Translations.ModuleAttributeTest do
+  alias GenLSP.Enumerations.CompletionItemKind
+
   use Expert.Test.Expert.CompletionCase
 
   describe "module attributes" do
@@ -45,11 +47,11 @@ defmodule Expert.CodeIntelligence.Completion.Translations.ModuleAttributeTest do
       assert {:ok, [snippet_completion, empty_completion]} =
                project
                |> complete(source)
-               |> fetch_completion(kind: :property)
+               |> fetch_completion(kind: CompletionItemKind.property())
 
       assert snippet_completion.detail
       assert snippet_completion.label == "@doc"
-      assert snippet_completion.kind == :property
+      assert snippet_completion.kind == CompletionItemKind.property()
 
       # note: indentation should be correctly adjusted by editor
       assert apply_completion(snippet_completion) == ~q[
@@ -64,7 +66,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.ModuleAttributeTest do
 
       assert empty_completion.detail
       assert empty_completion.label == "@doc false"
-      assert empty_completion.kind == :property
+      assert empty_completion.kind == CompletionItemKind.property()
 
       assert apply_completion(empty_completion) == ~q[
         defmodule MyModule do
@@ -90,11 +92,11 @@ defmodule Expert.CodeIntelligence.Completion.Translations.ModuleAttributeTest do
       assert {:ok, [_snippet_completion, empty_completion]} =
                project
                |> complete(source)
-               |> fetch_completion(kind: :property)
+               |> fetch_completion(kind: CompletionItemKind.property())
 
       assert empty_completion.detail
       assert empty_completion.label == "@doc"
-      assert empty_completion.kind == :property
+      assert empty_completion.kind == CompletionItemKind.property()
 
       assert apply_completion(empty_completion) == ~q[
         defmodule MyModule do
@@ -184,7 +186,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.ModuleAttributeTest do
       assert {:ok, [spec_my_function, spec]} =
                project
                |> complete(source)
-               |> fetch_completion(kind: :property)
+               |> fetch_completion(kind: CompletionItemKind.property())
 
       assert spec_my_function.label == "@spec my_function"
 
@@ -225,7 +227,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.ModuleAttributeTest do
       assert {:ok, [spec_my_function, spec]} =
                project
                |> complete(source)
-               |> fetch_completion(kind: :property)
+               |> fetch_completion(kind: CompletionItemKind.property())
 
       assert spec_my_function.label == "@spec my_function"
 
@@ -266,7 +268,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.ModuleAttributeTest do
       assert {:ok, [spec_my_function, _spec]} =
                project
                |> complete(source)
-               |> fetch_completion(kind: :property)
+               |> fetch_completion(kind: CompletionItemKind.property())
 
       assert spec_my_function.label == "@spec my_function"
 

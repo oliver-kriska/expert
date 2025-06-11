@@ -2,13 +2,14 @@ defmodule Expert.CodeIntelligence.Completion.Translations.MapField do
   alias Engine.Completion.Candidate
   alias Expert.CodeIntelligence.Completion.Translatable
   alias Forge.Ast.Env
+  alias GenLSP.Enumerations.CompletionItemKind
 
   defimpl Translatable, for: Candidate.MapField do
     def translate(%Candidate.MapField{} = map_field, builder, %Env{} = env) do
       builder.text_edit(env, map_field.name, range(env),
         detail: map_field.name,
         label: map_field.name,
-        kind: :field
+        kind: CompletionItemKind.field()
       )
     end
 

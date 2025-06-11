@@ -2,6 +2,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.Struct do
   alias Forge.Ast.Env
   alias Forge.Formats
   alias Future.Code, as: Code
+  alias GenLSP.Enumerations.CompletionItemKind
 
   def completion(%Env{} = _env, _builder, _module_name, _full_name, 0) do
     nil
@@ -12,7 +13,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.Struct do
     plural = "${count} more structs"
 
     builder_opts = [
-      kind: :module,
+      kind: CompletionItemKind.module(),
       label: "#{module_name}...(#{Formats.plural(more, singular, plural)})",
       detail: "#{full_name}."
     ]
@@ -25,7 +26,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.Struct do
 
   def completion(%Env{} = env, builder, struct_name, full_name) do
     builder_opts = [
-      kind: :struct,
+      kind: CompletionItemKind.struct(),
       detail: "#{full_name}",
       label: "#{struct_name}"
     ]

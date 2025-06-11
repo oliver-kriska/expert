@@ -17,6 +17,8 @@ defmodule Expert.CodeIntelligence.Completion.Builder do
   alias Forge.Document.Position
   alias Forge.Document.Range
   alias Future.Code, as: Code
+  alias GenLSP.Enumerations.InsertTextFormat
+  alias GenLSP.Enumerations.MarkupKind
   alias GenLSP.Structures.CompletionItem
   alias GenLSP.Structures.MarkupContent
 
@@ -75,7 +77,7 @@ defmodule Expert.CodeIntelligence.Completion.Builder do
     option =
       options
       |> Keyword.put(:text_edit, edits)
-      |> Keyword.put(:insert_text_format, :snippet)
+      |> Keyword.put(:insert_text_format, InsertTextFormat.snippet())
 
     CompletionItem
     |> struct(option)
@@ -183,7 +185,7 @@ defmodule Expert.CodeIntelligence.Completion.Builder do
   defp markdown_docs(%CompletionItem{} = item) do
     case item.documentation do
       doc when is_binary(doc) ->
-        %{item | documentation: %MarkupContent{kind: :markdown, value: doc}}
+        %{item | documentation: %MarkupContent{kind: MarkupKind.markdown(), value: doc}}
 
       _ ->
         item

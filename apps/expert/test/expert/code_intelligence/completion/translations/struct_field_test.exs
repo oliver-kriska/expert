@@ -1,4 +1,6 @@
 defmodule Expert.CodeIntelligence.Completion.Translations.StructFieldTest do
+  alias GenLSP.Enumerations.CompletionItemKind
+
   use Expert.Test.Expert.CompletionCase
 
   test "a struct's fields are completed", %{project: project} do
@@ -10,7 +12,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.StructFieldTest do
     assert {:ok, completion} =
              project
              |> complete(source)
-             |> fetch_completion(kind: :field)
+             |> fetch_completion(kind: CompletionItemKind.field())
 
     assert completion.detail == "String.t()"
     assert completion.label == "first_name"
@@ -26,7 +28,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.StructFieldTest do
     assert {:ok, completion} =
              project
              |> complete(source)
-             |> fetch_completion(kind: :field)
+             |> fetch_completion(kind: CompletionItemKind.field())
 
     assert completion.detail == "String.t()"
     assert completion.label == "first_name"
@@ -42,7 +44,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.StructFieldTest do
     assert {:ok, completion} =
              project
              |> complete(source)
-             |> fetch_completion(kind: :field)
+             |> fetch_completion(kind: CompletionItemKind.field())
 
     assert completion.detail == "String.t()"
     assert completion.label == "first_name"
@@ -59,7 +61,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.StructFieldTest do
     assert {:ok, completion} =
              project
              |> complete(source)
-             |> fetch_completion(kind: :field)
+             |> fetch_completion(kind: CompletionItemKind.field())
 
     assert completion.detail == "String.t()"
     assert completion.label == "first_name"
@@ -79,7 +81,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.StructFieldTest do
     assert {:ok, completion} =
              project
              |> complete(source)
-             |> fetch_completion(kind: :field)
+             |> fetch_completion(kind: CompletionItemKind.field())
 
     assert completion.detail == "String.t()"
     assert completion.label == "first_name"
@@ -103,7 +105,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.StructFieldTest do
       {:ok, completions} =
         project
         |> complete(wrap_with_module("%Project.Structs.Account{|}"))
-        |> fetch_completion(kind: :field)
+        |> fetch_completion(kind: CompletionItemKind.field())
 
       completion = find_by_label(completions, "last_login_at")
       expected = "%Project.Structs.Account{last_login_at: ${1:last_login_at}}"
@@ -114,7 +116,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.StructFieldTest do
       {:ok, completions} =
         project
         |> complete(wrap_with_module("%Project.Structs.Account{la|}"))
-        |> fetch_completion(kind: :field)
+        |> fetch_completion(kind: CompletionItemKind.field())
 
       completion = find_by_label(completions, "last_login_at")
       expected = "%Project.Structs.Account{last_login_at: ${1:last_login_at}}"
@@ -125,7 +127,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.StructFieldTest do
       {:ok, completions} =
         project
         |> complete(wrap_with_module("%Project.Structs.Account{last_login_at: nil, |}"))
-        |> fetch_completion(kind: :field)
+        |> fetch_completion(kind: CompletionItemKind.field())
 
       completion = find_by_label(completions, "user")
 
@@ -137,7 +139,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.StructFieldTest do
       assert {:error, :not_found} ==
                project
                |> complete(wrap_with_module("%Project.Structs.Account{last_login_at: |}"))
-               |> fetch_completion(kind: :field)
+               |> fetch_completion(kind: CompletionItemKind.field())
     end
 
     test "should complete when typed a field character after the comma", %{
@@ -166,7 +168,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.StructFieldTest do
       {:ok, completions} =
         project
         |> complete(source)
-        |> fetch_completion(kind: :field)
+        |> fetch_completion(kind: CompletionItemKind.field())
 
       completion = find_by_label(completions, "user")
       assert apply_completion(completion) == expected
@@ -196,7 +198,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.StructFieldTest do
       {:ok, completions} =
         project
         |> complete(source)
-        |> fetch_completion(kind: :field)
+        |> fetch_completion(kind: CompletionItemKind.field())
 
       completion = find_by_label(completions, "last_login_at")
       assert apply_completion(completion) == expected
@@ -206,21 +208,21 @@ defmodule Expert.CodeIntelligence.Completion.Translations.StructFieldTest do
       assert {:error, :not_found} ==
                project
                |> complete("%Project.Structs.Account{last_login_at: |}")
-               |> fetch_completion(kind: :field)
+               |> fetch_completion(kind: CompletionItemKind.field())
     end
 
     test "complete nothing when the prefix is invalid", %{project: project} do
       assert {:error, :not_found} ==
                project
                |> complete("%Project.Structs.Account{l.|}")
-               |> fetch_completion(kind: :field)
+               |> fetch_completion(kind: CompletionItemKind.field())
     end
 
     test "complete nothing when the module is not a struct", %{project: project} do
       assert {:error, :not_found} ==
                project
                |> complete("%Project.Structs.NotAStruct{|}")
-               |> fetch_completion(kind: :field)
+               |> fetch_completion(kind: CompletionItemKind.field())
     end
   end
 end

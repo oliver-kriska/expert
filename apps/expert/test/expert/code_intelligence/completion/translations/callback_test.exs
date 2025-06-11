@@ -1,4 +1,6 @@
 defmodule Expert.CodeIntelligence.Completion.Translations.CallbackTest do
+  alias GenLSP.Enumerations.CompletionItemKind
+
   use Expert.Test.Expert.CompletionCase
 
   describe "callback completions" do
@@ -13,7 +15,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.CallbackTest do
       {:ok, completion} =
         project
         |> complete(source)
-        |> fetch_completion(kind: :interface)
+        |> fetch_completion(kind: CompletionItemKind.interface())
 
       assert apply_completion(completion) =~
                "@impl true\ndef handle_info(${1:msg}, ${2:state}) do"
@@ -30,7 +32,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.CallbackTest do
       {:ok, completion} =
         project
         |> complete(source)
-        |> fetch_completion(kind: :interface)
+        |> fetch_completion(kind: CompletionItemKind.interface())
 
       assert apply_completion(completion) =~
                "@impl true\ndef handle_info(${1:msg}, ${2:state}) do"
@@ -48,7 +50,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.CallbackTest do
       {:ok, completion} =
         project
         |> complete(source)
-        |> fetch_completion(kind: :interface)
+        |> fetch_completion(kind: CompletionItemKind.interface())
 
       assert apply_completion(completion) == """
              defmodule MyServer do

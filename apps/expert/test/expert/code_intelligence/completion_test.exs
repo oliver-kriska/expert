@@ -1,6 +1,8 @@
 defmodule Expert.CodeIntelligence.CompletionTest do
   alias Engine.Completion.Candidate
   alias Expert.CodeIntelligence.Completion.SortScope
+  alias GenLSP.Enumerations.CompletionItemKind
+
   alias GenLSP.Structures.CompletionItem
   alias GenLSP.Structures.CompletionList
 
@@ -51,7 +53,7 @@ defmodule Expert.CodeIntelligence.CompletionTest do
       assert [_ | _] = completions = complete(project, "E|")
 
       for completion <- completions do
-        assert completion.kind == :module
+        assert completion.kind == CompletionItemKind.module()
       end
     end
 
@@ -98,7 +100,7 @@ defmodule Expert.CodeIntelligence.CompletionTest do
     test "only modules that are behaviuors are completed in an @impl", %{project: project} do
       assert [behaviour] = complete(project, "@impl U|")
       assert behaviour.label == "Unary"
-      assert behaviour.kind == :module
+      assert behaviour.kind == CompletionItemKind.module()
     end
   end
 
@@ -222,7 +224,8 @@ defmodule Expert.CodeIntelligence.CompletionTest do
       completions = complete(project, "alias Foo.")
 
       for completion <- complete(project, "alias Foo.") do
-        assert %_{kind: :module} = completion
+        module_kind = CompletionItemKind.module()
+        assert %_{kind: ^module_kind} = completion
       end
 
       assert {:ok, _} = fetch_completion(completions, label: "Foo-behaviour")

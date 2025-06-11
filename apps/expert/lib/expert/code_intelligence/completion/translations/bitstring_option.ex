@@ -4,6 +4,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.BitstringOption do
   alias Expert.CodeIntelligence.Completion.Translatable
   alias Expert.CodeIntelligence.Completion.Translations
   alias Forge.Ast.Env
+  alias GenLSP.Enumerations.CompletionItemKind
 
   require Logger
 
@@ -17,7 +18,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.BitstringOption do
     env
     |> builder.plain_text(option.name,
       filter_text: option.name,
-      kind: :unit,
+      kind: CompletionItemKind.unit(),
       label: option.name
     )
     |> builder.set_sort_scope(SortScope.global())
