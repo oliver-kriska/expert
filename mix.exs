@@ -31,22 +31,10 @@ defmodule Expert.LanguageServer.MixProject do
         pages/architecture.md
         pages/glossary.md
       ),
-      filter_modules: fn mod_name, _ ->
-        case Module.split(mod_name) do
-          ["Expert", "Protocol", "Requests" | _] -> true
-          ["Expert", "Protocol", "Notifications" | _] -> true
-          ["Expert", "Protocol", "Responses" | _] -> true
-          ["Expert", "Protocol" | _] -> false
-          _ -> true
-        end
-      end,
       groups_for_modules: [
-        Core: ~r/Expert.^(RemoteControl|Protocol|Server)/,
-        "Remote Control": ~r/Expert.RemoteControl/,
-        "Protocol Requests": ~r/Expert.Protocol.Requests/,
-        "Protocol Notifications": ~r/Expert.Protocol.Notifications/,
-        "Protocol Responses": ~r/Expert.Protocol.Responses/,
-        Server: ~r/Expert.Server/
+        Core: ~r/(Expert|Engine)/,
+        Engine: ~r/Engine/,
+        Server: ~r/Expert/
       ]
     ]
   end

@@ -1,13 +1,13 @@
 defmodule Engine.CodeAction.Handlers.ReplaceRemoteFunction do
+  alias Engine.CodeAction
+  alias Engine.CodeAction.Diagnostic
+  alias Engine.Modules
   alias Forge.Ast
   alias Forge.Document
   alias Forge.Document.Changes
   alias Forge.Document.Edit
   alias Forge.Document.Range
-
-  alias Engine.CodeAction
-  alias Engine.CodeAction.Diagnostic
-  alias Engine.Modules
+  alias GenLSP.Enumerations.CodeActionKind
   alias Sourceror.Zipper
 
   @behaviour CodeAction.Handler
@@ -27,7 +27,7 @@ defmodule Engine.CodeAction.Handlers.ReplaceRemoteFunction do
 
   @impl CodeAction.Handler
   def kinds do
-    [:quick_fix]
+    [CodeActionKind.quick_fix()]
   end
 
   @impl CodeAction.Handler
@@ -41,7 +41,14 @@ defmodule Engine.CodeAction.Handlers.ReplaceRemoteFunction do
       case apply_transform(doc, line_number, module, function, suggestion) do
         {:ok, edits} ->
           changes = Changes.new(doc, edits)
-          code_action = CodeAction.new(doc.uri, "Rename to #{suggestion}", :quick_fix, changes)
+
+          code_action =
+            CodeAction.new(
+              doc.uri,
+              "Rename to #{suggestion}",
+              CodeActionKind.quick_fix(),
+              changes
+            )
 
           [code_action | acc]
 

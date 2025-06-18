@@ -31,6 +31,7 @@ defmodule Engine.CodeAction.Handlers.RemoveUnusedAlias do
   alias Forge.Document.Edit
   alias Forge.Document.Position
   alias Forge.Document.Range
+  alias GenLSP.Enumerations
   alias Sourceror.Zipper
 
   import Record
@@ -51,7 +52,14 @@ defmodule Engine.CodeAction.Handlers.RemoveUnusedAlias do
       case to_edit(document, range.start, diagnostic) do
         {:ok, module_name, edit} ->
           changes = Changes.new(document, [edit])
-          action = CodeAction.new(document.uri, "Remove alias #{module_name}", :source, changes)
+
+          action =
+            CodeAction.new(
+              document.uri,
+              "Remove alias #{module_name}",
+              Enumerations.CodeActionKind.source(),
+              changes
+            )
 
           [action | acc]
 
@@ -63,7 +71,7 @@ defmodule Engine.CodeAction.Handlers.RemoveUnusedAlias do
 
   @impl CodeAction.Handler
   def kinds do
-    [:source]
+    [Enumerations.CodeActionKind.source()]
   end
 
   @impl CodeAction.Handler

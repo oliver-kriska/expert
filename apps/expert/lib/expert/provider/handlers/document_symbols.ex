@@ -2,21 +2,21 @@ defmodule Expert.Provider.Handlers.DocumentSymbols do
   alias Engine.Api
   alias Engine.CodeIntelligence.Symbols
   alias Expert.Configuration
-  alias Expert.Protocol.Requests.DocumentSymbols
-  alias Expert.Protocol.Responses
-  alias Expert.Protocol.Types.Document.Symbol
-  alias Expert.Protocol.Types.Symbol.Kind, as: SymbolKind
   alias Forge.Document
+  alias Forge.Protocol.Response
+  alias GenLSP.Enumerations.SymbolKind
+  alias GenLSP.Requests
+  alias GenLSP.Structures
 
-  require SymbolKind
+  def handle(%Requests.TextDocumentDocumentSymbol{} = request, %Configuration{} = config) do
+    document = Document.Container.context_document(request.params, nil)
 
-  def handle(%DocumentSymbols{} = request, %Configuration{} = config) do
     symbols =
       config.project
-      |> Api.document_symbols(request.document)
-      |> Enum.map(&to_response(&1, request.document))
+      |> Api.document_symbols(document)
+      |> Enum.map(&to_response(&1, document))
 
-    response = Responses.DocumentSymbols.new(request.id, symbols)
+    response = %Response{id: request.id, result: symbols}
 
     {:reply, response}
   end
@@ -31,28 +31,28 @@ defmodule Expert.Provider.Handlers.DocumentSymbols do
           nil
       end
 
-    Symbol.new(
+    %Structures.DocumentSymbol{
       children: children,
       detail: root.detail,
       kind: to_kind(root.type),
       name: root.name,
       range: root.range,
       selection_range: root.detail_range
-    )
+    }
   end
 
-  defp to_kind(:struct), do: :struct
-  defp to_kind(:module), do: :module
-  defp to_kind(:variable), do: :variable
-  defp to_kind({:function, _}), do: :function
-  defp to_kind({:protocol, _}), do: :module
-  defp to_kind(:module_attribute), do: :constant
-  defp to_kind(:ex_unit_test), do: :method
-  defp to_kind(:ex_unit_describe), do: :method
-  defp to_kind(:ex_unit_setup), do: :method
-  defp to_kind(:ex_unit_setup_all), do: :method
-  defp to_kind(:type), do: :type_parameter
-  defp to_kind(:spec), do: :interface
-  defp to_kind(:file), do: :file
-  defp to_kind(_), do: :string
+  defp to_kind(:struct), do: SymbolKind.struct()
+  defp to_kind(:module), do: SymbolKind.module()
+  defp to_kind(:variable), do: SymbolKind.variable()
+  defp to_kind({:function, _}), do: SymbolKind.function()
+  defp to_kind({:protocol, _}), do: SymbolKind.module()
+  defp to_kind(:module_attribute), do: SymbolKind.constant()
+  defp to_kind(:ex_unit_test), do: SymbolKind.method()
+  defp to_kind(:ex_unit_describe), do: SymbolKind.method()
+  defp to_kind(:ex_unit_setup), do: SymbolKind.method()
+  defp to_kind(:ex_unit_setup_all), do: SymbolKind.method()
+  defp to_kind(:type), do: SymbolKind.type_parameter()
+  defp to_kind(:spec), do: SymbolKind.interface()
+  defp to_kind(:file), do: SymbolKind.file()
+  defp to_kind(_), do: SymbolKind.string()
 end

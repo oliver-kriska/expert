@@ -1,4 +1,6 @@
 defmodule Expert.CodeIntelligence.Completion.Translations.VariableTest do
+  alias GenLSP.Enumerations.CompletionItemKind
+
   use Expert.Test.Expert.CompletionCase
 
   test "variables are completed", %{project: project} do
@@ -12,7 +14,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.VariableTest do
     assert {:ok, completion} =
              project
              |> complete(source)
-             |> fetch_completion(kind: :variable)
+             |> fetch_completion(kind: CompletionItemKind.variable())
 
     assert completion.label == "stinky"
     assert completion.detail == "stinky"
@@ -37,7 +39,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.VariableTest do
     assert {:ok, [c1, c2]} =
              project
              |> complete(source)
-             |> fetch_completion(kind: :variable)
+             |> fetch_completion(kind: CompletionItemKind.variable())
 
     assert c1.label == "var_1"
     assert c2.label == "var_2"

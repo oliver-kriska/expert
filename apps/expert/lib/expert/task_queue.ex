@@ -1,8 +1,8 @@
 defmodule Expert.TaskQueue do
   defmodule State do
-    alias Expert.Proto.Convert
-    alias Expert.Proto.LspTypes.ResponseError
     alias Expert.Transport
+    alias Forge.Protocol.Convert
+    alias GenLSP.Enumerations.ErrorCodes
     import Forge.Logging
     require Logger
 
@@ -120,11 +120,23 @@ defmodule Expert.TaskQueue do
       end
     end
 
-    defp write_error(id, message, code \\ :internal_error) do
-      error = ResponseError.new(code: code, message: message)
+    defp write_error(id, message, code \\ ErrorCodes.internal_error()) do
+      error = %GenLSP.ErrorResponse{code: map_code(code), message: message}
 
       Transport.write(%{id: id, error: error})
     end
+
+    @dialyzer {:nowarn_function, map_code: 1}
+
+    defp map_code(:parse_error), do: ErrorCodes.parse_error()
+    defp map_code(:invalid_request), do: ErrorCodes.invalid_request()
+    defp map_code(:method_not_found), do: ErrorCodes.method_not_found()
+    defp map_code(:invalid_params), do: ErrorCodes.invalid_params()
+    defp map_code(:internal_error), do: ErrorCodes.internal_error()
+    defp map_code(:server_not_initialized), do: ErrorCodes.server_not_initialized()
+    defp map_code(:unknown_error_code), do: ErrorCodes.unknown_error_code()
+    defp map_code(:request_cancelled), do: -32_800
+    defp map_code(code) when is_integer(code), do: code
 
     defp run_task(fun, mfa) when is_function(fun) do
       task_supervisor_name()
@@ -165,7 +177,7 @@ defmodule Expert.TaskQueue do
     GenServer.call(__MODULE__, :size)
   end
 
-  def cancel(%{lsp: %{id: id}}) do
+  def cancel(%{params: %{id: id}}) do
     cancel(id)
   end
 

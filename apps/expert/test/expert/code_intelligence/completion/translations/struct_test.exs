@@ -1,4 +1,6 @@
 defmodule Expert.CodeIntelligence.Completion.Translations.StructTest do
+  alias GenLSP.Enumerations.CompletionItemKind
+
   use Expert.Test.Expert.CompletionCase
 
   describe "structs" do
@@ -6,7 +8,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.StructTest do
       assert {:ok, [_, _, _] = account_and_user_and_order} =
                project
                |> complete("%Project.Structs.|")
-               |> fetch_completion(kind: :struct)
+               |> fetch_completion(kind: CompletionItemKind.struct())
 
       assert Enum.find(account_and_user_and_order, &(&1.label == "User"))
       account = Enum.find(account_and_user_and_order, &(&1.label == "Account"))
@@ -20,7 +22,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.StructTest do
       assert {:ok, account} =
                project
                |> complete("%Project.Structs.A|")
-               |> fetch_completion(kind: :struct)
+               |> fetch_completion(kind: CompletionItemKind.struct())
 
       assert account
       assert account.detail == "Project.Structs.Account"
@@ -41,7 +43,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.StructTest do
 
       assert [completion] = complete(project, source)
 
-      assert completion.kind == :struct
+      assert completion.kind == CompletionItemKind.struct()
       assert apply_completion(completion) == expected
     end
 
@@ -53,7 +55,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.StructTest do
       ]
 
       assert [completion] = complete(project, source)
-      assert completion.kind == :struct
+      assert completion.kind == CompletionItemKind.struct()
       assert apply_completion(completion) =~ "    %Project.Structs.Account{$1}"
     end
 
@@ -66,7 +68,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.StructTest do
       ]
 
       assert [completion] = complete(project, source)
-      assert completion.kind == :struct
+      assert completion.kind == CompletionItemKind.struct()
       assert apply_completion(completion) =~ "    %Account{$1}"
     end
 
@@ -83,7 +85,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.StructTest do
 
       assert [completion] = complete(project, source)
 
-      assert completion.kind == :struct
+      assert completion.kind == CompletionItemKind.struct()
       assert apply_completion(completion) == expected
     end
 
@@ -106,7 +108,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.StructTest do
 
         assert [completion] = complete(project, source)
 
-        assert completion.kind == :struct
+        assert completion.kind == CompletionItemKind.struct()
         assert apply_completion(completion) == expected
       end
 
@@ -121,7 +123,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.StructTest do
       ]
 
         assert [completion] = complete(project, source)
-        assert completion.kind == :module
+        assert completion.kind == CompletionItemKind.module()
 
         assert apply_completion(completion) == ~q[
         defmodule TestModule do
@@ -143,7 +145,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.StructTest do
 
       assert [completion] = complete(project, source)
 
-      assert completion.kind == :struct
+      assert completion.kind == CompletionItemKind.struct()
       assert apply_completion(completion) == expected
     end
 
@@ -159,7 +161,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.StructTest do
       ]
 
       assert [completion] = complete(project, source)
-      assert completion.kind == :struct
+      assert completion.kind == CompletionItemKind.struct()
       assert apply_completion(completion) == expected
     end
 
@@ -226,7 +228,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.StructTest do
       assert {:ok, completion} =
                project
                |> complete(source)
-               |> fetch_completion(kind: :struct)
+               |> fetch_completion(kind: CompletionItemKind.struct())
 
       assert apply_completion(completion) == expected
     end
@@ -249,7 +251,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.StructTest do
       assert {:ok, completion} =
                project
                |> complete(source)
-               |> fetch_completion(kind: :struct)
+               |> fetch_completion(kind: CompletionItemKind.struct())
 
       assert apply_completion(completion) == expected
     end
@@ -272,7 +274,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.StructTest do
       assert {:ok, completion} =
                project
                |> complete(source)
-               |> fetch_completion(kind: :struct)
+               |> fetch_completion(kind: CompletionItemKind.struct())
 
       assert apply_completion(completion) == expected
     end

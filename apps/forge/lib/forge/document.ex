@@ -6,13 +6,13 @@ defmodule Forge.Document do
   All language server documents are represented and backed by documents, which
   provide functionality for fetching lines, applying changes, and tracking versions.
   """
-  alias Forge.Convertible
   alias Forge.Document.Edit
   alias Forge.Document.Line
   alias Forge.Document.Lines
   alias Forge.Document.Position
   alias Forge.Document.Range
   alias Forge.Math
+  alias Forge.Protocol.Convertible
 
   import Forge.Document.Line
 
@@ -129,7 +129,7 @@ defmodule Forge.Document do
   Builds a string that represents the text of the document from the two positions given.
   The from position, defaults to `:beginning` meaning the start of the document.
   Positions can be a `Document.Position.t` or anything that will convert to a position using
-  `Forge.Convertible.to_native/2`.
+  `Forge.Protocol.Convertible.to_native/2`.
   """
   @spec fragment(t, fragment_position() | :beginning, fragment_position()) :: String.t()
   @spec fragment(t, fragment_position()) :: String.t()
@@ -302,6 +302,10 @@ defmodule Forge.Document do
     with {:ok, native_range} <- Convertible.to_native(range, document) do
       apply_change(document, Edit.new(text, native_range))
     end
+  end
+
+  defp apply_change(%__MODULE__{} = document, %{text: text}) do
+    apply_change(document, Edit.new(text, nil))
   end
 
   defp apply_change(%__MODULE__{} = document, convertable_edit) do

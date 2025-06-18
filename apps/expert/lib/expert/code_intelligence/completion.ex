@@ -4,16 +4,17 @@ defmodule Expert.CodeIntelligence.Completion do
   alias Expert.CodeIntelligence.Completion.Translatable
   alias Expert.Configuration
   alias Expert.Project.Intelligence
-  alias Expert.Protocol.Types.Completion
-  alias Expert.Protocol.Types.InsertTextFormat
   alias Forge.Ast.Analysis
   alias Forge.Ast.Env
   alias Forge.Document.Position
   alias Forge.Project
   alias Future.Code, as: Code
+  alias GenLSP.Enumerations.CompletionTriggerKind
+  alias GenLSP.Structures.CompletionContext
+  alias GenLSP.Structures.CompletionItem
+  alias GenLSP.Structures.CompletionList
   alias Mix.Tasks.Namespace
 
-  require InsertTextFormat
   require Logger
 
   @expert_deps Enum.map([:expert | Mix.Project.deps_apps()], &Atom.to_string/1)
@@ -24,13 +25,13 @@ defmodule Expert.CodeIntelligence.Completion do
     [".", "@", "&", "%", "^", ":", "!", "-", "~"]
   end
 
-  @spec complete(Project.t(), Analysis.t(), Position.t(), Completion.Context.t()) ::
-          Completion.List.t()
+  @spec complete(Project.t(), Analysis.t(), Position.t(), CompletionContext.t()) ::
+          CompletionList.t()
   def complete(
         %Project{} = project,
         %Analysis{} = analysis,
         %Position{} = position,
-        %Completion.Context{} = context
+        %CompletionContext{} = context
       ) do
     case Env.new(project, analysis, position) do
       {:ok, env} ->
@@ -46,7 +47,7 @@ defmodule Expert.CodeIntelligence.Completion do
 
   defp log_candidates(candidates) do
     log_iolist =
-      Enum.reduce(candidates, ["Emitting Completions: ["], fn %Completion.Item{} = completion,
+      Enum.reduce(candidates, ["Emitting Completions: ["], fn %CompletionItem{} = completion,
                                                               acc ->
         name = Map.get(completion, :name) || Map.get(completion, :label)
         kind = completion |> Map.get(:kind, :unknown) |> to_string()
@@ -57,7 +58,7 @@ defmodule Expert.CodeIntelligence.Completion do
     Logger.info([log_iolist, "]"])
   end
 
-  defp completions(%Project{} = project, %Env{} = env, %Completion.Context{} = context) do
+  defp completions(%Project{} = project, %Env{} = env, %CompletionContext{} = context) do
     prefix_tokens = Env.prefix_tokens(env, 1)
 
     cond do
@@ -162,7 +163,7 @@ defmodule Expert.CodeIntelligence.Completion do
          local_completions,
          %Project{} = project,
          %Env{} = env,
-         %Completion.Context{} = context
+         %CompletionContext{} = context
        ) do
     debug_local_completions(local_completions)
 
@@ -170,7 +171,7 @@ defmodule Expert.CodeIntelligence.Completion do
         displayable?(project, result),
         applies_to_context?(project, result, context),
         applies_to_env?(env, result),
-        %Completion.Item{} = item <- to_completion_item(result, env) do
+        %CompletionItem{} = item <- to_completion_item(result, env) do
       item
     end
   end
@@ -338,30 +339,31 @@ defmodule Expert.CodeIntelligence.Completion do
     false
   end
 
-  defp applies_to_context?(%Project{} = project, result, %Completion.Context{
-         trigger_kind: :trigger_character,
-         trigger_character: "%"
-       }) do
-    case result do
-      %Candidate.Module{} = result ->
-        Intelligence.defines_struct?(project, result.full_name, from: :child, to: :child)
+  defp applies_to_context?(%Project{} = project, result, %CompletionContext{} = context) do
+    struct_completion? =
+      context.trigger_kind == CompletionTriggerKind.trigger_character() and
+        context.trigger_character == "%"
 
-      %Candidate.Struct{} ->
-        true
+    if struct_completion? do
+      case result do
+        %Candidate.Module{} = result ->
+          Intelligence.defines_struct?(project, result.full_name, from: :child, to: :child)
 
-      _other ->
-        false
+        %Candidate.Struct{} ->
+          true
+
+        _other ->
+          false
+      end
+    else
+      true
     end
-  end
-
-  defp applies_to_context?(_project, _result, _context) do
-    true
   end
 
   defp maybe_to_completion_list(items \\ [])
 
   defp maybe_to_completion_list([]) do
-    Completion.List.new(items: [], is_incomplete: true)
+    %CompletionList{items: [], is_incomplete: true}
   end
 
   defp maybe_to_completion_list(items), do: items

@@ -3,16 +3,17 @@ defmodule Expert.Provider.Markdown do
   Utilities for formatting Markdown content.
   """
 
-  alias Expert.Protocol.Types.Markup
+  alias GenLSP.Enumerations
+  alias GenLSP.Structures.MarkupContent
 
   @type markdown :: String.t()
 
   @doc """
   Converts a string of Markdown into LSP markup content.
   """
-  @spec to_content(markdown) :: Markup.Content.t()
+  @spec to_content(markdown) :: MarkupContent.t()
   def to_content(markdown) when is_binary(markdown) do
-    %Markup.Content{kind: :markdown, value: markdown}
+    %MarkupContent{kind: Enumerations.MarkupKind.markdown(), value: markdown}
   end
 
   @doc """

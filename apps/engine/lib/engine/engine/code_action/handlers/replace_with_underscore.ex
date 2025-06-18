@@ -5,6 +5,7 @@ defmodule Engine.CodeAction.Handlers.ReplaceWithUnderscore do
   alias Forge.Document
   alias Forge.Document.Changes
   alias Forge.Document.Range
+  alias GenLSP.Enumerations.CodeActionKind
   alias Sourceror.Zipper
 
   @behaviour CodeAction.Handler
@@ -14,7 +15,13 @@ defmodule Engine.CodeAction.Handlers.ReplaceWithUnderscore do
     Enum.reduce(diagnostics, [], fn %Diagnostic{} = diagnostic, acc ->
       with {:ok, variable_name, line_number} <- extract_variable_and_line(diagnostic),
            {:ok, changes} <- to_changes(doc, line_number, variable_name) do
-        action = CodeAction.new(doc.uri, "Rename to _#{variable_name}", :quick_fix, changes)
+        action =
+          CodeAction.new(
+            doc.uri,
+            "Rename to _#{variable_name}",
+            CodeActionKind.quick_fix(),
+            changes
+          )
 
         [action | acc]
       else
@@ -26,7 +33,7 @@ defmodule Engine.CodeAction.Handlers.ReplaceWithUnderscore do
 
   @impl CodeAction.Handler
   def kinds do
-    [:quick_fix]
+    [CodeActionKind.quick_fix()]
   end
 
   @impl CodeAction.Handler

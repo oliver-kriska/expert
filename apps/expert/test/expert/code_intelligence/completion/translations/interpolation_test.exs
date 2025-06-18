@@ -1,4 +1,6 @@
 defmodule Expert.CodeIntelligence.Completion.Translations.InterpolationTest do
+  alias GenLSP.Enumerations.CompletionItemKind
+
   use Expert.Test.Expert.CompletionCase
 
   test "variables are completed inside strings", %{project: project} do
@@ -12,7 +14,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.InterpolationTest do
     assert {:ok, completion} =
              project
              |> complete(source)
-             |> fetch_completion(kind: :variable)
+             |> fetch_completion(kind: CompletionItemKind.variable())
 
     expected =
       ~S[
@@ -58,7 +60,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.InterpolationTest do
     assert {:ok, completion} =
              project
              |> complete(source)
-             |> fetch_completion(kind: :struct)
+             |> fetch_completion(kind: CompletionItemKind.struct())
 
     assert String.trim(apply_completion(completion)) ==
              ~S["#{inspect(%Project.Structs.User{$1})}"]

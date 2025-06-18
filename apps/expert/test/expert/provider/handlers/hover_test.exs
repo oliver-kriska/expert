@@ -1,15 +1,12 @@
 defmodule Expert.Provider.Handlers.HoverTest do
   alias Engine.Api.Messages
   alias Engine.Test.Fixtures
-
-  alias Expert.Proto.Convert
-  alias Expert.Protocol.Requests
-  alias Expert.Protocol.Types
   alias Expert.Provider.Handlers
-  alias Expert.Test.Protocol.Fixtures.LspProtocol
-
   alias Forge.Document
   alias Forge.Document.Position
+  alias Forge.Protocol.Convert
+  alias GenLSP.Requests
+  alias GenLSP.Structures
 
   import Forge.Test.CodeSigil
   import Forge.Test.CursorSupport
@@ -100,8 +97,8 @@ defmodule Expert.Provider.Handlers.HoverTest do
       """
 
       with_compiled_in(project, code, fn ->
-        assert {:reply, %{result: %Types.Hover{} = result}} = hover(project, hovered)
-        assert result.contents.kind == :markdown
+        assert {:reply, %{result: %Structures.Hover{} = result}} = hover(project, hovered)
+        assert result.contents.kind == "markdown"
         assert result.contents.value == expected
         assert "«HoverWithDoc»" = hovered |> strip_cursor() |> decorate(result.range)
       end)
@@ -167,8 +164,8 @@ defmodule Expert.Provider.Handlers.HoverTest do
       """
 
       with_compiled_in(project, code, fn ->
-        assert {:reply, %{result: %Types.Hover{} = result}} = hover(project, hovered)
-        assert result.contents.kind == :markdown
+        assert {:reply, %{result: %Structures.Hover{} = result}} = hover(project, hovered)
+        assert result.contents.kind == "markdown"
         assert result.contents.value == expected
         assert "«HoverBehaviour»" = hovered |> strip_cursor() |> decorate(result.range)
       end)
@@ -224,8 +221,8 @@ defmodule Expert.Provider.Handlers.HoverTest do
       """
 
       with_compiled_in(project, code, fn ->
-        assert {:reply, %{result: %Types.Hover{} = result}} = hover(project, hovered)
-        assert result.contents.kind == :markdown
+        assert {:reply, %{result: %Structures.Hover{} = result}} = hover(project, hovered)
+        assert result.contents.kind == "markdown"
         assert result.contents.value == expected
         assert "«HoverBehaviour»" = hovered |> strip_cursor() |> decorate(result.range)
       end)
@@ -264,8 +261,8 @@ defmodule Expert.Provider.Handlers.HoverTest do
       """
 
       with_compiled_in(project, code, fn ->
-        assert {:reply, %{result: %Types.Hover{} = result}} = hover(project, hovered)
-        assert result.contents.kind == :markdown
+        assert {:reply, %{result: %Structures.Hover{} = result}} = hover(project, hovered)
+        assert result.contents.kind == "markdown"
         assert result.contents.value == expected
         assert "%«StructWithDoc»{}" = hovered |> strip_cursor() |> decorate(result.range)
       end)
@@ -302,8 +299,8 @@ defmodule Expert.Provider.Handlers.HoverTest do
       """
 
       with_compiled_in(project, code, fn ->
-        assert {:reply, %{result: %Types.Hover{} = result}} = hover(project, hovered)
-        assert result.contents.kind == :markdown
+        assert {:reply, %{result: %Structures.Hover{} = result}} = hover(project, hovered)
+        assert result.contents.kind == "markdown"
         assert result.contents.value == expected
         assert "%«StructWithDoc»{}" = hovered |> strip_cursor() |> decorate(result.range)
       end)
@@ -331,8 +328,8 @@ defmodule Expert.Provider.Handlers.HoverTest do
       """
 
       with_compiled_in(project, code, fn ->
-        assert {:reply, %{result: %Types.Hover{} = result}} = hover(project, hovered)
-        assert result.contents.kind == :markdown
+        assert {:reply, %{result: %Structures.Hover{} = result}} = hover(project, hovered)
+        assert result.contents.kind == "markdown"
         assert result.contents.value == expected
         assert "%«StructWithDoc»{}" = hovered |> strip_cursor() |> decorate(result.range)
       end)
@@ -364,8 +361,8 @@ defmodule Expert.Provider.Handlers.HoverTest do
       """
 
       with_compiled_in(project, code, fn ->
-        assert {:reply, %{result: %Types.Hover{} = result}} = hover(project, hovered)
-        assert result.contents.kind == :markdown
+        assert {:reply, %{result: %Structures.Hover{} = result}} = hover(project, hovered)
+        assert result.contents.kind == "markdown"
         assert result.contents.value == expected
         assert "«CallHover.my_fun»(1, 2)" = hovered |> strip_cursor() |> decorate(result.range)
       end)
@@ -392,8 +389,8 @@ defmodule Expert.Provider.Handlers.HoverTest do
       """
 
       with_compiled_in(project, code, fn ->
-        assert {:reply, %{result: %Types.Hover{} = result}} = hover(project, hovered)
-        assert result.contents.kind == :markdown
+        assert {:reply, %{result: %Structures.Hover{} = result}} = hover(project, hovered)
+        assert result.contents.kind == "markdown"
         assert result.contents.value == expected
         assert "«CallHover.my_fun»(1, 2)" = hovered |> strip_cursor() |> decorate(result.range)
       end)
@@ -432,8 +429,8 @@ defmodule Expert.Provider.Handlers.HoverTest do
       """
 
       with_compiled_in(project, code, fn ->
-        assert {:reply, %{result: %Types.Hover{} = result}} = hover(project, hovered)
-        assert result.contents.kind == :markdown
+        assert {:reply, %{result: %Structures.Hover{} = result}} = hover(project, hovered)
+        assert result.contents.kind == "markdown"
         assert result.contents.value == expected
         assert "«CallHover.my_fun»(1, 2)" = hovered |> strip_cursor() |> decorate(result.range)
       end)
@@ -458,8 +455,8 @@ defmodule Expert.Provider.Handlers.HoverTest do
       """
 
       with_compiled_in(project, code, fn ->
-        assert {:reply, %{result: %Types.Hover{} = result}} = hover(project, hovered)
-        assert result.contents.kind == :markdown
+        assert {:reply, %{result: %Structures.Hover{} = result}} = hover(project, hovered)
+        assert result.contents.kind == "markdown"
         assert result.contents.value == expected
         assert "«CallHover.my_fun»" = hovered |> strip_cursor() |> decorate(result.range)
       end)
@@ -501,8 +498,8 @@ defmodule Expert.Provider.Handlers.HoverTest do
       """
 
       with_compiled_in(project, code, fn ->
-        assert {:reply, %{result: %Types.Hover{} = result}} = hover(project, hovered)
-        assert result.contents.kind == :markdown
+        assert {:reply, %{result: %Structures.Hover{} = result}} = hover(project, hovered)
+        assert result.contents.kind == "markdown"
         assert result.contents.value == expected
         assert "«CallHover.my_fun»(1)" = hovered |> strip_cursor() |> decorate(result.range)
       end)
@@ -529,8 +526,8 @@ defmodule Expert.Provider.Handlers.HoverTest do
       """
 
       with_compiled_in(project, code, fn ->
-        assert {:reply, %{result: %Types.Hover{} = result}} = hover(project, hovered)
-        assert result.contents.kind == :markdown
+        assert {:reply, %{result: %Structures.Hover{} = result}} = hover(project, hovered)
+        assert result.contents.kind == "markdown"
         assert result.contents.value == expected
         assert "«MacroHover.my_macro»(:foo)" = hovered |> strip_cursor() |> decorate(result.range)
       end)
@@ -557,8 +554,8 @@ defmodule Expert.Provider.Handlers.HoverTest do
       """
 
       with_compiled_in(project, code, fn ->
-        assert {:reply, %{result: %Types.Hover{} = result}} = hover(project, hovered)
-        assert result.contents.kind == :markdown
+        assert {:reply, %{result: %Structures.Hover{} = result}} = hover(project, hovered)
+        assert result.contents.kind == "markdown"
         assert result.contents.value == expected
       end)
     end
@@ -588,8 +585,8 @@ defmodule Expert.Provider.Handlers.HoverTest do
       """
 
       with_compiled_in(project, code, fn ->
-        assert {:reply, %{result: %Types.Hover{} = result}} = hover(project, hovered)
-        assert result.contents.kind == :markdown
+        assert {:reply, %{result: %Structures.Hover{} = result}} = hover(project, hovered)
+        assert result.contents.kind == "markdown"
         assert result.contents.value == expected
 
         assert "@type foo :: «TypeHover.my_type»()" =
@@ -615,8 +612,8 @@ defmodule Expert.Provider.Handlers.HoverTest do
       """
 
       with_compiled_in(project, code, fn ->
-        assert {:reply, %{result: %Types.Hover{} = result}} = hover(project, hovered)
-        assert result.contents.kind == :markdown
+        assert {:reply, %{result: %Structures.Hover{} = result}} = hover(project, hovered)
+        assert result.contents.kind == "markdown"
         assert result.contents.value == expected
 
         assert "@type foo :: «TypeHover.my_type»()" =
@@ -642,8 +639,8 @@ defmodule Expert.Provider.Handlers.HoverTest do
       """
 
       with_compiled_in(project, code, fn ->
-        assert {:reply, %{result: %Types.Hover{} = result}} = hover(project, hovered)
-        assert result.contents.kind == :markdown
+        assert {:reply, %{result: %Structures.Hover{} = result}} = hover(project, hovered)
+        assert result.contents.kind == "markdown"
         assert result.contents.value == expected
 
         assert "@type foo :: «TypeHover.my_type»(:foo)" =
@@ -669,8 +666,8 @@ defmodule Expert.Provider.Handlers.HoverTest do
       """
 
       with_compiled_in(project, code, fn ->
-        assert {:reply, %{result: %Types.Hover{} = result}} = hover(project, hovered)
-        assert result.contents.kind == :markdown
+        assert {:reply, %{result: %Structures.Hover{} = result}} = hover(project, hovered)
+        assert result.contents.kind == "markdown"
         assert result.contents.value == expected
 
         assert "@type foo :: «TypeHover.my_type»(:foo)" =
@@ -713,8 +710,8 @@ defmodule Expert.Provider.Handlers.HoverTest do
       """
 
       with_compiled_in(project, code, fn ->
-        assert {:reply, %{result: %Types.Hover{} = result}} = hover(project, hovered)
-        assert result.contents.kind == :markdown
+        assert {:reply, %{result: %Structures.Hover{} = result}} = hover(project, hovered)
+        assert result.contents.kind == "markdown"
         assert result.contents.value == expected
       end)
     end
@@ -755,14 +752,16 @@ defmodule Expert.Provider.Handlers.HoverTest do
   defp hover_request(path, line, char) do
     uri = Document.Path.ensure_uri(path)
 
-    # convert line and char to zero-based
-    params = [
-      position: [line: line - 1, character: char - 1],
-      text_document: [uri: uri]
-    ]
+    with {:ok, _} <- Document.Store.open_temporary(uri) do
+      req = %Requests.TextDocumentHover{
+        id: Forge.Protocol.Id.next(),
+        params: %Structures.HoverParams{
+          # convert line and char to zero-based
+          position: %Structures.Position{line: line - 1, character: char - 1},
+          text_document: %Structures.TextDocumentIdentifier{uri: uri}
+        }
+      }
 
-    with {:ok, _} <- Document.Store.open_temporary(uri),
-         {:ok, req} <- LspProtocol.build(Requests.Hover, params) do
       Convert.to_native(req)
     end
   end

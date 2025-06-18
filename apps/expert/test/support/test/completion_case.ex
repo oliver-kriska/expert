@@ -1,13 +1,13 @@
 defmodule Expert.Test.Expert.CompletionCase do
   alias Expert.CodeIntelligence.Completion
-  alias Expert.Protocol.Types.Completion.Context, as: CompletionContext
-  alias Expert.Protocol.Types.Completion.Item, as: CompletionItem
-  alias Expert.Protocol.Types.Completion.List, as: CompletionList
-
   alias Forge.Ast
   alias Forge.Document
   alias Forge.Project
   alias Forge.Test.CodeSigil
+  alias GenLSP.Enumerations.CompletionTriggerKind
+  alias GenLSP.Structures.CompletionContext
+  alias GenLSP.Structures.CompletionItem
+  alias GenLSP.Structures.CompletionList
 
   use ExUnit.CaseTemplate
   import Forge.Test.CursorSupport
@@ -67,12 +67,12 @@ defmodule Expert.Test.Expert.CompletionCase do
 
     context =
       if is_binary(trigger_character) do
-        CompletionContext.new(
-          trigger_kind: :trigger_character,
+        %CompletionContext{
+          trigger_kind: CompletionTriggerKind.trigger_character(),
           trigger_character: trigger_character
-        )
+        }
       else
-        CompletionContext.new(trigger_kind: :invoked)
+        %CompletionContext{trigger_kind: CompletionTriggerKind.invoked()}
       end
 
     analysis = Ast.analyze(document)
@@ -87,6 +87,18 @@ defmodule Expert.Test.Expert.CompletionCase do
 
   def fetch_completion(completions, label_prefix) when is_binary(label_prefix) do
     matcher = &String.starts_with?(&1.label, label_prefix)
+
+    case completions |> completion_items() |> Enum.filter(matcher) do
+      [] -> {:error, :not_found}
+      [found] -> {:ok, found}
+      found when is_list(found) -> {:ok, found}
+    end
+  end
+
+  def fetch_completion(completions, kind) when is_integer(kind) do
+    matcher = fn completion ->
+      Map.get(completion, :kind) == kind
+    end
 
     case completions |> completion_items() |> Enum.filter(matcher) do
       [] -> {:error, :not_found}

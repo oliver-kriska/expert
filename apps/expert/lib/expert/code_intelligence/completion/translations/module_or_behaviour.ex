@@ -5,6 +5,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.ModuleOrBehaviour do
   alias Expert.CodeIntelligence.Completion.Translations
   alias Expert.Project.Intelligence
   alias Forge.Ast.Env
+  alias GenLSP.Enumerations.CompletionItemKind
 
   defimpl Translatable, for: Candidate.Module do
     def translate(module, builder, %Env{} = env) do
@@ -109,7 +110,11 @@ defmodule Expert.CodeIntelligence.Completion.Translations.ModuleOrBehaviour do
     detail = builder.fallback(detail, "#{module_name} (Module)")
 
     env
-    |> builder.plain_text(module_name, label: module_name, kind: :module, detail: detail)
+    |> builder.plain_text(module_name,
+      label: module_name,
+      kind: CompletionItemKind.module(),
+      detail: detail
+    )
     |> builder.set_sort_scope(SortScope.module())
   end
 

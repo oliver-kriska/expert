@@ -1,4 +1,7 @@
 defmodule Expert.CodeIntelligence.Completion.Translations.ModuleOrBehaviourTest do
+  alias GenLSP.Enumerations.CompletionItemKind
+  alias GenLSP.Enumerations.InsertTextFormat
+
   use Expert.Test.Expert.CompletionCase
 
   describe "module completions" do
@@ -6,9 +9,9 @@ defmodule Expert.CodeIntelligence.Completion.Translations.ModuleOrBehaviourTest 
       assert {:ok, completion} =
                project
                |> complete("Enu|")
-               |> fetch_completion(label: "Enum", kind: :module)
+               |> fetch_completion(label: "Enum", kind: CompletionItemKind.module())
 
-      assert completion.kind == :module
+      assert completion.kind == CompletionItemKind.module()
       assert completion.label == "Enum"
       assert completion.detail
     end
@@ -17,9 +20,9 @@ defmodule Expert.CodeIntelligence.Completion.Translations.ModuleOrBehaviourTest 
       assert {:ok, completion} =
                project
                |> complete("Projec|")
-               |> fetch_completion(kind: :module)
+               |> fetch_completion(kind: CompletionItemKind.module())
 
-      assert completion.kind == :module
+      assert completion.kind == CompletionItemKind.module()
       assert completion.label == "Project"
       assert completion.detail =~ "Project"
     end
@@ -28,9 +31,9 @@ defmodule Expert.CodeIntelligence.Completion.Translations.ModuleOrBehaviourTest 
       assert {:ok, completion} =
                project
                |> complete("Project.Structs.Us|")
-               |> fetch_completion(kind: :module)
+               |> fetch_completion(kind: CompletionItemKind.module())
 
-      assert completion.kind == :module
+      assert completion.kind == CompletionItemKind.module()
       assert completion.label == "User"
       assert completion.detail =~ "Project.Structs.User"
     end
@@ -38,10 +41,10 @@ defmodule Expert.CodeIntelligence.Completion.Translations.ModuleOrBehaviourTest 
     test "behaviours should emit a completion", %{project: project} do
       assert {:ok, completion} =
                project
-               |> complete("GenS|")
-               |> fetch_completion(kind: :module)
+               |> complete("GenSer|")
+               |> fetch_completion(kind: CompletionItemKind.module())
 
-      assert completion.kind == :module
+      assert completion.kind == CompletionItemKind.module()
       assert completion.label == "GenServer"
       assert completion.detail =~ "A behaviour module"
     end
@@ -50,9 +53,9 @@ defmodule Expert.CodeIntelligence.Completion.Translations.ModuleOrBehaviourTest 
       assert {:ok, completion} =
                project
                |> complete("Enumer|")
-               |> fetch_completion(kind: :module)
+               |> fetch_completion(kind: CompletionItemKind.module())
 
-      assert completion.kind == :module
+      assert completion.kind == CompletionItemKind.module()
       assert completion.label == "Enumerable"
       assert completion.detail =~ "Enumerable protocol"
     end
@@ -70,7 +73,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.ModuleOrBehaviourTest 
                |> complete(code, trigger_character: ".")
                |> fetch_completion("Foo")
 
-      assert completion.kind == :module
+      assert completion.kind == CompletionItemKind.module()
     end
   end
 
@@ -81,7 +84,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.ModuleOrBehaviourTest 
                |> complete(":erla|")
                |> fetch_completion(":erlang")
 
-      assert completion.kind == :module
+      assert completion.kind == CompletionItemKind.module()
       assert apply_completion(completion) == ":erlang"
     end
   end
@@ -95,9 +98,9 @@ defmodule Expert.CodeIntelligence.Completion.Translations.ModuleOrBehaviourTest 
       assert {:ok, completion} =
                project
                |> complete(source)
-               |> fetch_completion(kind: :struct)
+               |> fetch_completion(kind: CompletionItemKind.struct())
 
-      assert completion.insert_text_format == :snippet
+      assert completion.insert_text_format == InsertTextFormat.snippet()
       assert completion.label == "MapSet"
       assert completion.detail == "MapSet"
       assert apply_completion(completion) == "%MapSet{$1}\n"
@@ -117,7 +120,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.ModuleOrBehaviourTest 
       assert {:ok, completion} =
                project
                |> complete(source)
-               |> fetch_completion(kind: :struct)
+               |> fetch_completion(kind: CompletionItemKind.struct())
 
       assert apply_completion(completion) == expected
     end
@@ -140,7 +143,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.ModuleOrBehaviourTest 
       assert {:ok, completion} =
                project
                |> complete(source)
-               |> fetch_completion(kind: :struct)
+               |> fetch_completion(kind: CompletionItemKind.struct())
 
       assert completion.detail == "Project.Structs.User"
       assert apply_completion(completion) == expected
@@ -160,7 +163,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.ModuleOrBehaviourTest 
       assert {:ok, completion} =
                project
                |> complete(source)
-               |> fetch_completion(kind: :struct)
+               |> fetch_completion(kind: CompletionItemKind.struct())
 
       assert apply_completion(completion) == expected
     end
@@ -179,7 +182,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.ModuleOrBehaviourTest 
       assert {:ok, completion} =
                project
                |> complete(source)
-               |> fetch_completion(kind: :struct)
+               |> fetch_completion(kind: CompletionItemKind.struct())
 
       assert completion.label == "Account"
       assert apply_completion(completion) == expected
@@ -197,7 +200,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.ModuleOrBehaviourTest 
       assert {:ok, completion} =
                project
                |> complete(source)
-               |> fetch_completion(kind: :struct)
+               |> fetch_completion(kind: CompletionItemKind.struct())
 
       assert completion.label == "Account"
       assert apply_completion(completion) == expected
@@ -221,7 +224,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.ModuleOrBehaviourTest 
       assert {:ok, completion} =
                project
                |> complete(source)
-               |> fetch_completion(kind: :struct)
+               |> fetch_completion(kind: CompletionItemKind.struct())
 
       assert completion.detail == "Project.Structs.User"
       assert apply_completion(completion) == expected
@@ -247,11 +250,11 @@ defmodule Expert.CodeIntelligence.Completion.Translations.ModuleOrBehaviourTest 
       [order, order_line] = complete(project, source)
 
       assert order_line.label == "Order...(1 more struct)"
-      assert order_line.kind == :module
+      assert order_line.kind == CompletionItemKind.module()
       assert apply_completion(order_line) =~ "%Order."
 
       assert order.label == "Order"
-      assert order.kind == :struct
+      assert order.kind == CompletionItemKind.struct()
       assert apply_completion(order) =~ "%Order{$1}"
     end
 

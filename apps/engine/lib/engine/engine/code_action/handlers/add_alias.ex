@@ -1,4 +1,11 @@
 defmodule Engine.CodeAction.Handlers.AddAlias do
+  alias Engine.Analyzer
+  alias Engine.CodeAction
+  alias Engine.CodeIntelligence.Entity
+  alias Engine.CodeMod
+  alias Engine.Modules
+  alias Engine.Search.Fuzzy
+  alias Engine.Search.Indexer.Entry
   alias Forge.Ast
   alias Forge.Ast.Analysis
   alias Forge.Ast.Analysis.Alias
@@ -7,14 +14,7 @@ defmodule Engine.CodeAction.Handlers.AddAlias do
   alias Forge.Document.Position
   alias Forge.Document.Range
   alias Forge.Formats
-
-  alias Engine.Analyzer
-  alias Engine.CodeAction
-  alias Engine.CodeIntelligence.Entity
-  alias Engine.CodeMod
-  alias Engine.Modules
-  alias Engine.Search.Fuzzy
-  alias Engine.Search.Indexer.Entry
+  alias GenLSP.Enumerations.CodeActionKind
   alias Mix.Tasks.Namespace
   alias Sourceror.Zipper
 
@@ -41,7 +41,7 @@ defmodule Engine.CodeAction.Handlers.AddAlias do
 
   @impl CodeAction.Handler
   def kinds do
-    [:quick_fix]
+    [CodeActionKind.quick_fix()]
   end
 
   @impl CodeAction.Handler
@@ -69,7 +69,7 @@ defmodule Engine.CodeAction.Handlers.AddAlias do
         CodeAction.new(
           analysis.document.uri,
           "alias #{Formats.module(potential_alias_module)}",
-          :quick_fix,
+          CodeActionKind.quick_fix(),
           changes
         )
     end

@@ -1,8 +1,8 @@
 defmodule Expert.CodeIntelligence.Completion.BuilderTest do
   alias Expert.CodeIntelligence.Completion.SortScope
-  alias Expert.Protocol.Types.Completion.Item, as: CompletionItem
   alias Forge.Ast
   alias Forge.Ast.Env
+  alias GenLSP.Structures.CompletionItem
 
   use ExUnit.Case, async: true
 
@@ -19,9 +19,10 @@ defmodule Expert.CodeIntelligence.Completion.BuilderTest do
   end
 
   def item(label, opts \\ []) do
-    opts
-    |> Keyword.merge(label: label)
-    |> CompletionItem.new()
+    fields = Keyword.merge(opts, label: label)
+
+    CompletionItem
+    |> struct(fields)
     |> set_sort_scope(SortScope.default())
   end
 

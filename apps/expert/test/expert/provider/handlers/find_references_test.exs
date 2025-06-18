@@ -1,13 +1,13 @@
 defmodule Expert.Provider.Handlers.FindReferencesTest do
-  alias Expert.Proto.Convert
-  alias Expert.Protocol.Requests.FindReferences
-  alias Expert.Protocol.Responses
   alias Expert.Provider.Handlers
   alias Forge.Ast.Analysis
   alias Forge.Document
   alias Forge.Document.Location
+  alias Forge.Protocol.Convert
+  alias Forge.Protocol.Response
+  alias GenLSP.Requests.TextDocumentReferences
+  alias GenLSP.Structures
 
-  import Expert.Test.Protocol.Fixtures.LspProtocol
   import Engine.Test.Fixtures
 
   use ExUnit.Case, async: false
@@ -28,13 +28,18 @@ defmodule Expert.Provider.Handlers.FindReferencesTest do
   def build_request(path, line, char) do
     uri = Document.Path.ensure_uri(path)
 
-    params = [
-      text_document: [uri: uri],
-      position: [line: line, character: char]
-    ]
+    with {:ok, _} <- Document.Store.open_temporary(uri) do
+      req = %TextDocumentReferences{
+        id: Forge.Protocol.Id.next(),
+        params: %Structures.ReferenceParams{
+          context: %Structures.ReferenceContext{
+            include_declaration: true
+          },
+          text_document: %Structures.TextDocumentIdentifier{uri: uri},
+          position: %Structures.Position{line: line, character: char}
+        }
+      }
 
-    with {:ok, _} <- Document.Store.open_temporary(uri),
-         {:ok, req} <- build(FindReferences, params) do
       Convert.to_native(req)
     end
   end
@@ -62,7 +67,7 @@ defmodule Expert.Provider.Handlers.FindReferencesTest do
 
       {:ok, request} = build_request(uri, 5, 6)
 
-      assert {:reply, %Responses.FindReferences{} = response} = handle(request, project)
+      assert {:reply, %Response{} = response} = handle(request, project)
       assert [%Location{} = location] = response.result
       assert location.uri =~ "file.ex"
     end
@@ -72,7 +77,7 @@ defmodule Expert.Provider.Handlers.FindReferencesTest do
 
       {:ok, request} = build_request(uri, 1, 5)
 
-      assert {:reply, %Responses.FindReferences{} = response} = handle(request, project)
+      assert {:reply, %Response{} = response} = handle(request, project)
       assert response.result == nil
     end
   end

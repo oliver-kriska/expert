@@ -5,6 +5,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.StructField do
   alias Expert.CodeIntelligence.Completion.Translations
   alias Forge.Ast.Env
   alias Future.Code, as: Code
+  alias GenLSP.Enumerations.CompletionItemKind
 
   defimpl Translatable, for: Candidate.StructField do
     def translate(field, builder, %Env{} = env) do
@@ -21,7 +22,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.StructField do
     value = to_string(name)
 
     builder_opts = [
-      kind: :field,
+      kind: CompletionItemKind.field(),
       label: "#{name}: #{value}",
       filter_text: "#{name}:"
     ]
@@ -38,7 +39,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.StructField do
     builder.plain_text(env, struct_field.name,
       detail: struct_field.type_spec,
       label: struct_field.name,
-      kind: :field
+      kind: CompletionItemKind.field()
     )
   end
 

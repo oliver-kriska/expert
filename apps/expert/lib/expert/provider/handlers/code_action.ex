@@ -1,42 +1,47 @@
 defmodule Expert.Provider.Handlers.CodeAction do
-  alias Expert.Protocol.Requests
-  alias Expert.Protocol.Responses
-  alias Expert.Protocol.Types
-  alias Expert.Protocol.Types.Workspace
-
   alias Engine.CodeAction
   alias Expert.Configuration
+  alias Forge.Protocol.Response
+  alias GenLSP.Requests
+  alias GenLSP.Structures
 
-  require Logger
-
-  def handle(%Requests.CodeAction{} = request, %Configuration{} = config) do
-    diagnostics = Enum.map(request.context.diagnostics, &to_code_action_diagnostic/1)
+  def handle(
+        %Requests.TextDocumentCodeAction{params: %Structures.CodeActionParams{} = params} =
+          request,
+        %Configuration{} = config
+      ) do
+    document = Forge.Document.Container.context_document(params, nil)
+    diagnostics = Enum.map(params.context.diagnostics, &to_code_action_diagnostic/1)
 
     code_actions =
       Engine.Api.code_actions(
         config.project,
-        request.document,
-        request.range,
+        document,
+        params.range,
         diagnostics,
-        request.context.only || :all,
-        request.context.trigger_kind
+        params.context.only || :all,
+        params.context.trigger_kind
       )
 
     results = Enum.map(code_actions, &to_result/1)
-    reply = Responses.CodeAction.new(request.id, results)
+    reply = %Response{id: request.id, result: results}
 
     {:reply, reply}
   end
 
-  defp to_code_action_diagnostic(%Types.Diagnostic{} = diagnostic) do
-    CodeAction.Diagnostic.new(diagnostic.range, diagnostic.message, diagnostic.source)
+  defp to_code_action_diagnostic(%Structures.Diagnostic{} = diagnostic) do
+    %Structures.Diagnostic{
+      range: diagnostic.range,
+      message: diagnostic.message,
+      source: diagnostic.source
+    }
   end
 
   defp to_result(%CodeAction{} = action) do
-    Types.CodeAction.new(
+    %Structures.CodeAction{
       title: action.title,
       kind: action.kind,
-      edit: Workspace.Edit.new(changes: %{action.uri => action.changes})
-    )
+      edit: %Structures.WorkspaceEdit{changes: %{action.uri => action.changes}}
+    }
   end
 end

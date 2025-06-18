@@ -2,56 +2,59 @@ defmodule Expert.Provider.Handlers.WorkspaceSymbol do
   alias Engine.Api
   alias Engine.CodeIntelligence.Symbols
   alias Expert.Configuration
-  alias Expert.Protocol.Requests.WorkspaceSymbol
-  alias Expert.Protocol.Responses
-  alias Expert.Protocol.Types.Location
-  alias Expert.Protocol.Types.Symbol.Kind, as: SymbolKind
-  alias Expert.Protocol.Types.Workspace.Symbol
-
-  require SymbolKind
+  alias Forge.Protocol.Response
+  alias GenLSP.Enumerations.SymbolKind
+  alias GenLSP.Requests
+  alias GenLSP.Structures
 
   require Logger
 
-  def handle(%WorkspaceSymbol{} = request, %Configuration{} = config) do
+  def handle(
+        %Requests.WorkspaceSymbol{params: %Structures.WorkspaceSymbolParams{} = params} = request,
+        %Configuration{} = config
+      ) do
     symbols =
-      if String.length(request.query) > 1 do
+      if String.length(params.query) > 1 do
         config.project
-        |> Api.workspace_symbols(request.query)
+        |> Api.workspace_symbols(params.query)
         |> tap(fn symbols -> Logger.info("syms #{inspect(Enum.take(symbols, 5))}") end)
         |> Enum.map(&to_response/1)
       else
         []
       end
 
-    response = Responses.WorkspaceSymbol.new(request.id, symbols)
+    response = %Response{id: request.id, result: symbols}
+
+    Logger.info("WorkspaceSymbol results: #{inspect(response, pretty: true)}")
+
     {:reply, response}
   end
 
   def to_response(%Symbols.Workspace{} = root) do
-    Symbol.new(
+    %Structures.WorkspaceSymbol{
       kind: to_kind(root.type),
       location: to_location(root.link),
       name: root.name,
       container_name: root.container_name
-    )
+    }
   end
 
   defp to_location(%Symbols.Workspace.Link{} = link) do
-    Location.new(uri: link.uri, range: link.detail_range)
+    %Structures.Location{uri: link.uri, range: link.detail_range}
   end
 
-  defp to_kind(:struct), do: :struct
-  defp to_kind(:module), do: :module
-  defp to_kind({:protocol, _}), do: :module
-  defp to_kind({:xp_protocol, _}), do: :module
-  defp to_kind(:variable), do: :variable
-  defp to_kind({:function, _}), do: :function
-  defp to_kind(:module_attribute), do: :constant
-  defp to_kind(:ex_unit_test), do: :method
-  defp to_kind(:ex_unit_describe), do: :method
-  defp to_kind(:ex_unit_setup), do: :method
-  defp to_kind(:ex_unit_setup_all), do: :method
-  defp to_kind(:type), do: :type_parameter
-  defp to_kind(:spec), do: :interface
-  defp to_kind(:file), do: :file
+  defp to_kind(:struct), do: SymbolKind.struct()
+  defp to_kind(:module), do: SymbolKind.module()
+  defp to_kind({:protocol, _}), do: SymbolKind.module()
+  defp to_kind({:xp_protocol, _}), do: SymbolKind.module()
+  defp to_kind(:variable), do: SymbolKind.variable()
+  defp to_kind({:function, _}), do: SymbolKind.function()
+  defp to_kind(:module_attribute), do: SymbolKind.constant()
+  defp to_kind(:ex_unit_test), do: SymbolKind.method()
+  defp to_kind(:ex_unit_describe), do: SymbolKind.method()
+  defp to_kind(:ex_unit_setup), do: SymbolKind.method()
+  defp to_kind(:ex_unit_setup_all), do: SymbolKind.method()
+  defp to_kind(:type), do: SymbolKind.type_parameter()
+  defp to_kind(:spec), do: SymbolKind.interface()
+  defp to_kind(:file), do: SymbolKind.file()
 end

@@ -1,5 +1,6 @@
 defmodule Expert.Transport.StdIO do
-  alias Expert.Protocol.JsonRpc
+  alias Forge.Protocol.Convert
+  alias Forge.Protocol.JsonRpc
 
   require Logger
 
@@ -22,7 +23,7 @@ defmodule Expert.Transport.StdIO do
   def write(io_device \\ :stdio, payload)
 
   def write(io_device, %_{} = payload) do
-    with {:ok, lsp} <- Expert.Proto.Convert.to_lsp(payload),
+    with {:ok, lsp} <- encode(payload),
          {:ok, json} <- Jason.encode(lsp) do
       write(io_device, json)
     end
@@ -54,7 +55,58 @@ defmodule Expert.Transport.StdIO do
   def write(_, []) do
   end
 
-  # private
+  defp encode(%{id: id, result: result}) do
+    with {:ok, result} <- dump_lsp(result) do
+      {:ok,
+       %{
+         "jsonrpc" => "2.0",
+         "id" => id,
+         "result" => result
+       }}
+    end
+  end
+
+  defp encode(%{id: id, error: error}) do
+    with {:ok, error} <- dump_lsp(error) do
+      {:ok,
+       %{
+         "jsonrpc" => "2.0",
+         "id" => id,
+         "error" => error
+       }}
+    end
+  end
+
+  defp encode(%_{} = request) do
+    dump_lsp(request)
+  end
+
+  # Dialyzer complains about Schematic.dump not existing, but it does
+  # This will be removed by #20 anyways
+  @dialyzer {:nowarn_function, dump_lsp: 1}
+
+  defp dump_lsp(%module{} = item) do
+    with {:ok, item} <- Convert.to_lsp(item) do
+      Schematic.dump(module.schematic(), item)
+    end
+  end
+
+  defp dump_lsp(list) when is_list(list) do
+    dump =
+      Enum.map(list, fn item ->
+        case dump_lsp(item) do
+          {:ok, dumped} -> dumped
+          {:error, reason} -> throw({:error, reason})
+        end
+      end)
+
+    {:ok, dump}
+  catch
+    {:error, reason} ->
+      {:error, reason}
+  end
+
+  defp dump_lsp(other), do: {:ok, other}
 
   defp loop(buffer, device, callback) do
     case IO.binread(device, :line) do

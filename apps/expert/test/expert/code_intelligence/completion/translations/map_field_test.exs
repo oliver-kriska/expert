@@ -1,4 +1,6 @@
 defmodule Expert.CodeIntelligence.Completion.Translations.MapFieldTest do
+  alias GenLSP.Enumerations.CompletionItemKind
+
   use Expert.Test.Expert.CompletionCase
 
   test "a map's fields are completed", %{project: project} do
@@ -10,7 +12,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.MapFieldTest do
     assert {:ok, completion} =
              project
              |> complete(source)
-             |> fetch_completion(kind: :field)
+             |> fetch_completion(kind: CompletionItemKind.field())
 
     assert completion.detail == "first_name"
     assert apply_completion(completion) =~ "user.first_name"
@@ -25,7 +27,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.MapFieldTest do
     assert {:ok, [first_name, last_name]} =
              project
              |> complete(source)
-             |> fetch_completion(kind: :field)
+             |> fetch_completion(kind: CompletionItemKind.field())
 
     assert apply_completion(first_name) =~ "user.first_name"
     assert apply_completion(last_name) =~ "user.last_name"

@@ -1,10 +1,10 @@
 defmodule Expert.Configuration.Support do
   @moduledoc false
 
-  alias Expert.Protocol.Types.ClientCapabilities
+  alias GenLSP.Structures.ClientCapabilities
 
   # To track a new client capability, add a new field and the path to the
-  # capability in the `Expert.Protocol.Types.ClientCapabilities` struct
+  # capability in the `GenLSP.Structures.ClientCapabilities` struct
   # to this mapping:
   @client_capability_mapping [
     code_action_dynamic_registration: [
@@ -58,7 +58,8 @@ defmodule Expert.Configuration.Support do
   def new(%ClientCapabilities{} = client_capabilities) do
     defaults =
       for {key, path} <- @client_capability_mapping do
-        value = get_in(client_capabilities, path) || false
+        path = Enum.map(path, &Access.key/1)
+        value = get_in(Map.from_struct(client_capabilities), path) || false
         {key, value}
       end
 

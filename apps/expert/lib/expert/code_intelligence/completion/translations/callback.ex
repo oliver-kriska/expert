@@ -5,6 +5,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.Callback do
   alias Expert.CodeIntelligence.Completion.Translatable
   alias Forge.Ast.Env
   alias Forge.Document
+  alias GenLSP.Enumerations.CompletionItemKind
 
   defimpl Translatable, for: Callback do
     def translate(callback, _builder, %Env{} = env) do
@@ -21,7 +22,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.Callback do
         insert_text(name, arg_names, env),
         line_range(line),
         label: label(name, arg_names),
-        kind: :interface,
+        kind: CompletionItemKind.interface(),
         detail: detail(callback),
         sort_text: sort_text(callback),
         filter_text: "def #{name}",

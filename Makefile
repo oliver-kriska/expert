@@ -1,4 +1,4 @@
-poncho_dirs = forge expert_credo proto protocol engine expert
+poncho_dirs = forge expert_credo engine expert
 
 compile.all: compile.poncho
 

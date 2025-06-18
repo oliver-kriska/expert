@@ -3,6 +3,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.Callable do
   alias Expert.CodeIntelligence.Completion.Builder
   alias Expert.CodeIntelligence.Completion.SortScope
   alias Forge.Ast.Env
+  alias GenLSP.Enumerations.CompletionItemKind
 
   @callables [Candidate.Function, Candidate.Macro, Candidate.Callback, Candidate.Typespec]
 
@@ -49,10 +50,10 @@ defmodule Expert.CodeIntelligence.Completion.Translations.Callable do
     kind =
       case callable do
         %Candidate.Typespec{} ->
-          :type_parameter
+          CompletionItemKind.type_parameter()
 
         _ ->
-          :function
+          CompletionItemKind.function()
       end
 
     detail =
@@ -83,7 +84,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.Callable do
       env
       |> Builder.plain_text(name_and_arity,
         label: name_and_arity,
-        kind: :function,
+        kind: CompletionItemKind.function(),
         detail: "(Capture)",
         sort_text: sort_text(callable),
         filter_text: "#{callable.name}",
@@ -95,7 +96,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.Callable do
       env
       |> Builder.snippet(callable_snippet(callable, env),
         label: label(callable, env),
-        kind: :function,
+        kind: CompletionItemKind.function(),
         detail: "(Capture with arguments)",
         sort_text: sort_text(callable),
         filter_text: "#{callable.name}",

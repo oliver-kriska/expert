@@ -1,11 +1,13 @@
 defmodule Expert.TaskQueueTest do
   alias Engine.Test.Fixtures
   alias Expert.Configuration
-  alias Expert.Protocol.Notifications
-  alias Expert.Protocol.Requests
   alias Expert.Provider.Handlers
   alias Expert.TaskQueue
   alias Expert.Transport
+  alias GenLSP.Enumerations.ErrorCodes
+  alias GenLSP.Notifications
+  alias GenLSP.Requests
+  alias GenLSP.Structures
 
   use ExUnit.Case
   use Patch
@@ -33,9 +35,12 @@ defmodule Expert.TaskQueueTest do
       func.(request, config)
     end)
 
-    patch(Requests.Completion, :to_elixir, fn req -> {:ok, req} end)
+    patch(Requests.TextDocumentCompletion, :to_elixir, fn req -> {:ok, req} end)
 
-    request = Requests.Completion.new(id: id, text_document: nil, position: nil, context: nil)
+    request = %Requests.TextDocumentCompletion{
+      id: id,
+      params: %Structures.CompletionParams{text_document: nil, position: nil, context: nil}
+    }
 
     {id, {Handlers.Completion, :handle, [request, config]}}
   end
@@ -62,7 +67,8 @@ defmodule Expert.TaskQueueTest do
       assert_receive %{id: ^id, error: error}
 
       assert TaskQueue.size() == 0
-      assert error.code == :request_cancelled
+      # ErrorCodes.request_cancelled()
+      assert error.code == -32_800
       assert error.message == "Request cancelled"
     end
 
@@ -74,7 +80,8 @@ defmodule Expert.TaskQueueTest do
 
       assert_receive %{id: ^id, error: error}
       assert TaskQueue.size() == 0
-      assert error.code == :request_cancelled
+      # ErrorCodes.request_cancelled()
+      assert error.code == -32_800
       assert error.message == "Request cancelled"
     end
 
@@ -87,19 +94,18 @@ defmodule Expert.TaskQueueTest do
       {id, mfa} = request(config, fn _, _ -> Process.sleep(500) end)
       assert :ok = TaskQueue.add(id, mfa)
 
-      {:ok, notif} =
-        Notifications.Cancel.parse(%{
-          "method" => "$/cancelRequest",
-          "jsonrpc" => "2.0",
-          "params" => %{
-            "id" => id
+      notif =
+        %Notifications.DollarCancelRequest{
+          params: %{
+            id: id
           }
-        })
+        }
 
       assert :ok = TaskQueue.cancel(notif)
       assert_receive %{id: ^id, error: error}
       assert TaskQueue.size() == 0
-      assert error.code == :request_cancelled
+      # ErrorCodes.request_cancelled()
+      assert error.code == -32_800
       assert error.message == "Request cancelled"
     end
 
@@ -107,20 +113,18 @@ defmodule Expert.TaskQueueTest do
       {id, mfa} = request(config, fn _, _ -> Process.sleep(500) end)
       assert :ok = TaskQueue.add(id, mfa)
 
-      {:ok, req} =
-        Requests.Cancel.parse(%{
-          "method" => "$/cancelRequest",
-          "jsonrpc" => "2.0",
-          "id" => "50",
-          "params" => %{
-            "id" => id
+      req =
+        %Notifications.DollarCancelRequest{
+          params: %{
+            id: id
           }
-        })
+        }
 
       assert :ok = TaskQueue.cancel(req)
       assert_receive %{id: ^id, error: error}
       assert TaskQueue.size() == 0
-      assert error.code == :request_cancelled
+      # ErrorCodes.request_cancelled()
+      assert error.code == -32_800
       assert error.message == "Request cancelled"
     end
 
@@ -157,7 +161,7 @@ defmodule Expert.TaskQueueTest do
       assert :ok = TaskQueue.add(id, mfa)
 
       assert_receive %{id: ^id, error: error}
-      assert error.code == :internal_error
+      assert error.code == ErrorCodes.internal_error()
       assert error.message =~ "Boom!"
     end
   end

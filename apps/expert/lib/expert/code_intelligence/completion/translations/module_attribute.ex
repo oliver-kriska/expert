@@ -6,6 +6,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.ModuleAttribute do
   alias Forge.Ast
   alias Forge.Ast.Env
   alias Forge.Document.Position
+  alias GenLSP.Enumerations.CompletionItemKind
 
   defimpl Translatable, for: Candidate.ModuleAttribute do
     def translate(attribute, builder, %Env{} = env) do
@@ -25,14 +26,14 @@ defmodule Expert.CodeIntelligence.Completion.Translations.ModuleAttribute do
         with_doc =
           builder.text_edit_snippet(env, doc_snippet, range,
             detail: "Document public module",
-            kind: :property,
+            kind: CompletionItemKind.property(),
             label: "@moduledoc"
           )
 
         without_doc =
           builder.text_edit(env, "@moduledoc false", range,
             detail: "Mark as private",
-            kind: :property,
+            kind: CompletionItemKind.property(),
             label: "@moduledoc false"
           )
 
@@ -55,14 +56,14 @@ defmodule Expert.CodeIntelligence.Completion.Translations.ModuleAttribute do
         with_doc =
           builder.text_edit_snippet(env, doc_snippet, range,
             detail: "Document public function",
-            kind: :property,
+            kind: CompletionItemKind.property(),
             label: "@doc"
           )
 
         without_doc =
           builder.text_edit(env, "@doc false", range,
             detail: "Mark as private",
-            kind: :property,
+            kind: CompletionItemKind.property(),
             label: "@doc false"
           )
 
@@ -91,7 +92,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.ModuleAttribute do
       {:ok, range} ->
         builder.text_edit(env, attribute.name, range,
           detail: "module attribute",
-          kind: :constant,
+          kind: CompletionItemKind.constant(),
           label: attribute.name
         )
 
@@ -153,7 +154,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.ModuleAttribute do
     env
     |> builder.text_edit_snippet(snippet, range,
       detail: "Typespec",
-      kind: :property,
+      kind: CompletionItemKind.property(),
       label: "@spec #{name}"
     )
     |> builder.set_sort_scope(SortScope.global(false, 0))
@@ -170,7 +171,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.ModuleAttribute do
     env
     |> builder.text_edit_snippet(snippet, range,
       detail: "Typespec",
-      kind: :property,
+      kind: CompletionItemKind.property(),
       label: "@spec"
     )
     |> builder.set_sort_scope(SortScope.global(false, 1))

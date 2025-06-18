@@ -1,11 +1,11 @@
 defprotocol Expert.CodeIntelligence.Completion.Translatable do
+  alias GenLSP.Structures.CompletionItem
   alias Forge.Ast.Env
-  alias Expert.Protocol.Types.Completion
   alias Expert.CodeIntelligence.Completion.Builder
 
   @type t :: any()
 
-  @type translated :: [Completion.Item.t()] | Completion.Item.t() | :skip
+  @type translated :: [CompletionItem.t()] | CompletionItem.t() | :skip
 
   @fallback_to_any true
   @spec translate(t, Builder.t(), Env.t()) :: translated

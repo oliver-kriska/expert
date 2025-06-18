@@ -2,9 +2,9 @@ defmodule Expert.Project.Progress.Percentage do
   @moduledoc """
   The backing data structure for percentage based progress reports
   """
-  alias Expert.Protocol.Notifications
-  alias Expert.Protocol.Types.WorkDone
   alias Forge.Math
+  alias GenLSP.Notifications
+  alias GenLSP.Structures
 
   @enforce_keys [:token, :kind, :max]
   defstruct [:token, :kind, :title, :message, :max, current: 0]
@@ -35,10 +35,12 @@ defmodule Expert.Project.Progress.Percentage do
   end
 
   def to_protocol(%__MODULE__{kind: :begin} = value) do
-    Notifications.Progress.new(
-      token: value.token,
-      value: WorkDone.Progress.Begin.new(kind: "begin", title: value.title, percentage: 0)
-    )
+    %Notifications.DollarProgress{
+      params: %Structures.ProgressParams{
+        token: value.token,
+        value: %Structures.WorkDoneProgressBegin{kind: "begin", title: value.title, percentage: 0}
+      }
+    }
   end
 
   def to_protocol(%__MODULE__{kind: :report} = value) do
@@ -47,21 +49,24 @@ defmodule Expert.Project.Progress.Percentage do
       |> round()
       |> Math.clamp(0, 100)
 
-    Notifications.Progress.new(
-      token: value.token,
-      value:
-        WorkDone.Progress.Report.new(
+    %Notifications.DollarProgress{
+      params: %Structures.ProgressParams{
+        token: value.token,
+        value: %Structures.WorkDoneProgressReport{
           kind: "report",
           message: value.message,
           percentage: percent_complete
-        )
-    )
+        }
+      }
+    }
   end
 
   def to_protocol(%__MODULE__{kind: :end} = value) do
-    Notifications.Progress.new(
-      token: value.token,
-      value: WorkDone.Progress.End.new(kind: "end", message: value.message)
-    )
+    %Notifications.DollarProgress{
+      params: %Structures.ProgressParams{
+        token: value.token,
+        value: %Structures.WorkDoneProgressEnd{kind: "end", message: value.message}
+      }
+    }
   end
 end

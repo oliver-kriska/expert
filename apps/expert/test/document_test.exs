@@ -1,14 +1,9 @@
 defmodule Forge.DocumentTest do
-  alias Expert.Protocol.Types.Position
-  alias Expert.Protocol.Types.Range
-  alias Expert.Protocol.Types.TextEdit
   alias Forge.Document
 
-  alias Expert.Protocol.Types.TextDocument.ContentChangeEvent.TextDocumentContentChangeEvent,
-    as: RangedContentChange
-
-  alias Expert.Protocol.Types.TextDocument.ContentChangeEvent.TextDocumentContentChangeEvent1,
-    as: TextOnlyContentChange
+  alias GenLSP.Structures.Position
+  alias GenLSP.Structures.Range
+  alias GenLSP.Structures.TextEdit
 
   use ExUnit.Case
   use ExUnitProperties
@@ -38,11 +33,11 @@ defmodule Forge.DocumentTest do
   end
 
   def edit(text) do
-    TextEdit.new(new_text: text, range: nil)
+    %TextEdit{new_text: text, range: nil}
   end
 
   def edit(text, range) do
-    TextEdit.new(new_text: text, range: range)
+    %TextEdit{new_text: text, range: range}
   end
 
   describe "new" do
@@ -86,16 +81,18 @@ defmodule Forge.DocumentTest do
 
   describe "applying protocol content change events" do
     test "applying a text only change replaces all the test" do
-      {:ok, doc} = run_changes("hello", [TextOnlyContentChange.new(text: "goodbye")])
+      {:ok, doc} =
+        run_changes("hello", [%{text: "goodbye"}])
+
       assert "goodbye" = text(doc)
     end
 
     test "applying a range event replaces the range" do
       range_change =
-        RangedContentChange.new(
+        %{
           range: new_range(0, 6, 1, 0),
           text: "people"
-        )
+        }
 
       {:ok, doc} = run_changes("hello there", [range_change])
       assert "hello people" == text(doc)
@@ -164,14 +161,14 @@ defmodule Forge.DocumentTest do
       high = map_size(line_offsets)
 
       if high == 0 do
-        Position.new(line: 0, character: offset)
+        %Position{line: 0, character: offset}
       else
         low = find_low_high(low, high, offset, line_offsets)
 
         # low is the least x for which the line offset is larger than the current offset
         # or array.length if no line offset is larger than the current offset
         line = low - 1
-        Position.new(line: line, character: offset - line_offsets[line])
+        %Position{line: line, character: offset - line_offsets[line]}
       end
     end
 
@@ -182,7 +179,7 @@ defmodule Forge.DocumentTest do
     end
 
     def new_position(l, c) do
-      Position.new(line: l, character: c)
+      %Position{line: l, character: c}
     end
 
     def position_after_substring(text, sub_text) do
@@ -199,19 +196,19 @@ defmodule Forge.DocumentTest do
         |> String.to_charlist()
         |> length()
 
-      Range.new(
+      %Range{
         start: position_at(doc, index),
         end: position_at(doc, index + substring_len)
-      )
+      }
     end
 
     def range_after_substring(doc_text, sub_text) do
       pos = position_after_substring(doc_text, sub_text)
-      Range.new(start: pos, end: pos)
+      %Range{start: pos, end: pos}
     end
 
     def new_range(sl, sc, el, ec) do
-      Range.new(start: new_position(sl, sc), end: new_position(el, ec))
+      %Range{start: new_position(sl, sc), end: new_position(el, ec)}
     end
 
     def run_changes(original, changes, opts \\ []) do
@@ -539,10 +536,10 @@ defmodule Forge.DocumentTest do
       event =
         edit(
           "",
-          Range.new(
-            start: Position.new(character: 0, line: 2),
-            end: Position.new(character: 22, line: 2)
-          )
+          %Range{
+            start: %Position{character: 0, line: 2},
+            end: %Position{character: 22, line: 2}
+          }
         )
 
       assert {:ok, doc} = run_changes(orig, [event])
@@ -730,8 +727,8 @@ defmodule Forge.DocumentTest do
         "this is the first line\nthis is the second"
         |> document()
         |> Document.fragment(
-          Position.new(line: 0, character: 5),
-          Position.new(line: 0, character: 7)
+          %Position{line: 0, character: 5},
+          %Position{line: 0, character: 7}
         )
 
       assert doc == "is"

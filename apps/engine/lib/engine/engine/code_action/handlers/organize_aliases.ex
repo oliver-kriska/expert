@@ -6,6 +6,7 @@ defmodule Engine.CodeAction.Handlers.OrganizeAliases do
   alias Forge.Document
   alias Forge.Document.Changes
   alias Forge.Document.Range
+  alias GenLSP.Enumerations.CodeActionKind
 
   require Logger
 
@@ -23,7 +24,15 @@ defmodule Engine.CodeAction.Handlers.OrganizeAliases do
         []
       else
         changes = Changes.new(doc, edits)
-        [CodeAction.new(doc.uri, "Organize aliases", :source_organize_imports, changes)]
+
+        [
+          CodeAction.new(
+            doc.uri,
+            "Organize aliases",
+            CodeActionKind.source_organize_imports(),
+            changes
+          )
+        ]
       end
     else
       _ ->
@@ -33,7 +42,7 @@ defmodule Engine.CodeAction.Handlers.OrganizeAliases do
 
   @impl CodeAction.Handler
   def kinds do
-    [:source, :source_organize_imports]
+    [CodeActionKind.source(), CodeActionKind.source_organize_imports()]
   end
 
   @impl CodeAction.Handler

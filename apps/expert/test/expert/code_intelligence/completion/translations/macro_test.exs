@@ -1,5 +1,8 @@
 defmodule Expert.CodeIntelligence.Completion.Translations.MacroTest do
-  alias Expert.Protocol.Types.Completion
+  alias GenLSP.Enumerations.CompletionItemKind
+  alias GenLSP.Enumerations.InsertTextFormat
+
+  alias GenLSP.Structures.CompletionItem
 
   use Expert.Test.Expert.CompletionCase
 
@@ -30,7 +33,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.MacroTest do
                |> complete("def|")
                |> fetch_completion("def ")
 
-      assert %Completion.Item{} = completion
+      assert %CompletionItem{} = completion
       assert completion.detail
     end
 
@@ -42,7 +45,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.MacroTest do
 
       assert completion.detail
       assert completion.label == "def (define a function)"
-      assert completion.insert_text_format == :snippet
+      assert completion.insert_text_format == InsertTextFormat.snippet()
       assert apply_completion(completion) == "def ${1:name}($2) do\n  $0\nend"
     end
 
@@ -128,7 +131,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.MacroTest do
                |> complete("defp|")
                |> fetch_completion("defp ")
 
-      assert %Completion.Item{} = completion
+      assert %CompletionItem{} = completion
     end
 
     test "defp", %{project: project} do
@@ -139,7 +142,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.MacroTest do
 
       assert completion.detail
       assert completion.label == "defp (define a private function)"
-      assert completion.insert_text_format == :snippet
+      assert completion.insert_text_format == InsertTextFormat.snippet()
       assert apply_completion(completion) == "defp ${1:name}($2) do\n  $0\nend"
     end
 
@@ -149,7 +152,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.MacroTest do
                |> complete("defmacro|")
                |> fetch_completion("defmacro ")
 
-      assert %Completion.Item{} = completion
+      assert %CompletionItem{} = completion
       assert completion.detail
     end
 
@@ -161,7 +164,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.MacroTest do
 
       assert completion.detail
       assert completion.label == "defmacro (define a macro)"
-      assert completion.insert_text_format == :snippet
+      assert completion.insert_text_format == InsertTextFormat.snippet()
       assert apply_completion(completion) == "defmacro ${1:name}($2) do\n  $0\nend"
     end
 
@@ -171,7 +174,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.MacroTest do
                |> complete("defmacrop|")
                |> fetch_completion("defmacrop ")
 
-      assert %Completion.Item{} = completion
+      assert %CompletionItem{} = completion
       assert completion.detail
     end
 
@@ -183,7 +186,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.MacroTest do
 
       assert completion.detail
       assert completion.label == "defmacrop (define a private macro)"
-      assert completion.insert_text_format == :snippet
+      assert completion.insert_text_format == InsertTextFormat.snippet()
       assert apply_completion(completion) == "defmacrop ${1:name}($2) do\n  $0\nend"
     end
 
@@ -194,7 +197,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.MacroTest do
                |> fetch_completion("defmodule ")
 
       assert completion.detail
-      assert %Completion.Item{} = completion
+      assert %CompletionItem{} = completion
     end
 
     test "defmodule for lib paths", %{project: project} do
@@ -205,7 +208,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.MacroTest do
 
       assert completion.detail
       assert completion.label == "defmodule (define a module)"
-      assert completion.insert_text_format == :snippet
+      assert completion.insert_text_format == InsertTextFormat.snippet()
 
       assert apply_completion(completion) == """
              defmodule ${1:File} do
@@ -222,7 +225,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.MacroTest do
 
       assert completion.detail
       assert completion.label == "defmodule (define a module)"
-      assert completion.insert_text_format == :snippet
+      assert completion.insert_text_format == InsertTextFormat.snippet()
 
       assert apply_completion(completion) == """
              defmodule ${1:Foo.Project.MyTest} do
@@ -239,7 +242,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.MacroTest do
 
       assert completion.detail
       assert completion.label == "defmodule (define a module)"
-      assert completion.insert_text_format == :snippet
+      assert completion.insert_text_format == InsertTextFormat.snippet()
 
       assert apply_completion(completion) == """
              defmodule ${1:Path.To.File} do
@@ -256,7 +259,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.MacroTest do
 
       assert completion.detail
       assert completion.label == "defmodule (define a module)"
-      assert completion.insert_text_format == :snippet
+      assert completion.insert_text_format == InsertTextFormat.snippet()
 
       assert apply_completion(completion) == """
              defmodule ${1:Path} do
@@ -273,7 +276,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.MacroTest do
 
       assert completion.detail
       assert completion.label == "defmodule (define a module)"
-      assert completion.insert_text_format == :snippet
+      assert completion.insert_text_format == InsertTextFormat.snippet()
 
       assert apply_completion(completion) == """
              defmodule ${1:Path.To.My.Module.Test} do
@@ -290,7 +293,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.MacroTest do
 
       assert completion.detail
       assert completion.label == "defmodule (define a module)"
-      assert completion.insert_text_format == :snippet
+      assert completion.insert_text_format == InsertTextFormat.snippet()
 
       assert apply_completion(completion) == """
              defmodule ${1:My.Module.Test} do
@@ -305,7 +308,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.MacroTest do
                |> complete("defprotocol|")
                |> fetch_completion("defprotocol ")
 
-      assert %Completion.Item{} = completion
+      assert %CompletionItem{} = completion
       assert completion.detail
     end
 
@@ -317,7 +320,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.MacroTest do
 
       assert completion.detail
       assert completion.label == "defprotocol (define a protocol)"
-      assert completion.insert_text_format == :snippet
+      assert completion.insert_text_format == InsertTextFormat.snippet()
 
       assert apply_completion(completion) == """
              defprotocol ${1:protocol_name} do
@@ -332,7 +335,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.MacroTest do
                |> complete("defimpl|")
                |> fetch_completion("defimpl ")
 
-      assert %Completion.Item{} = completion
+      assert %CompletionItem{} = completion
     end
 
     test "defimpl returns a snippet", %{project: project} do
@@ -343,7 +346,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.MacroTest do
 
       assert completion.detail
       assert completion.label == "defimpl (define a protocol implementation)"
-      assert completion.insert_text_format == :snippet
+      assert completion.insert_text_format == InsertTextFormat.snippet()
 
       assert apply_completion(completion) == """
              defimpl ${1:protocol_name}, for: ${2:struct_name} do
@@ -360,7 +363,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.MacroTest do
 
       assert completion.detail
       assert completion.label == "defoverridable (mark a function as overridable)"
-      assert completion.insert_text_format == :snippet
+      assert completion.insert_text_format == InsertTextFormat.snippet()
 
       assert apply_completion(completion) == "defoverridable ${1:keyword_or_behaviour}"
     end
@@ -373,7 +376,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.MacroTest do
 
       assert completion.detail
       assert completion.label == "defdelegate (define a delegate function)"
-      assert completion.insert_text_format == :snippet
+      assert completion.insert_text_format == InsertTextFormat.snippet()
       assert apply_completion(completion) == "defdelegate ${1:call}(${2:args}), to: ${3:module}"
     end
 
@@ -385,7 +388,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.MacroTest do
 
       assert completion.detail
       assert completion.label == "defguard (define a guard macro)"
-      assert completion.insert_text_format == :snippet
+      assert completion.insert_text_format == InsertTextFormat.snippet()
       assert apply_completion(completion) == "defguard ${1:guard}(${2:args}) when $0"
     end
 
@@ -397,7 +400,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.MacroTest do
 
       assert completion.detail
       assert completion.label == "defguardp (define a private guard macro)"
-      assert completion.insert_text_format == :snippet
+      assert completion.insert_text_format == InsertTextFormat.snippet()
       assert apply_completion(completion) == "defguardp ${1:guard}(${2:args}) when $0"
     end
 
@@ -409,7 +412,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.MacroTest do
 
       assert completion.detail
       assert completion.label == "defexception (define an exception)"
-      assert completion.insert_text_format == :snippet
+      assert completion.insert_text_format == InsertTextFormat.snippet()
       assert apply_completion(completion) == "defexception [${1::message}]"
     end
 
@@ -421,7 +424,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.MacroTest do
 
       assert completion.detail
       assert completion.label == "defstruct (define a struct)"
-      assert completion.insert_text_format == :snippet
+      assert completion.insert_text_format == InsertTextFormat.snippet()
       assert apply_completion(completion) == "defstruct [${1:fields}]"
     end
 
@@ -433,7 +436,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.MacroTest do
 
       assert completion.detail
       assert completion.label == "alias (alias a module's name)"
-      assert completion.insert_text_format == :snippet
+      assert completion.insert_text_format == InsertTextFormat.snippet()
       assert apply_completion(completion) == "alias $0"
     end
 
@@ -444,7 +447,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.MacroTest do
                |> fetch_completion("use ")
 
       assert completion.label == "use (invoke another module's __using__ macro)"
-      assert completion.insert_text_format == :snippet
+      assert completion.insert_text_format == InsertTextFormat.snippet()
       assert apply_completion(completion) == "use $0"
     end
 
@@ -456,7 +459,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.MacroTest do
 
       assert completion.detail
       assert completion.label == "import (import a module's functions)"
-      assert completion.insert_text_format == :snippet
+      assert completion.insert_text_format == InsertTextFormat.snippet()
       assert apply_completion(completion) == "import $0"
     end
 
@@ -468,7 +471,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.MacroTest do
 
       assert completion.detail
       assert completion.label == "require (require a module's macros)"
-      assert completion.insert_text_format == :snippet
+      assert completion.insert_text_format == InsertTextFormat.snippet()
       assert apply_completion(completion) == "require $0"
     end
 
@@ -480,7 +483,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.MacroTest do
 
       assert completion.detail
       assert completion.label == "quote (quote block)"
-      assert completion.insert_text_format == :snippet
+      assert completion.insert_text_format == InsertTextFormat.snippet()
 
       assert apply_completion(completion) == """
              quote $1 do
@@ -497,7 +500,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.MacroTest do
 
       assert completion.detail
       assert completion.label == "receive (receive block)"
-      assert completion.insert_text_format == :snippet
+      assert completion.insert_text_format == InsertTextFormat.snippet()
 
       assert apply_completion(completion) == """
              receive do
@@ -514,7 +517,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.MacroTest do
 
       assert completion.detail
       assert completion.label == "try (try / catch / rescue block)"
-      assert completion.insert_text_format == :snippet
+      assert completion.insert_text_format == InsertTextFormat.snippet()
 
       assert apply_completion(completion) == """
              try do
@@ -531,7 +534,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.MacroTest do
 
       assert completion.detail
       assert completion.label == "with (with statement)"
-      assert completion.insert_text_format == :snippet
+      assert completion.insert_text_format == InsertTextFormat.snippet()
 
       assert apply_completion(completion) == """
              with ${1:pattern} <- ${2:expression} do
@@ -548,7 +551,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.MacroTest do
 
       assert completion.detail
       assert completion.label == "if (if statement)"
-      assert completion.insert_text_format == :snippet
+      assert completion.insert_text_format == InsertTextFormat.snippet()
 
       assert apply_completion(completion) == """
              if $1 do
@@ -565,7 +568,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.MacroTest do
 
       assert completion.detail
       assert completion.label == "unless (unless statement)"
-      assert completion.insert_text_format == :snippet
+      assert completion.insert_text_format == InsertTextFormat.snippet()
 
       assert apply_completion(completion) == """
              unless $1 do
@@ -582,7 +585,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.MacroTest do
 
       assert completion.detail
       assert completion.label == "case (case statement)"
-      assert completion.insert_text_format == :snippet
+      assert completion.insert_text_format == InsertTextFormat.snippet()
 
       assert apply_completion(completion) == """
              case $1 do
@@ -599,7 +602,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.MacroTest do
 
       assert completion.detail
       assert completion.label == "cond (cond statement)"
-      assert completion.insert_text_format == :snippet
+      assert completion.insert_text_format == InsertTextFormat.snippet()
 
       assert apply_completion(completion) == """
              cond do
@@ -617,7 +620,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.MacroTest do
 
       assert completion.detail
       assert completion.label == "for (comprehension)"
-      assert completion.insert_text_format == :snippet
+      assert completion.insert_text_format == InsertTextFormat.snippet()
 
       assert apply_completion(completion) == """
              for ${1:pattern} <- ${2:enumerable} do
@@ -648,7 +651,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.MacroTest do
 
       assert completion.detail
       assert completion.label == "__MODULE__"
-      assert completion.kind == :constant
+      assert completion.kind == CompletionItemKind.constant()
     end
 
     test "__DIR__ is suggested", %{project: project} do
@@ -659,7 +662,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.MacroTest do
 
       assert completion.detail
       assert completion.label == "__DIR__"
-      assert completion.kind == :constant
+      assert completion.kind == CompletionItemKind.constant()
     end
 
     test "__ENV__ is suggested", %{project: project} do
@@ -670,7 +673,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.MacroTest do
 
       assert completion.detail
       assert completion.label == "__ENV__"
-      assert completion.kind == :constant
+      assert completion.kind == CompletionItemKind.constant()
     end
 
     test "__CALLER__ is suggested", %{project: project} do
@@ -681,7 +684,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.MacroTest do
 
       assert completion.detail
       assert completion.label == "__CALLER__"
-      assert completion.kind == :constant
+      assert completion.kind == CompletionItemKind.constant()
     end
 
     test "__STACKTRACE__ is suggested", %{project: project} do
@@ -692,7 +695,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.MacroTest do
 
       assert completion.detail
       assert completion.label == "__STACKTRACE__"
-      assert completion.kind == :constant
+      assert completion.kind == CompletionItemKind.constant()
     end
 
     test "__aliases__ is hidden", %{project: project} do
@@ -746,10 +749,10 @@ defmodule Expert.CodeIntelligence.Completion.Translations.MacroTest do
       assert {:ok, completion} =
                project
                |> complete(source)
-               |> fetch_completion(kind: :function)
+               |> fetch_completion(kind: CompletionItemKind.function())
 
-      assert completion.kind == :function
-      assert completion.insert_text_format == :snippet
+      assert completion.kind == CompletionItemKind.function()
+      assert completion.insert_text_format == InsertTextFormat.snippet()
       assert completion.label == "macro_add(a, b)"
 
       assert apply_completion(completion) =~ "macro_add(${1:a}, ${2:b})"
@@ -765,10 +768,10 @@ defmodule Expert.CodeIntelligence.Completion.Translations.MacroTest do
       assert {:ok, completion} =
                project
                |> complete(source)
-               |> fetch_completion(kind: :function)
+               |> fetch_completion(kind: CompletionItemKind.function())
 
-      assert completion.kind == :function
-      assert completion.insert_text_format == :snippet
+      assert completion.kind == CompletionItemKind.function()
+      assert completion.insert_text_format == InsertTextFormat.snippet()
       assert completion.label == "macro_add(a, b)"
 
       assert apply_completion(completion) =~ "Project.Macros.macro_add(${1:a}, ${2:b})"
@@ -785,10 +788,10 @@ defmodule Expert.CodeIntelligence.Completion.Translations.MacroTest do
       assert {:ok, completion} =
                project
                |> complete(source)
-               |> fetch_completion(kind: :function)
+               |> fetch_completion(kind: CompletionItemKind.function())
 
-      assert completion.kind == :function
-      assert completion.insert_text_format == :snippet
+      assert completion.kind == CompletionItemKind.function()
+      assert completion.insert_text_format == InsertTextFormat.snippet()
       assert completion.label == "macro_add(a, b)"
 
       assert apply_completion(completion) =~ "Macros.macro_add(${1:a}, ${2:b})"
@@ -805,7 +808,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.MacroTest do
       assert {:ok, completion} =
                project
                |> complete(source)
-               |> fetch_completion(kind: :function)
+               |> fetch_completion(kind: CompletionItemKind.function())
 
       assert completion.label == "macro_1_without_parens arg"
       assert apply_completion(completion) =~ "macro_1_without_parens ${1:arg}"
@@ -822,7 +825,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.MacroTest do
       assert {:ok, completion} =
                project
                |> complete(source)
-               |> fetch_completion(kind: :function)
+               |> fetch_completion(kind: CompletionItemKind.function())
 
       assert completion.label == "macro_1_without_parens arg"
       assert apply_completion(completion) =~ "Project.Macros.macro_1_without_parens ${1:arg}"
@@ -838,7 +841,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.MacroTest do
       assert {:ok, completion} =
                project
                |> complete(source)
-               |> fetch_completion(kind: :function)
+               |> fetch_completion(kind: CompletionItemKind.function())
 
       assert completion.label == "macro_2_without_parens arg1, arg2, arg3, arg4"
 
@@ -906,7 +909,7 @@ defmodule Expert.CodeIntelligence.Completion.Translations.MacroTest do
                |> fetch_completion("describe ")
 
       assert describe.label == "describe \"message\""
-      assert describe.insert_text_format == :snippet
+      assert describe.insert_text_format == InsertTextFormat.snippet()
 
       assert apply_completion(describe) ==
                inside_exunit_context("describe \"${1:message}\" do\n  $0\nend")

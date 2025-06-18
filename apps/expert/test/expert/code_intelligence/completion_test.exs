@@ -1,8 +1,10 @@
 defmodule Expert.CodeIntelligence.CompletionTest do
   alias Engine.Completion.Candidate
   alias Expert.CodeIntelligence.Completion.SortScope
-  alias Expert.Protocol.Types.Completion
-  alias Expert.Protocol.Types.Completion.Item, as: CompletionItem
+  alias GenLSP.Enumerations.CompletionItemKind
+
+  alias GenLSP.Structures.CompletionItem
+  alias GenLSP.Structures.CompletionList
 
   use Expert.Test.Expert.CompletionCase
   use Patch
@@ -51,7 +53,7 @@ defmodule Expert.CodeIntelligence.CompletionTest do
       assert [_ | _] = completions = complete(project, "E|")
 
       for completion <- completions do
-        assert completion.kind == :module
+        assert completion.kind == CompletionItemKind.module()
       end
     end
 
@@ -62,7 +64,7 @@ defmodule Expert.CodeIntelligence.CompletionTest do
 
   describe "ignoring things" do
     test "returns an incomplete completion list when the context is empty", %{project: project} do
-      assert %Completion.List{is_incomplete: true, items: []} =
+      assert %CompletionList{is_incomplete: true, items: []} =
                complete(project, " ", as_list: false)
     end
 
@@ -98,7 +100,7 @@ defmodule Expert.CodeIntelligence.CompletionTest do
     test "only modules that are behaviuors are completed in an @impl", %{project: project} do
       assert [behaviour] = complete(project, "@impl U|")
       assert behaviour.label == "Unary"
-      assert behaviour.kind == :module
+      assert behaviour.kind == CompletionItemKind.module()
     end
   end
 
@@ -222,7 +224,8 @@ defmodule Expert.CodeIntelligence.CompletionTest do
       completions = complete(project, "alias Foo.")
 
       for completion <- complete(project, "alias Foo.") do
-        assert %_{kind: :module} = completion
+        module_kind = CompletionItemKind.module()
+        assert %_{kind: ^module_kind} = completion
       end
 
       assert {:ok, _} = fetch_completion(completions, label: "Foo-behaviour")

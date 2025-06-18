@@ -1,9 +1,10 @@
 defmodule Expert.Project.DiagnosticsTest do
-  alias Expert.Protocol.Notifications.PublishDiagnostics
   alias Expert.Test.DispatchFake
   alias Expert.Transport
   alias Forge.Document
   alias Forge.Plugin.V1.Diagnostic
+  alias GenLSP.Notifications.TextDocumentPublishDiagnostics
+  alias GenLSP.Structures.PublishDiagnosticsParams
 
   use ExUnit.Case
   use Patch
@@ -64,13 +65,17 @@ defmodule Expert.Project.DiagnosticsTest do
         file_diagnostics(diagnostics: [diagnostic(document.uri)], uri: document.uri)
 
       Engine.Api.broadcast(project, file_diagnostics_message)
-      assert_receive {:transport, %PublishDiagnostics{}}
+      assert_receive {:transport, %TextDocumentPublishDiagnostics{}}
 
       Document.Store.get_and_update(document.uri, &Document.mark_clean/1)
 
+      Engine.Api.broadcast(project, project_compile_requested())
       Engine.Api.broadcast(project, project_diagnostics(diagnostics: []))
 
-      assert_receive {:transport, %PublishDiagnostics{diagnostics: nil}}
+      assert_receive {:transport,
+                      %TextDocumentPublishDiagnostics{
+                        params: %PublishDiagnosticsParams{diagnostics: []}
+                      }}
     end
 
     test "it clears a file's diagnostics if it has been closed", %{
@@ -82,12 +87,17 @@ defmodule Expert.Project.DiagnosticsTest do
         file_diagnostics(diagnostics: [diagnostic(document.uri)], uri: document.uri)
 
       Engine.Api.broadcast(project, file_diagnostics_message)
-      assert_receive {:transport, %PublishDiagnostics{}}, 500
+      assert_receive {:transport, %TextDocumentPublishDiagnostics{}}, 500
 
       Document.Store.close(document.uri)
+
+      Engine.Api.broadcast(project, project_compile_requested())
       Engine.Api.broadcast(project, project_diagnostics(diagnostics: []))
 
-      assert_receive {:transport, %PublishDiagnostics{diagnostics: nil}}
+      assert_receive {:transport,
+                      %TextDocumentPublishDiagnostics{
+                        params: %PublishDiagnosticsParams{diagnostics: []}
+                      }}
     end
 
     test "it adds a diagnostic to the last line if they're out of bounds", %{project: project} do
@@ -102,7 +112,12 @@ defmodule Expert.Project.DiagnosticsTest do
       file_diagnostics_message = file_diagnostics(diagnostics: [diagnostic], uri: document.uri)
 
       Engine.Api.broadcast(project, file_diagnostics_message)
-      assert_receive {:transport, %PublishDiagnostics{lsp: %{diagnostics: [diagnostic]}}}, 500
+
+      assert_receive {:transport,
+                      %TextDocumentPublishDiagnostics{
+                        params: %PublishDiagnosticsParams{diagnostics: [diagnostic]}
+                      }},
+                     500
 
       assert %Diagnostic.Result{} = diagnostic
       assert diagnostic.position == {4, 1}
