@@ -69,11 +69,12 @@ defmodule Expert.Project.DiagnosticsTest do
 
       Document.Store.get_and_update(document.uri, &Document.mark_clean/1)
 
+      Engine.Api.broadcast(project, project_compile_requested())
       Engine.Api.broadcast(project, project_diagnostics(diagnostics: []))
 
       assert_receive {:transport,
                       %TextDocumentPublishDiagnostics{
-                        params: %PublishDiagnosticsParams{diagnostics: nil}
+                        params: %PublishDiagnosticsParams{diagnostics: []}
                       }}
     end
 
@@ -89,11 +90,13 @@ defmodule Expert.Project.DiagnosticsTest do
       assert_receive {:transport, %TextDocumentPublishDiagnostics{}}, 500
 
       Document.Store.close(document.uri)
+
+      Engine.Api.broadcast(project, project_compile_requested())
       Engine.Api.broadcast(project, project_diagnostics(diagnostics: []))
 
       assert_receive {:transport,
                       %TextDocumentPublishDiagnostics{
-                        params: %PublishDiagnosticsParams{diagnostics: nil}
+                        params: %PublishDiagnosticsParams{diagnostics: []}
                       }}
     end
 
