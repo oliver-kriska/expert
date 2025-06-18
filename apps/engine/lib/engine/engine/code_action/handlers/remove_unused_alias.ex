@@ -52,7 +52,14 @@ defmodule Engine.CodeAction.Handlers.RemoveUnusedAlias do
       case to_edit(document, range.start, diagnostic) do
         {:ok, module_name, edit} ->
           changes = Changes.new(document, [edit])
-          action = CodeAction.new(document.uri, "Remove alias #{module_name}", :source, changes)
+
+          action =
+            CodeAction.new(
+              document.uri,
+              "Remove alias #{module_name}",
+              Enumerations.CodeActionKind.source(),
+              changes
+            )
 
           [action | acc]
 

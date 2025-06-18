@@ -41,7 +41,14 @@ defmodule Engine.CodeAction.Handlers.ReplaceRemoteFunction do
       case apply_transform(doc, line_number, module, function, suggestion) do
         {:ok, edits} ->
           changes = Changes.new(doc, edits)
-          code_action = CodeAction.new(doc.uri, "Rename to #{suggestion}", :quick_fix, changes)
+
+          code_action =
+            CodeAction.new(
+              doc.uri,
+              "Rename to #{suggestion}",
+              CodeActionKind.quick_fix(),
+              changes
+            )
 
           [code_action | acc]
 

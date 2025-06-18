@@ -9,18 +9,9 @@ defmodule Engine.CodeAction do
 
   defstruct [:title, :kind, :changes, :uri]
 
-  @type code_action_kind ::
-          :empty
-          | :quick_fix
-          | :refactor
-          | :refactor_extract
-          | :refactor_inline
-          | :refactor_rewrite
-          | :source
-          | :source_organize_imports
-          | :source_fix_all
+  @type code_action_kind :: GenLSP.Enumerations.CodeActionKind.t()
 
-  @type trigger_kind :: :invoked | :automatic
+  @type trigger_kind :: GenLSP.Enumerations.CodeActionTriggerKind.t()
 
   @type t :: %__MODULE__{
           title: String.t(),

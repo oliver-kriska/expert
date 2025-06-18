@@ -75,9 +75,9 @@ defmodule Expert.Configuration do
     apply_config_change(config, default_config())
   end
 
-  @spec on_change(t, DidChangeConfiguration.t()) ::
+  @spec on_change(t, WorkspaceDidChangeConfiguration.t()) ::
           {:ok, t}
-          | {:ok, t, Requests.RegisterCapability.t()}
+          | {:ok, t, Requests.ClientRegisterCapability.t()}
   def on_change(%__MODULE__{} = old_config, :defaults) do
     apply_config_change(old_config, default_config())
   end

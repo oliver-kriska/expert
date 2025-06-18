@@ -35,6 +35,8 @@ defmodule Forge.MixProject do
       Mix.Credo.dependency(),
       Mix.Dialyzer.dependency(),
       {:gen_lsp, "~> 0.10"},
+      {:jason, "~> 1.4"},
+      {:schematic, "~> 0.2"},
       {:snowflake, "~> 1.0"},
       {:sourceror, "~> 1.9"},
       {:stream_data, "~> 1.1", only: [:test], runtime: false},

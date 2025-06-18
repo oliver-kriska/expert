@@ -27,6 +27,10 @@ defmodule Expert.Window do
     end
   end
 
+  # There is a warning introduced somehow in #19 but this file will get removed
+  # in #20 so we can ignore it for now.
+  @dialyzer {:nowarn_function, show: 2}
+
   @spec show(level(), message()) :: :ok
   def show(level, message) when level in @levels and is_binary(message) do
     show_message = show_message(level, message)

@@ -9,7 +9,7 @@ defmodule Expert.MixProject do
       elixir: "~> 1.15",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
-      dialyzer: Mix.Dialyzer.config(add_apps: [:jason, :proto]),
+      dialyzer: Mix.Dialyzer.config(add_apps: [:jason]),
       aliases: aliases(),
       elixirc_paths: elixirc_paths(Mix.env())
     ]
@@ -44,12 +44,14 @@ defmodule Expert.MixProject do
       Mix.Dialyzer.dependency(),
       {:elixir_sense,
        github: "elixir-lsp/elixir_sense", ref: "73ce7e0d239342fb9527d7ba567203e77dbb9b25"},
+      {:engine, path: "../engine", env: Mix.env()},
+      {:forge, path: "../forge", env: Mix.env()},
       {:gen_lsp, "~> 0.10"},
       {:jason, "~> 1.4"},
       {:logger_file_backend, "~> 0.0", only: [:dev, :prod]},
       {:patch, "~> 0.15", runtime: false, only: [:dev, :test]},
       {:path_glob, "~> 0.2"},
-      {:engine, path: "../engine", env: Mix.env()},
+      {:schematic, "~> 0.2"},
       {:sourceror, "~> 1.9"}
     ]
   end

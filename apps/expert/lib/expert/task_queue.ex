@@ -126,6 +126,8 @@ defmodule Expert.TaskQueue do
       Transport.write(%{id: id, error: error})
     end
 
+    @dialyzer {:nowarn_function, map_code: 1}
+
     defp map_code(:parse_error), do: ErrorCodes.parse_error()
     defp map_code(:invalid_request), do: ErrorCodes.invalid_request()
     defp map_code(:method_not_found), do: ErrorCodes.method_not_found()

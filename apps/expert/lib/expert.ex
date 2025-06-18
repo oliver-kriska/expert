@@ -25,14 +25,14 @@ defmodule Expert do
   @dialyzer {:nowarn_function, apply_to_state: 2}
 
   @spec server_request(
-          Requests.request(),
-          (Requests.request(), {:ok, any()} | {:error, term()} -> term())
+          term(),
+          (term(), {:ok, any()} | {:error, term()} -> term())
         ) :: :ok
   def server_request(request, on_response) when is_function(on_response, 2) do
     GenServer.call(__MODULE__, {:server_request, request, on_response})
   end
 
-  @spec server_request(Requests.request()) :: :ok
+  @spec server_request(term()) :: :ok
   def server_request(request) do
     server_request(request, fn _, _ -> :ok end)
   end

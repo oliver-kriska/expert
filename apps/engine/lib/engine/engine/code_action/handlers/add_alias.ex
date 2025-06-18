@@ -69,7 +69,7 @@ defmodule Engine.CodeAction.Handlers.AddAlias do
         CodeAction.new(
           analysis.document.uri,
           "alias #{Formats.module(potential_alias_module)}",
-          :quick_fix,
+          CodeActionKind.quick_fix(),
           changes
         )
     end

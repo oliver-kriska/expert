@@ -81,6 +81,10 @@ defmodule Expert.Transport.StdIO do
     dump_lsp(request)
   end
 
+  # Dialyzer complains about Schematic.dump not existing, but it does
+  # This will be removed by #20 anyways
+  @dialyzer {:nowarn_function, dump_lsp: 1}
+
   defp dump_lsp(%module{} = item) do
     with {:ok, item} <- Convert.to_lsp(item) do
       Schematic.dump(module.schematic(), item)
