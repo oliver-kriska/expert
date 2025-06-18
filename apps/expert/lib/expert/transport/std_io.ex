@@ -82,9 +82,8 @@ defmodule Expert.Transport.StdIO do
   end
 
   defp dump_lsp(%module{} = item) do
-    with {:ok, item} <- Convert.to_lsp(item),
-         {:ok, item} <- Schematic.dump(module.schematic(), item) do
-      {:ok, item}
+    with {:ok, item} <- Convert.to_lsp(item) do
+      Schematic.dump(module.schematic(), item)
     end
   end
 
