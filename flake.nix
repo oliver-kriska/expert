@@ -14,7 +14,7 @@
     inputs.flake-parts.lib.mkFlake {inherit inputs;} {
       flake = {
         lib = {
-          mkLexical = {erlang}: erlang.callPackage ./nix/lexical.nix {};
+          mkExpert = {erlang}: erlang.callPackage ./nix/expert.nix {};
         };
       };
 
@@ -26,7 +26,7 @@
         ...
       }: let
         erlang = pkgs.beam.packages.erlang;
-        lexical = self.lib.mkLexical {inherit erlang;};
+        expert = self.lib.mkExpert {inherit erlang;};
       in {
         formatter = pkgs.alejandra;
 
@@ -47,10 +47,10 @@
         };
 
         packages = {
-          inherit lexical;
-          default = lexical;
+          inherit expert;
+          default = expert;
 
-          __fodHashGen = lexical.mixFodDeps.overrideAttrs (final: curr: {
+          __fodHashGen = expert.mixFodDeps.overrideAttrs (final: curr: {
             outputHash = pkgs.lib.fakeSha256;
           });
         };

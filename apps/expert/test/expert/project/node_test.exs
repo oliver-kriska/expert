@@ -1,0 +1,56 @@
+defmodule Expert.Project.NodeTest do
+  import Engine.Test.Fixtures
+  import Engine.Api.Messages
+  alias Expert.Project.Node, as: ProjectNode
+
+  use ExUnit.Case
+  use Forge.Test.EventualAssertions
+
+  setup do
+    project = project()
+
+    {:ok, _} = start_supervised({DynamicSupervisor, Expert.Project.Supervisor.options()})
+    {:ok, _} = start_supervised({Expert.Project.Supervisor, project})
+
+    :ok = Engine.Api.register_listener(project, self(), [project_compiled()])
+
+    {:ok, project: project}
+  end
+
+  test "the project should be compiled when the node starts" do
+    assert_receive project_compiled(), 750
+  end
+
+  test "remote control is started when the node starts", %{project: project} do
+    apps = Engine.call(project, Application, :started_applications)
+    app_names = Enum.map(apps, &elem(&1, 0))
+    assert :engine in app_names
+  end
+
+  test "the node is restarted when it goes down", %{project: project} do
+    node_name = ProjectNode.node_name(project)
+    old_pid = node_pid(project)
+
+    :ok = Engine.stop(project)
+    assert_eventually Node.ping(node_name) == :pong, 1000
+
+    new_pid = node_pid(project)
+    assert is_pid(new_pid)
+    assert new_pid != old_pid
+  end
+
+  test "the node restarts when the supervisor pid is killed", %{project: project} do
+    node_name = ProjectNode.node_name(project)
+    supervisor_pid = Engine.call(project, Process, :whereis, [Engine.Supervisor])
+
+    assert is_pid(supervisor_pid)
+    Process.exit(supervisor_pid, :kill)
+    assert_eventually Node.ping(node_name) == :pong, 750
+  end
+
+  defp node_pid(project) do
+    project
+    |> Engine.ProjectNode.name()
+    |> Process.whereis()
+  end
+end

@@ -38,7 +38,7 @@ defmodule Mix.Tasks.Lsp.DataModel.Type do
         "null" -> quote(do: nil)
         "DocumentUri" -> quote(do: String.t())
         "decimal" -> quote(do: float())
-        "URI" -> quote(do: Lexical.uri())
+        "URI" -> quote(do: Expert.uri())
       end
     end
 

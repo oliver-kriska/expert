@@ -22,10 +22,10 @@ erl_crash.dump
 # Temporary files, for example, from tests.
 /tmp/
 
-lexical.log
+expert.log
 
-lexical_debug
+expert_debug
 
 priv/plts
 
-apps/common/src/future_elixir_parser.erl
+apps/forge/src/future_elixir_parser.erl

@@ -1,0 +1,57 @@
+defmodule Expert.MixProject do
+  use Mix.Project
+  Code.require_file("../../mix_includes.exs")
+
+  def project do
+    [
+      app: :expert,
+      version: "0.7.2",
+      elixir: "~> 1.15",
+      start_permanent: Mix.env() == :prod,
+      deps: deps(),
+      dialyzer: Mix.Dialyzer.config(add_apps: [:jason, :proto]),
+      aliases: aliases(),
+      elixirc_paths: elixirc_paths(Mix.env())
+    ]
+  end
+
+  def application do
+    [
+      extra_applications: [:logger, :runtime_tools, :kernel, :erts],
+      mod: {Expert.Application, []}
+    ]
+  end
+
+  def aliases do
+    [
+      compile: "compile --docs --debug-info",
+      docs: "docs --html",
+      test: "test --no-start"
+    ]
+  end
+
+  defp elixirc_paths(:test) do
+    ["lib", "test/support"]
+  end
+
+  defp elixirc_paths(_) do
+    ["lib"]
+  end
+
+  defp deps do
+    [
+      {:forge, path: "../forge", env: Mix.env()},
+      Mix.Credo.dependency(),
+      Mix.Dialyzer.dependency(),
+      {:elixir_sense,
+       github: "elixir-lsp/elixir_sense", ref: "73ce7e0d239342fb9527d7ba567203e77dbb9b25"},
+      {:jason, "~> 1.4"},
+      {:logger_file_backend, "~> 0.0", only: [:dev, :prod]},
+      {:patch, "~> 0.15", runtime: false, only: [:dev, :test]},
+      {:path_glob, "~> 0.2"},
+      {:protocol, path: "../protocol", env: Mix.env()},
+      {:engine, path: "../engine", env: Mix.env()},
+      {:sourceror, "~> 1.9"}
+    ]
+  end
+end

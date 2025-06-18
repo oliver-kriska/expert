@@ -1,4 +1,4 @@
-use Lexical.Server.IEx.Helpers
+use Expert.IEx.Helpers
 
 try do
   Mix.ensure_application!(:observer)

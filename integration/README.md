@@ -24,10 +24,10 @@ $ NO_BUILD=1 ./integration/test.sh
 
 ### Debugging
 
-Run the tests with `LX_DEBUG=1` to see the output from the underlying commands:
+Run the tests with `XP_DEBUG=1` to see the output from the underlying commands:
 
 ```sh
-$ LX_DEBUG=1 ./integration/test.sh
+$ XP_DEBUG=1 ./integration/test.sh
 ...
 test_find_asdf_directory...
 > No version manager detected

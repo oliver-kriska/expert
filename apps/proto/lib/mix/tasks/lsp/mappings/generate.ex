@@ -16,9 +16,9 @@ defmodule Mix.Tasks.Lsp.Mappings.Generate do
 
   ## Command line options
     * `--types-module` - Controls the module in which the generated structures are placed.
-      (defaults to `Lexical.Protocol.Types`)
+      (defaults to `Expert.Protocol.Types`)
     * `--proto-module` - Controls the module in which the generated structures are placed.
-      (defaults to `Lexical.Proto`)
+      (defaults to `Expert.Proto`)
     * `--only` - Only generate the LSP types in the comma separated list
     * `--roots` - A comma separated list of types to import. The types given will be interrogated
       and all their references will also be imported. This is useful when importing complex structures,

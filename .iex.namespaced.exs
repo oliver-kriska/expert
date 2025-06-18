@@ -1,2 +1,2 @@
-use LXical.Server.IEx.Helpers
-alias LXical, as: Lexical
+use XPExpert.Server.IEx.Helpers
+alias XPExpert, as: EXpert

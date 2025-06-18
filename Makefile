@@ -1,4 +1,4 @@
-poncho_dirs = common lexical_credo proto protocol remote_control server
+poncho_dirs = forge expert_credo proto protocol engine expert
 
 compile.all: compile.poncho
 

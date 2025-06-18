@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 set -eo pipefail
 
-docker build -t lx -f integration/Dockerfile .
+docker build -t xp -f integration/Dockerfile .

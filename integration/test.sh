@@ -15,14 +15,14 @@ if [ -z "$NO_BUILD" ]; then
     "$script_dir"/build.sh
 fi
 
-start_lexical() {
-    local command='LX_HALT_AFTER_BOOT=1 _build/dev/package/lexical/bin/start_lexical.sh; exit $?'
+start_expert() {
+    local command='XP_HALT_AFTER_BOOT=1 _build/dev/package/expert/bin/start_expert.sh; exit $?'
 
     if [[ $1 != "" ]]; then
         command="$1 && $command"
     fi
 
-    docker run -i lx bash -c "$command" 2>&1
+    docker run -i xp bash -c "$command" 2>&1
     return $?
 }
 
@@ -36,10 +36,10 @@ run_test() {
     log "$test... "
 
     local output
-    output=$(start_lexical "$setup")
+    output=$(start_expert "$setup")
     local exit_code=$?
 
-    if [[ -n $LX_DEBUG ]]; then
+    if [[ -n $XP_DEBUG ]]; then
         log_info "\n$(prefix_lines "> " "$output")"
     fi
 

@@ -1,4 +1,4 @@
-defmodule Lexical.Protocol.MixProject do
+defmodule Expert.Protocol.MixProject do
   use Mix.Project
   Code.require_file("../../mix_includes.exs")
 
@@ -29,7 +29,7 @@ defmodule Lexical.Protocol.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:common, path: "../common", env: Mix.env()},
+      {:forge, path: "../forge", env: Mix.env()},
       Mix.Credo.dependency(),
       Mix.Dialyzer.dependency(),
       {:jason, "~> 1.4", optional: true},

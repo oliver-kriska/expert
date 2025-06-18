@@ -17,8 +17,8 @@ defmodule Mix.Tasks.Lsp.Mappings do
     end
   end
 
-  @types_module Lexical.Protocol.Types
-  @proto_module Lexical.Proto
+  @types_module Expert.Protocol.Types
+  @proto_module Expert.Proto
 
   defstruct [:mappings, :imported_lsp_names, :types_module, :proto_module]
 
