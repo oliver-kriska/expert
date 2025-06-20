@@ -30,45 +30,16 @@ defmodule Expert.Configuration do
   @dialyzer {:nowarn_function, set_dialyzer_enabled: 2}
 
   @spec new(Forge.uri(), map(), String.t() | nil) :: t
-  def new(root_uri, %Structures.ClientCapabilities{} = client_capabilities, client_name) do
+  def new(_root_uri, %Structures.ClientCapabilities{} = client_capabilities, client_name) do
     support = Support.new(client_capabilities)
-    projects = find_projects(root_uri)
 
-    %__MODULE__{support: support, projects: projects, client_name: client_name}
+    %__MODULE__{support: support, projects: [], client_name: client_name}
     |> tap(&set/1)
   end
 
   @spec new(keyword()) :: t
   def new(attrs \\ []) do
     struct!(__MODULE__, [support: Support.new()] ++ attrs)
-  end
-
-  defp find_projects(root_uri) do
-    root_path = Forge.Document.Path.from_uri(root_uri)
-    root_mix_exs = Path.join(root_path, "mix.exs")
-
-    projects =
-      if File.exists?(root_mix_exs) do
-        [Project.new(root_uri)]
-      else
-        find_multiroot_projects(root_path)
-      end
-
-    if projects == [], do: [Project.new(root_uri)], else: projects
-  end
-
-  defp find_multiroot_projects(root_path) do
-    mix_exs_blob = Path.join([root_path, "**", "mix.exs"])
-
-    for mix_exs_path <- Path.wildcard(mix_exs_blob),
-        "deps" not in Path.split(mix_exs_path) do
-      project_uri =
-        mix_exs_path
-        |> Path.dirname()
-        |> Forge.Document.Path.to_uri()
-
-      Project.new(project_uri)
-    end
   end
 
   defp set(%__MODULE__{} = config) do
@@ -167,5 +138,19 @@ defmodule Expert.Configuration do
 
   defp maybe_add_watched_extensions(%__MODULE__{} = old_config, _) do
     {:ok, old_config}
+  end
+
+  @spec add_project(t, Project.t()) :: t
+  def add_project(%__MODULE__{} = config, %Project{} = project) do
+    if Enum.any?(config.projects, &(&1.root_uri == project.root_uri)) do
+      config
+    else
+      projects = [project | config.projects]
+      new_config = %__MODULE__{config | projects: projects}
+
+      set(new_config)
+
+      new_config
+    end
   end
 end

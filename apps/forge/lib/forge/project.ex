@@ -341,4 +341,37 @@ defmodule Forge.Project do
       Forge.Path.parent_path?(document.path, root_path(project))
     end)
   end
+
+  def find_project(path) do
+    project_root = find_parent_root_dir(path)
+
+    if is_nil(project_root) do
+      nil
+    else
+      new(project_root)
+    end
+  end
+
+  defp find_parent_root_dir(path) do
+    path = Forge.Document.Path.from_uri(path)
+    path = path |> Path.expand() |> Path.dirname()
+
+    segments = Path.split(path)
+
+    traverse_path(segments)
+  end
+
+  defp traverse_path([]), do: nil
+
+  defp traverse_path(segments) do
+    path = Path.join(segments)
+    mix_exs_path = Path.join(path, "mix.exs")
+
+    if File.exists?(mix_exs_path) do
+      Document.Path.to_uri(path)
+    else
+      {_, rest} = List.pop_at(segments, -1)
+      traverse_path(rest)
+    end
+  end
 end

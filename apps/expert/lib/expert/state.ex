@@ -66,17 +66,27 @@ defmodule Expert.State do
 
     Transport.write(registrations())
 
-    for project <- config.projects do
-      Logger.info("Starting project at uri #{project.root_uri}")
-      result = Expert.Project.Supervisor.start(project)
-      Logger.info("result: #{inspect(result)}")
-    end
-
     {:ok, new_state}
   end
 
   def initialize(%__MODULE__{initialized?: true}, %Requests.Initialize{}) do
     {:error, :already_initialized}
+  end
+
+  defp maybe_start_project(project, config) do
+    already_started? =
+      Enum.any?(config.projects, fn p ->
+        p.root_uri == project.root_uri
+      end)
+
+    if already_started? do
+      :ok
+    else
+      Logger.info("Starting project at uri #{project.root_uri}")
+      result = Expert.Project.Supervisor.start(project)
+      Logger.info("result: #{inspect(result)}")
+      :ok
+    end
   end
 
   def in_flight?(%__MODULE__{} = state, request_id) do
@@ -179,6 +189,18 @@ defmodule Expert.State do
       version: version,
       language_id: language_id
     } = did_open.params.text_document
+
+    project = Project.find_project(uri)
+    config = state.configuration
+
+    state =
+      if not is_nil(project) do
+        maybe_start_project(project, config)
+        config = Configuration.add_project(config, project)
+        %__MODULE__{state | configuration: config}
+      else
+        state
+      end
 
     case Document.Store.open(uri, text, version, language_id) do
       :ok ->
