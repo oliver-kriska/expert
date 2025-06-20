@@ -3,6 +3,7 @@ defmodule Expert.Project.DiagnosticsTest do
   alias Forge.Document
   alias Forge.Plugin.V1.Diagnostic
   alias GenLSP.Notifications.TextDocumentPublishDiagnostics
+  alias GenLSP.Structures
   alias GenLSP.Structures.PublishDiagnosticsParams
 
   use ExUnit.Case
@@ -73,17 +74,16 @@ defmodule Expert.Project.DiagnosticsTest do
 
       Engine.Api.broadcast(project, file_diagnostics_message)
 
+      expected_severity = GenLSP.Enumerations.DiagnosticSeverity.error()
+
       assert_receive {:transport,
                       %TextDocumentPublishDiagnostics{
                         params: %PublishDiagnosticsParams{
                           diagnostics: [
-                            %Forge.Plugin.V1.Diagnostic.Result{
-                              details: nil,
+                            %Structures.Diagnostic{
                               message: "stuff broke",
-                              position: 1,
-                              severity: :error,
-                              source: nil,
-                              uri: "file:///" <> _
+                              severity: ^expected_severity,
+                              source: nil
                             }
                           ]
                         }
@@ -126,7 +126,7 @@ defmodule Expert.Project.DiagnosticsTest do
       document = open_file(project, "defmodule Dummy do\n  .\nend\n")
       # only 3 lines in the file, but elixir compiler gives us a line number of 4
       diagnostic =
-        diagnostic("lib/project.ex",
+        diagnostic(document.uri,
           position: {4, 1},
           message: "missing terminator: end (for \"do\" starting at line 1)"
         )
@@ -141,8 +141,12 @@ defmodule Expert.Project.DiagnosticsTest do
                       }},
                      500
 
-      assert %Diagnostic.Result{} = diagnostic
-      assert diagnostic.position == {4, 1}
+      assert %Structures.Diagnostic{} = diagnostic
+
+      assert diagnostic.range == %GenLSP.Structures.Range{
+               end: %Structures.Position{character: 0, line: 3},
+               start: %Structures.Position{character: 0, line: 3}
+             }
     end
   end
 end

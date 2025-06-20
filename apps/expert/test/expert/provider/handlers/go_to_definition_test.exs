@@ -63,7 +63,7 @@ defmodule Expert.Provider.Handlers.GoToDefinitionTest do
       uses_file_path = file_path(project, Path.join("lib", "uses.ex"))
       {:ok, request} = build_request(uses_file_path, 4, 17)
 
-      {:reply, %{result: %Location{} = location}} = handle(request, project)
+      {:ok, %Location{} = location} = handle(request, project)
       assert Location.uri(location) == referenced_uri
     end
 
@@ -71,7 +71,7 @@ defmodule Expert.Provider.Handlers.GoToDefinitionTest do
       uses_file_path = file_path(project, Path.join("lib", "uses.ex"))
       {:ok, request} = build_request(uses_file_path, 4, 4)
 
-      {:reply, %{result: %Location{} = location}} = handle(request, project)
+      {:ok, %Location{} = location} = handle(request, project)
       assert Location.uri(location) == referenced_uri
     end
 
@@ -79,14 +79,14 @@ defmodule Expert.Provider.Handlers.GoToDefinitionTest do
       uses_file_path = file_path(project, Path.join("lib", "uses.ex"))
       {:ok, request} = build_request(uses_file_path, 8, 7)
 
-      {:reply, %{result: nil}} = handle(request, project)
+      {:ok, nil} = handle(request, project)
     end
 
     test "does not find built-in modules", %{project: project} do
       uses_file_path = file_path(project, Path.join("lib", "uses.ex"))
       {:ok, request} = build_request(uses_file_path, 8, 4)
 
-      {:reply, %{result: nil}} = handle(request, project)
+      {:ok, nil} = handle(request, project)
     end
   end
 end
