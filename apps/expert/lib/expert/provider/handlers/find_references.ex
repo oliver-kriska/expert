@@ -3,6 +3,7 @@ defmodule Expert.Provider.Handlers.FindReferences do
   alias Expert.Configuration
   alias Forge.Ast
   alias Forge.Document
+  alias Forge.Project
   alias Forge.Protocol.Response
   alias GenLSP.Requests.TextDocumentReferences
   alias GenLSP.Structures
@@ -14,12 +15,13 @@ defmodule Expert.Provider.Handlers.FindReferences do
         %Configuration{} = config
       ) do
     document = Forge.Document.Container.context_document(params, nil)
+    project = Project.project_for_document(config.projects, document)
     include_declaration? = !!params.context.include_declaration
 
     locations =
       case Document.Store.fetch(document.uri, :analysis) do
         {:ok, _document, %Ast.Analysis{} = analysis} ->
-          Api.references(config.project, analysis, params.position, include_declaration?)
+          Api.references(project, analysis, params.position, include_declaration?)
 
         _ ->
           nil

@@ -127,8 +127,6 @@ defmodule Expert do
   def handle_message(%_{} = request, %State{} = state) do
     with {:ok, handler} <- fetch_handler(request),
          {:ok, request} <- Convert.to_native(request) do
-      # Logger.info("Handling request: #{inspect(request, pretty: true)}")
-
       TaskQueue.add(request.id, {handler, :handle, [request, state.configuration]})
     else
       {:error, {:unhandled, _}} ->

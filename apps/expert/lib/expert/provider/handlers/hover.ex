@@ -20,8 +20,7 @@ defmodule Expert.Provider.Handlers.Hover do
         %Configuration{} = config
       ) do
     document = Document.Container.context_document(params, nil)
-
-    project = Project.project_for_document(config.projects, request.document)
+    project = Project.project_for_document(config.projects, document)
 
     maybe_hover =
       with {:ok, _document, %Ast.Analysis{} = analysis} <-

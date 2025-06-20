@@ -44,7 +44,7 @@ defmodule Expert.Configuration do
   end
 
   defp find_projects(root_uri) do
-    root_path = Lexical.Document.Path.from_uri(root_uri)
+    root_path = Forge.Document.Path.from_uri(root_uri)
     root_mix_exs = Path.join(root_path, "mix.exs")
 
     projects =
@@ -65,7 +65,7 @@ defmodule Expert.Configuration do
       project_uri =
         mix_exs_path
         |> Path.dirname()
-        |> Lexical.Document.Path.to_uri()
+        |> Forge.Document.Path.to_uri()
 
       Project.new(project_uri)
     end

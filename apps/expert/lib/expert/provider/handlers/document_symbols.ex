@@ -3,6 +3,7 @@ defmodule Expert.Provider.Handlers.DocumentSymbols do
   alias Engine.CodeIntelligence.Symbols
   alias Expert.Configuration
   alias Forge.Document
+  alias Forge.Project
   alias Forge.Protocol.Response
   alias GenLSP.Enumerations.SymbolKind
   alias GenLSP.Requests
@@ -10,9 +11,10 @@ defmodule Expert.Provider.Handlers.DocumentSymbols do
 
   def handle(%Requests.TextDocumentDocumentSymbol{} = request, %Configuration{} = config) do
     document = Document.Container.context_document(request.params, nil)
+    project = Project.project_for_document(config.projects, document)
 
     symbols =
-      config.project
+      project
       |> Api.document_symbols(document)
       |> Enum.map(&to_response(&1, document))
 

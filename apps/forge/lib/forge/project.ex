@@ -329,7 +329,7 @@ defmodule Forge.Project do
     path = Document.Path.from_uri(uri)
 
     Enum.find(projects, fn project ->
-      Lexical.Path.parent_path?(path, root_path(project))
+      Forge.Path.parent_path?(path, root_path(project))
     end)
   end
 
@@ -338,7 +338,7 @@ defmodule Forge.Project do
   """
   def project_for_document(projects, %Document{} = document) do
     Enum.find(projects, fn project ->
-      Lexical.Path.parent_path?(document.path, root_path(project))
+      Forge.Path.parent_path?(document.path, root_path(project))
     end)
   end
 end

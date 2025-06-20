@@ -1,5 +1,6 @@
 defmodule Expert.Provider.Handlers.GoToDefinition do
   alias Expert.Configuration
+  alias Forge.Project
   alias Forge.Protocol.Response
   alias GenLSP.Requests
   alias GenLSP.Structures
@@ -13,8 +14,9 @@ defmodule Expert.Provider.Handlers.GoToDefinition do
         %Configuration{} = config
       ) do
     document = Forge.Document.Container.context_document(params, nil)
+    project = Project.project_for_document(config.projects, document)
 
-    case Engine.Api.definition(config.project, document, params.position) do
+    case Engine.Api.definition(project, document, params.position) do
       {:ok, native_location} ->
         {:reply, %Response{id: request.id, result: native_location}}
 

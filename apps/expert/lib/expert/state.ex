@@ -6,6 +6,7 @@ defmodule Expert.State do
   alias Expert.Provider.Handlers
   alias Expert.Transport
   alias Forge.Document
+  alias Forge.Project
   alias Forge.Protocol.Id
   alias Forge.Protocol.Response
   alias GenLSP.Enumerations
@@ -47,11 +48,11 @@ defmodule Expert.State do
         _ -> nil
       end
 
-    root_path = Lexical.Document.Path.from_uri(event.root_uri)
+    root_path = Forge.Document.Path.from_uri(event.root_uri)
 
     root_path
-    |> Lexical.Workspace.new()
-    |> Lexical.Workspace.set_workspace()
+    |> Forge.Workspace.new()
+    |> Forge.Workspace.set_workspace()
 
     config = Configuration.new(event.root_uri, event.capabilities, client_name)
     new_state = %__MODULE__{state | configuration: config, initialized?: true}
@@ -67,7 +68,7 @@ defmodule Expert.State do
 
     for project <- config.projects do
       Logger.info("Starting project at uri #{project.root_uri}")
-      result = Project.Supervisor.start(project)
+      result = Expert.Project.Supervisor.start(project)
       Logger.info("result: #{inspect(result)}")
     end
 
@@ -147,11 +148,11 @@ defmodule Expert.State do
   def apply(%__MODULE__{} = state, %Notifications.TextDocumentDidChange{params: event}) do
     uri = event.text_document.uri
     version = event.text_document.version
-    project = Forge.Project.project_for_uri(state.configuration.projects, uri)
+    project = Project.project_for_uri(state.configuration.projects, uri)
 
     case Document.Store.get_and_update(
            uri,
-           &Document.apply_content_changes(&1, version, event.lsp.content_changes)
+           &Document.apply_content_changes(&1, version, event.content_changes)
          ) do
       {:ok, updated_source} ->
         updated_message =
@@ -208,7 +209,7 @@ defmodule Expert.State do
 
   def apply(%__MODULE__{} = state, %Notifications.TextDocumentDidSave{params: event}) do
     uri = event.text_document.uri
-    project = Lexical.Project.project_for_uri(state.configuration.projects, uri)
+    project = Forge.Project.project_for_uri(state.configuration.projects, uri)
 
     case Document.Store.save(uri) do
       :ok ->
@@ -238,7 +239,7 @@ defmodule Expert.State do
         change <- event.changes do
       event = filesystem_event(project: Project, uri: change.uri, event_type: change.type)
       Engine.Api.broadcast(project, event)
-    end)
+    end
 
     {:ok, state}
   end

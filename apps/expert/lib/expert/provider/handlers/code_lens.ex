@@ -16,12 +16,13 @@ defmodule Expert.Provider.Handlers.CodeLens do
         %Requests.TextDocumentCodeLens{params: %Structures.CodeLensParams{} = params} = request,
         %Configuration{} = config
       ) do
-    project = Project.project_for_document(config.projects, request.document)
+    document = Document.Container.context_document(params, nil)
+    project = Project.project_for_document(config.projects, document)
 
     document = Document.Container.context_document(params, nil)
 
     lenses =
-      case reindex_lens(project, request.document) do
+      case reindex_lens(project, document) do
         nil -> []
         lens -> List.wrap(lens)
       end

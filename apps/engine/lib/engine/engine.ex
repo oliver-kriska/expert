@@ -119,12 +119,12 @@ defmodule Engine do
   end
 
   def manager_node_name(%Project{} = project) do
-    workspace = Lexical.Workspace.get_workspace()
+    workspace = Forge.Workspace.get_workspace()
 
     workspace_name =
       case workspace do
         nil -> Project.name(project)
-        _ -> Lexical.Workspace.name(workspace)
+        _ -> Forge.Workspace.name(workspace)
       end
 
     :"manager-#{workspace_name}-#{Project.entropy(project)}@127.0.0.1"

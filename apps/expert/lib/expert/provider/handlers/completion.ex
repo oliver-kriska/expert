@@ -4,6 +4,7 @@ defmodule Expert.Provider.Handlers.Completion do
   alias Forge.Ast
   alias Forge.Document
   alias Forge.Document.Position
+  alias Forge.Project
   alias Forge.Protocol.Response
   alias GenLSP.Enumerations.CompletionTriggerKind
   alias GenLSP.Requests
@@ -19,10 +20,11 @@ defmodule Expert.Provider.Handlers.Completion do
         %Configuration{} = config
       ) do
     document = Document.Container.context_document(params, nil)
+    project = Project.project_for_document(config.projects, document)
 
     completions =
       CodeIntelligence.Completion.complete(
-        config.project,
+        project,
         document_analysis(document, params.position),
         params.position,
         params.context || %CompletionContext{trigger_kind: CompletionTriggerKind.invoked()}
