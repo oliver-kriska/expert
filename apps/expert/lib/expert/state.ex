@@ -194,12 +194,12 @@ defmodule Expert.State do
     config = state.configuration
 
     state =
-      if not is_nil(project) do
+      if is_nil(project) do
+        state
+      else
         maybe_start_project(project, config)
         config = Configuration.add_project(config, project)
         %__MODULE__{state | configuration: config}
-      else
-        state
       end
 
     case Document.Store.open(uri, text, version, language_id) do
