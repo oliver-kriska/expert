@@ -46,7 +46,7 @@ defmodule Expert.Provider.Handlers.Commands do
         {:ok, "ok"}
 
       error ->
-        GenLSP.notify(project.lsp, %GenLSP.Notifications.WindowShowMessage{
+        GenLSP.notify(Expert.get_lsp(), %GenLSP.Notifications.WindowShowMessage{
           params: %GenLSP.Structures.ShowMessageParams{
             type: GenLSP.Enumerations.MessageType.error(),
             message: "Indexing #{Project.name(project)} failed"

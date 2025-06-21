@@ -77,7 +77,7 @@ defmodule Engine.Plugin.Runner.CoordinatorTest do
     end
 
     test "works with projects" do
-      project = Project.new(%GenLSP.LSP{mod: :foo}, "file://" <> __DIR__)
+      project = Project.new("file://" <> __DIR__)
 
       Runner.diagnose(project, notifier())
 

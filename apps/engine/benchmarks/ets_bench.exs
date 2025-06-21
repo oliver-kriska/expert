@@ -33,7 +33,7 @@ defmodule BenchHelper do
 end
 
 cwd = __DIR__
-project = Project.new(%GenLSP.LSP{mod: :foo}, "file://#{cwd}")
+project = Project.new("file://#{cwd}")
 
 Engine.set_project(project)
 Project.ensure_workspace(project)

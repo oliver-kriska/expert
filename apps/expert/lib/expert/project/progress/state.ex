@@ -19,8 +19,8 @@ defmodule Expert.Project.Progress.State do
     progress = Value.begin(label)
     progress_by_label = Map.put(state.progress_by_label, label, progress)
 
-    write_work_done(state.project.lsp, progress.token)
-    write(state.project.lsp, progress)
+    write_work_done(Expert.get_lsp(), progress.token)
+    write(Expert.get_lsp(), progress)
 
     %__MODULE__{state | progress_by_label: progress_by_label}
   end
@@ -28,8 +28,8 @@ defmodule Expert.Project.Progress.State do
   def begin(%__MODULE__{} = state, percent_progress(label: label, max: max)) do
     progress = Percentage.begin(label, max)
     progress_by_label = Map.put(state.progress_by_label, label, progress)
-    write_work_done(state.project.lsp, progress.token)
-    write(state.project.lsp, progress)
+    write_work_done(Expert.get_lsp(), progress.token)
+    write(Expert.get_lsp(), progress)
 
     %__MODULE__{state | progress_by_label: progress_by_label}
   end
@@ -41,7 +41,7 @@ defmodule Expert.Project.Progress.State do
         {new_value, new_value}
       end)
 
-    write(state.project.lsp, progress)
+    write(Expert.get_lsp(), progress)
     %__MODULE__{state | progress_by_label: progress_by_label}
   end
 
@@ -55,7 +55,7 @@ defmodule Expert.Project.Progress.State do
         {new_percentage, new_percentage}
       end)
 
-    write(state.project.lsp, progress)
+    write(Expert.get_lsp(), progress)
     %__MODULE__{state | progress_by_label: progress_by_label}
   end
 
@@ -65,7 +65,7 @@ defmodule Expert.Project.Progress.State do
 
     case progress do
       %Value{} = progress ->
-        write(state.project.lsp, Value.complete(progress, message))
+        write(Expert.get_lsp(), Value.complete(progress, message))
 
       _ ->
         :ok
@@ -80,7 +80,7 @@ defmodule Expert.Project.Progress.State do
 
     case progress do
       %Percentage{} = progress ->
-        write(state.project.lsp, Percentage.complete(progress, message))
+        write(Expert.get_lsp(), Percentage.complete(progress, message))
 
       nil ->
         :ok

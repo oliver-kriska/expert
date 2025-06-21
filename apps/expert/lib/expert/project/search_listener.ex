@@ -31,7 +31,7 @@ defmodule Expert.Project.SearchListener do
   @impl GenServer
   def handle_info(project_reindex_requested(), %Project{} = project) do
     Logger.info("project reindex requested")
-    GenLSP.request(project.lsp, %Requests.WorkspaceCodeLensRefresh{id: Id.next()})
+    GenLSP.request(Expert.get_lsp(), %Requests.WorkspaceCodeLensRefresh{id: Id.next()})
 
     {:noreply, project}
   end
@@ -39,9 +39,9 @@ defmodule Expert.Project.SearchListener do
   def handle_info(project_reindexed(elapsed_ms: elapsed), %Project{} = project) do
     message = "Reindexed #{Project.name(project)} in #{Formats.time(elapsed, unit: :millisecond)}"
     Logger.info(message)
-    GenLSP.request(project.lsp, %Requests.WorkspaceCodeLensRefresh{id: Id.next()})
+    GenLSP.request(Expert.get_lsp(), %Requests.WorkspaceCodeLensRefresh{id: Id.next()})
 
-    GenLSP.notify(project.lsp, %GenLSP.Notifications.WindowShowMessage{
+    GenLSP.notify(Expert.get_lsp(), %GenLSP.Notifications.WindowShowMessage{
       params: %GenLSP.Structures.ShowMessageParams{
         type: GenLSP.Enumerations.MessageType.info(),
         message: message

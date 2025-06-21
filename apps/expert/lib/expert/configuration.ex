@@ -30,9 +30,9 @@ defmodule Expert.Configuration do
   @dialyzer {:nowarn_function, set_dialyzer_enabled: 2}
 
   @spec new(Forge.uri(), map(), String.t() | nil, GenLSP.Lsp.t()) :: t
-  def new(root_uri, %Structures.ClientCapabilities{} = client_capabilities, client_name, lsp) do
+  def new(root_uri, %Structures.ClientCapabilities{} = client_capabilities, client_name, _lsp) do
     support = Support.new(client_capabilities)
-    project = Project.new(lsp, root_uri)
+    project = Project.new(root_uri)
 
     %__MODULE__{support: support, project: project, client_name: client_name}
     |> tap(&set/1)

@@ -15,7 +15,7 @@ defmodule Engine.Test.Fixtures do
     |> Path.join()
     |> Path.expand()
     |> Forge.Document.Path.to_uri()
-    |> then(&Project.new(%GenLSP.LSP{mod: :foo}, &1))
+    |> then(&Project.new(&1))
   end
 
   def project do

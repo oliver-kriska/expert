@@ -40,7 +40,7 @@ defmodule Engine.Build.StateTest do
 
     project_name = to_string(project_name)
     fixture_dir = Path.join(fixtures_path(), project_name)
-    project = Project.new(%GenLSP.LSP{mod: :foo}, "file://#{fixture_dir}")
+    project = Project.new("file://#{fixture_dir}")
     state = State.new(project)
 
     Engine.set_project(project)

@@ -14,8 +14,7 @@ defmodule Forge.Project do
             mix_target: nil,
             env_variables: %{},
             project_module: nil,
-            entropy: 1,
-            lsp: nil
+            entropy: 1
 
   @type message :: String.t()
   @type restart_notification :: {:restart, Logger.level(), String.t()}
@@ -23,20 +22,19 @@ defmodule Forge.Project do
           root_uri: Forge.uri() | nil,
           mix_exs_uri: Forge.uri() | nil,
           entropy: non_neg_integer(),
-          lsp: GenLSP.LSP.t()
-          # mix_env: atom(),
-          # mix_target: atom(),
-          # env_variables: %{String.t() => String.t()}
+          mix_env: atom(),
+          mix_target: atom(),
+          env_variables: %{String.t() => String.t()}
         }
   @type error_with_message :: {:error, message}
 
   @workspace_directory_name ".expert"
 
-  @spec new(GenLSP.LSP.t(), Forge.uri()) :: t
-  def new(lsp, root_uri) do
+  @spec new(Forge.uri()) :: t
+  def new(root_uri) do
     entropy = :rand.uniform(65_536)
 
-    %__MODULE__{entropy: entropy, lsp: lsp}
+    %__MODULE__{entropy: entropy}
     |> maybe_set_root_uri(root_uri)
     |> maybe_set_mix_exs_uri()
   end

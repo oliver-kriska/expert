@@ -95,7 +95,7 @@ defmodule Expert.Project.Diagnostics do
     Enum.each(state.entries_by_uri, fn {uri, %State.Entry{} = entry} ->
       with {:ok, diagnostics} <-
              entry |> State.Entry.diagnostics() |> Forge.Protocol.Convert.to_lsp() do
-        GenLSP.notify(state.project.lsp, %TextDocumentPublishDiagnostics{
+        GenLSP.notify(Expert.get_lsp(), %TextDocumentPublishDiagnostics{
           params: %Structures.PublishDiagnosticsParams{uri: uri, diagnostics: diagnostics}
         })
       end

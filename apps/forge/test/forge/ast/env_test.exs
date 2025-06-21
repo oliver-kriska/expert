@@ -9,7 +9,7 @@ defmodule Forge.Ast.EnvTest do
 
   def new_env(text, opts \\ []) do
     opts = Keyword.merge([as: :document], opts)
-    project = Project.new(%GenLSP.LSP{mod: :foo}, "file://#{File.cwd!()}")
+    project = Project.new("file://#{File.cwd!()}")
     {position, document} = pop_cursor(text, opts)
     analysis = Ast.analyze(document)
     {:ok, env} = new(project, analysis, position)

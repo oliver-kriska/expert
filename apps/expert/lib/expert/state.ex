@@ -89,7 +89,7 @@ defmodule Expert.State do
         {:ok, %__MODULE__{state | configuration: config}}
 
       {:ok, config, request} ->
-        GenLSP.request(state.configuration.project.lsp, request)
+        GenLSP.request(Expert.get_lsp(), request)
         {:ok, %__MODULE__{state | configuration: config}}
     end
 
