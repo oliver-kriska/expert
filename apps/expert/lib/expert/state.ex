@@ -40,8 +40,7 @@ defmodule Expert.State do
         %__MODULE__{initialized?: false} = state,
         %Requests.Initialize{
           params: %Structures.InitializeParams{} = event
-        },
-        lsp
+        }
       ) do
     client_name =
       case event.client_info do
@@ -49,7 +48,7 @@ defmodule Expert.State do
         _ -> nil
       end
 
-    config = Configuration.new(event.root_uri, event.capabilities, client_name, lsp)
+    config = Configuration.new(event.root_uri, event.capabilities, client_name)
     new_state = %__MODULE__{state | configuration: config, initialized?: true}
     Logger.info("Starting project at uri #{config.project.root_uri}")
 

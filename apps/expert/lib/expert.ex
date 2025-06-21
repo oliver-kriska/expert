@@ -45,7 +45,7 @@ defmodule Expert do
     state = assigns(lsp).state
     Process.send_after(self(), :default_config, :timer.seconds(5))
 
-    case State.initialize(state, request, lsp) do
+    case State.initialize(state, request) do
       {:ok, response, state} ->
         # TODO: this should be gated behind the dynamic registration in the initialization params
         registrations = registrations()
@@ -153,18 +153,20 @@ defmodule Expert do
     end
   end
 
-  def handle_info(:default_config, %State{configuration: nil} = state) do
-    Logger.warning(
-      "Did not receive workspace/didChangeConfiguration notification after 5 seconds. " <>
-        "Using default settings."
-    )
+  def handle_info(:default_config, lsp) do
+    state = assigns(lsp).state
 
-    {:ok, config} = State.default_configuration(state)
-    {:noreply, %State{state | configuration: config}}
-  end
+    if state.configuration == nil do
+      Logger.warning(
+        "Did not receive workspace/didChangeConfiguration notification after 5 seconds. " <>
+          "Using default settings."
+      )
 
-  def handle_info(:default_config, %State{} = state) do
-    {:noreply, state}
+      {:ok, config} = State.default_configuration(state)
+      {:noreply, assign(lsp, state: %State{state | configuration: config})}
+    else
+      {:noreply, lsp}
+    end
   end
 
   defp apply_to_state(%State{} = state, %{} = request_or_notification) do
