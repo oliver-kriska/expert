@@ -24,7 +24,7 @@ defmodule Expert do
 
   @dialyzer {:nowarn_function, apply_to_state: 2}
 
-  def get_lsp(), do: :persistent_term.get(:expert_lsp, nil)
+  def get_lsp, do: :persistent_term.get(:expert_lsp, nil)
 
   def start_link(args) do
     Logger.debug(inspect(args))
