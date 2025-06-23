@@ -28,7 +28,6 @@ defmodule Expert.Provider.Handlers.DocumentSymbols do
           nil
       end
 
-    # FIXME: the ranges need to be converted to lsp structures
     %Structures.DocumentSymbol{
       children: children,
       detail: root.detail,
