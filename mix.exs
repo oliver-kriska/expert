@@ -17,7 +17,7 @@ defmodule Expert.LanguageServer.MixProject do
   defp deps do
     [
       {:ex_doc, "~> 0.34", only: :dev, runtime: false},
-      {:credo, "~> 1.7", only: [:dev, :test]}
+      {:credo, github: "rrrene/credo", only: [:dev, :test]}
     ]
   end
 

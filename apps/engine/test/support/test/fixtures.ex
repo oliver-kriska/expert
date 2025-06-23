@@ -15,7 +15,7 @@ defmodule Engine.Test.Fixtures do
     |> Path.join()
     |> Path.expand()
     |> Forge.Document.Path.to_uri()
-    |> then(&Project.new(&1))
+    |> Project.new()
   end
 
   def project do
