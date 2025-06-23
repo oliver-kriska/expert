@@ -178,8 +178,7 @@ defmodule Expert.State do
   end
 
   def apply(%__MODULE__{} = state, %GenLSP.Requests.Shutdown{}) do
-    # TODO: why is this an error log?
-    Logger.error("Shutting down")
+    Logger.info("Shutting down")
 
     {:ok, nil, %__MODULE__{state | shutdown_received?: true}}
   end
