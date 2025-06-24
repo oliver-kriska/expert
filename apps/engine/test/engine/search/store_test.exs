@@ -1,7 +1,7 @@
 defmodule Engine.Search.StoreTest do
   alias Engine.Dispatch
   alias Engine.Search.Indexer
-  alias Engine.Search.Indexer.Entry
+  alias Forge.Search.Indexer.Entry
   alias Engine.Search.Store
   alias Engine.Search.Store.Backends.Ets
   alias Engine.Test.Entry

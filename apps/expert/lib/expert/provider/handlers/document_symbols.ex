@@ -1,6 +1,6 @@
 defmodule Expert.Provider.Handlers.DocumentSymbols do
-  alias Engine.Api
-  alias Engine.CodeIntelligence.Symbols
+  alias Expert.EngineApi
+  alias Forge.CodeIntelligence.Symbols
   alias Expert.Configuration
   alias Forge.Document
   alias GenLSP.Enumerations.SymbolKind
@@ -12,7 +12,7 @@ defmodule Expert.Provider.Handlers.DocumentSymbols do
 
     symbols =
       config.project
-      |> Api.document_symbols(document)
+      |> EngineApi.document_symbols(document)
       |> Enum.map(&to_response(&1, document))
 
     {:ok, symbols}

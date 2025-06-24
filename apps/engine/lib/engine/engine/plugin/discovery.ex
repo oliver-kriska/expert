@@ -12,7 +12,6 @@ defmodule Engine.Plugin.Discovery do
 
   alias Engine.Module.Loader
   alias Engine.Plugin.Runner
-  alias Mix.Tasks.Namespace
 
   require Logger
 

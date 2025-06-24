@@ -14,7 +14,7 @@ defmodule Engine.Api.ProxyTest do
   use ExUnit.Case
   use Patch
 
-  import Api.Messages
+  import EngineApi.Messages
   import Engine.Test.Fixtures
 
   setup do

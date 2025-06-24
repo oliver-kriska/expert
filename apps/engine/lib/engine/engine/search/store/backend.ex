@@ -2,7 +2,7 @@ defmodule Engine.Search.Store.Backend do
   @moduledoc """
   A behaviour for search store backends
   """
-  alias Engine.Search.Indexer.Entry
+  alias Forge.Search.Indexer.Entry
   alias Forge.Project
 
   @type version :: pos_integer()

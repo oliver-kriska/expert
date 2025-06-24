@@ -1,5 +1,5 @@
 defmodule Expert.CodeIntelligence.Completion.Translations.MapField do
-  alias Engine.Completion.Candidate
+  alias Forge.Completion.Candidate
   alias Expert.CodeIntelligence.Completion.Translatable
   alias Forge.Ast.Env
   alias GenLSP.Enumerations.CompletionItemKind

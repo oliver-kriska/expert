@@ -1,7 +1,7 @@
 defmodule Engine.Api.Proxy.BufferingStateStateTest do
   alias Forge.Document
 
-  alias Engine.Api.Messages
+  alias Forge.EngineApi.Messages
   alias Engine.Api.Proxy
   alias Engine.Api.Proxy.BufferingState
   alias Engine.Build

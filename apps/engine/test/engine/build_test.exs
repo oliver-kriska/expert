@@ -1,7 +1,7 @@
 defmodule Engine.BuildTest do
   alias Elixir.Features
 
-  alias Engine.Api.Messages
+  alias Forge.EngineApi.Messages
   alias Engine.Build
   alias Engine.ProjectNodeSupervisor
   alias Forge.Document

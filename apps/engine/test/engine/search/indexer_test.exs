@@ -1,7 +1,7 @@
 defmodule Engine.Search.IndexerTest do
   alias Engine.Dispatch
   alias Engine.Search.Indexer
-  alias Engine.Search.Indexer.Entry
+  alias Forge.Search.Indexer.Entry
   alias Forge.Project
 
   use ExUnit.Case

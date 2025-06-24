@@ -1,8 +1,8 @@
 defmodule Engine.CodeAction.Handlers.ReplaceRemoteFunction do
   alias Engine.CodeAction
-  alias Engine.CodeAction.Diagnostic
   alias Engine.Modules
   alias Forge.Ast
+  alias Forge.CodeAction.Diagnostic
   alias Forge.Document
   alias Forge.Document.Changes
   alias Forge.Document.Edit
@@ -43,7 +43,7 @@ defmodule Engine.CodeAction.Handlers.ReplaceRemoteFunction do
           changes = Changes.new(doc, edits)
 
           code_action =
-            CodeAction.new(
+            Forge.CodeAction.new(
               doc.uri,
               "Rename to #{suggestion}",
               CodeActionKind.quick_fix(),

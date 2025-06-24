@@ -3,7 +3,7 @@ defmodule Engine.CodeIntelligence.DefinitionTest do
   alias Engine.Search
   alias Forge.Document
 
-  import Engine.Api.Messages
+  import Forge.EngineApi.Messages
   import Forge.Test.CodeSigil
   import Forge.Test.CursorSupport
   import Engine.Test.Fixtures

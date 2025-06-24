@@ -52,7 +52,7 @@ defmodule Engine.MixProject do
       {:phoenix_live_view, "~> 1.0", only: [:test], optional: true, runtime: false},
       {:sourceror, "~> 1.9"},
       {:stream_data, "~> 1.1", only: [:test], runtime: false},
-      {:refactorex, "~> 0.1.51"}
+      {:refactorex, "~> 0.1.52"}
     ]
   end
 

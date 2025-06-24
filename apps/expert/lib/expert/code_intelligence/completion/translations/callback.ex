@@ -1,5 +1,5 @@
 defmodule Expert.CodeIntelligence.Completion.Translations.Callback do
-  alias Engine.Completion.Candidate.Callback
+  alias Forge.Completion.Candidate.Callback
   alias Expert.CodeIntelligence.Completion.Builder
   alias Expert.CodeIntelligence.Completion.SortScope
   alias Expert.CodeIntelligence.Completion.Translatable

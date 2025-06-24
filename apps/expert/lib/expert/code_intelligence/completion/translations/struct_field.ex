@@ -1,5 +1,5 @@
 defmodule Expert.CodeIntelligence.Completion.Translations.StructField do
-  alias Engine.Completion.Candidate
+  alias Forge.Completion.Candidate
   alias Expert.CodeIntelligence.Completion.SortScope
   alias Expert.CodeIntelligence.Completion.Translatable
   alias Expert.CodeIntelligence.Completion.Translations

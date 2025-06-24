@@ -1,6 +1,6 @@
 defmodule Expert.Project.NodeTest do
   import Engine.Test.Fixtures
-  import Engine.Api.Messages
+  import Forge.EngineApi.Messages
   alias Expert.Project.Node, as: ProjectNode
 
   use ExUnit.Case

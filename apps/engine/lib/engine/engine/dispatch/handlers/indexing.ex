@@ -1,5 +1,5 @@
 defmodule Engine.Dispatch.Handlers.Indexing do
-  alias Engine.Api.Messages
+  alias Forge.EngineApi.Messages
   alias Engine.Commands
   alias Engine.Dispatch
   alias Engine.Search

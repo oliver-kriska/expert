@@ -6,7 +6,7 @@ defmodule Engine.Dispatch.Handlers.IndexingTest do
   alias Engine.Dispatch.Handlers.Indexing
   alias Engine.Search
 
-  import Api.Messages
+  import EngineApi.Messages
   import Forge.Test.CodeSigil
   import Forge.Test.EventualAssertions
   import Engine.Test.Fixtures

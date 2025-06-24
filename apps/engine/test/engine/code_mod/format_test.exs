@@ -1,6 +1,6 @@
 # credo:disable-for-this-file Credo.Check.Readability.RedundantBlankLines
 defmodule Engine.CodeMod.FormatTest do
-  alias Engine.Api.Messages
+  alias Forge.EngineApi.Messages
   alias Engine.Build
   alias Engine.CodeMod.Format
   alias Forge.Document

@@ -1,5 +1,5 @@
 defmodule Engine.Dispatch.HandlerTest do
-  alias Engine.Api.Messages
+  alias Forge.EngineApi.Messages
   alias Engine.Dispatch
 
   import Messages

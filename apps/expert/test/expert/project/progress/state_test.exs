@@ -2,7 +2,7 @@ defmodule Expert.Project.Progress.StateTest do
   alias Expert.Project.Progress.State
   alias Expert.Project.Progress.Value
 
-  import Engine.Api.Messages
+  import Forge.EngineApi.Messages
   import Engine.Test.Fixtures
 
   use ExUnit.Case, async: true

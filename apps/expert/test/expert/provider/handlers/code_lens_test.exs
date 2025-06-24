@@ -7,7 +7,7 @@ defmodule Expert.Provider.Handlers.CodeLensTest do
   alias GenLSP.Requests.TextDocumentCodeLens
   alias GenLSP.Structures
 
-  import Engine.Api.Messages
+  import Forge.EngineApi.Messages
   import Engine.Test.Fixtures
   import Forge.Test.RangeSupport
 

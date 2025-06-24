@@ -1,5 +1,5 @@
 defmodule Engine.Search.Indexer.Extractors.FunctionReference do
-  alias Engine.Search.Indexer.Entry
+  alias Forge.Search.Indexer.Entry
   alias Engine.Search.Indexer.Extractors.FunctionDefinition
   alias Engine.Search.Indexer.Metadata
   alias Engine.Search.Indexer.Source.Reducer

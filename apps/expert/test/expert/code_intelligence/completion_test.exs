@@ -1,5 +1,5 @@
 defmodule Expert.CodeIntelligence.CompletionTest do
-  alias Engine.Completion.Candidate
+  alias Forge.Completion.Candidate
   alias Expert.CodeIntelligence.Completion.SortScope
   alias GenLSP.Enumerations.CompletionItemKind
 

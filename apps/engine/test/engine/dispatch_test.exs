@@ -1,5 +1,5 @@
 defmodule Engine.DispatchTest do
-  alias Engine.Api.Messages
+  alias Forge.EngineApi.Messages
   alias Engine.Dispatch
 
   import Messages

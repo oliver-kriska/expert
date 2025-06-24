@@ -6,7 +6,7 @@ defmodule Expert.Provider.Handlers.GoToDefinitionTest do
   alias GenLSP.Requests.TextDocumentDefinition
   alias GenLSP.Structures
 
-  import Engine.Api.Messages
+  import Forge.EngineApi.Messages
   import Engine.Test.Fixtures
 
   use ExUnit.Case, async: false

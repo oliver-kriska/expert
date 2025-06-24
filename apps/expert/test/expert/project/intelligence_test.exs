@@ -1,5 +1,5 @@
 defmodule Expert.Project.IntelligenceTest do
-  alias Engine.Api.Messages
+  alias Forge.EngineApi.Messages
   alias Engine.Test.Fixtures
   alias Expert.Project.Intelligence
   alias Expert.Test.DispatchFake

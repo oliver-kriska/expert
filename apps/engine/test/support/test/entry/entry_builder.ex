@@ -1,5 +1,5 @@
 defmodule Engine.Test.Entry.Builder do
-  alias Engine.Search.Indexer.Entry
+  alias Forge.Search.Indexer.Entry
   alias Forge.Document.Range
   alias Forge.Identifier
 

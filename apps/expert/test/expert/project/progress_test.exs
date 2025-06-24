@@ -7,7 +7,7 @@ defmodule Expert.Project.ProgressTest do
   alias GenLSP.Structures
 
   import Engine.Test.Fixtures
-  import Engine.Api.Messages
+  import Forge.EngineApi.Messages
 
   use ExUnit.Case
   use Patch

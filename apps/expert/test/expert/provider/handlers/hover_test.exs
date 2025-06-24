@@ -1,5 +1,5 @@
 defmodule Expert.Provider.Handlers.HoverTest do
-  alias Engine.Api.Messages
+  alias Forge.EngineApi.Messages
   alias Engine.Test.Fixtures
   alias Expert.Provider.Handlers
   alias Forge.Document

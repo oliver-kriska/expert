@@ -10,7 +10,7 @@ defmodule Expert.Project.DiagnosticsTest do
   use Patch
   use DispatchFake
 
-  import Engine.Api.Messages
+  import Forge.EngineApi.Messages
   import Engine.Test.Fixtures
 
   setup do

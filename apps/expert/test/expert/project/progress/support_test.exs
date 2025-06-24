@@ -1,7 +1,7 @@
 defmodule Expert.Project.Progress.SupportTest do
   alias Expert.Project.Progress
 
-  import Engine.Api.Messages
+  import Forge.EngineApi.Messages
   import Engine.Test.Fixtures
 
   use ExUnit.Case
