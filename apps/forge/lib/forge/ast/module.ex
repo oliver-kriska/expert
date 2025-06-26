@@ -76,6 +76,10 @@ defmodule Forge.Ast.Module do
   def safe_split(module, opts) when is_atom(module) do
     string_name = Atom.to_string(module)
 
+    do_safe_split(string_name, opts)
+  end
+
+  defp do_safe_split(string_name, opts \\ []) do
     {type, split_module} =
       case String.split(string_name, ".") do
         ["Elixir" | rest] ->
@@ -95,5 +99,21 @@ defmodule Forge.Ast.Module do
       end
 
     {type, split_module}
+  end
+
+  @spec to_atom(module() | String.t()) :: module()
+  def to_atom(module) when is_atom(module) do
+    module
+  end
+
+  def to_atom(":" <> module_string) do
+    String.to_existing_atom(module_string)
+  end
+
+  def to_atom(module_string) when is_binary(module_string) do
+    case do_safe_split("Elixir." <> module_string) do
+      {:erlang, [module]} -> String.to_existing_atom(module)
+      {:elixir, parts} -> Module.concat(parts)
+    end
   end
 end

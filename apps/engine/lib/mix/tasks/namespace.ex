@@ -15,6 +15,9 @@ defmodule Mix.Tasks.Namespace do
   use Mix.Task
 
   @dev_deps [:patch]
+  # Unless explicitly added, nimble_parsec won't show up as a loaded app
+  # and will therefore not be namespaced.
+  @no_app_deps [:nimble_parsec]
 
   # These app names and root modules are strings to avoid them being namespaced
   # by this task. Plugin discovery uses this task, which happens after
@@ -27,15 +30,13 @@ defmodule Mix.Tasks.Namespace do
     "forge" => "Forge"
   }
 
-  @deps_apps Engine.MixProject.project()
-             |> Keyword.get(:deps)
-             |> Enum.map(&elem(&1, 0))
-             |> then(fn dep_names -> dep_names -- @dev_deps end)
-             |> Enum.map(&to_string/1)
-
   require Logger
 
   def run([base_directory]) do
+    # Ensure we cache the loaded apps at the time of namespacing
+    # Otherwise only the @extra_apps will be cached
+    init()
+
     Transform.Apps.apply_to_all(base_directory)
     Transform.Beams.apply_to_all(base_directory)
     Transform.Scripts.apply_to_all(base_directory)
@@ -115,10 +116,31 @@ defmodule Mix.Tasks.Namespace do
   end
 
   defp init do
-    @deps_apps
-    |> Enum.map(&String.to_atom/1)
+    discover_deps_apps()
+    |> Enum.concat(@no_app_deps)
+    |> then(&(&1 -- @dev_deps))
     |> root_modules_for_apps()
     |> Map.merge(extra_apps())
     |> register_mappings()
+  end
+
+  defp discover_deps_apps do
+    cwd = File.cwd!()
+
+    :application.loaded_applications()
+    |> Enum.flat_map(fn {app_name, _description, _version} ->
+      try do
+        app_dir = Application.app_dir(app_name)
+
+        if String.starts_with?(app_dir, cwd) do
+          [app_name]
+        else
+          []
+        end
+      rescue
+        _ -> []
+      end
+    end)
+    |> Enum.sort()
   end
 end

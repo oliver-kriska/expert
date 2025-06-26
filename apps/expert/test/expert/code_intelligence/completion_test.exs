@@ -9,39 +9,60 @@ defmodule Expert.CodeIntelligence.CompletionTest do
   use Expert.Test.Expert.CompletionCase
   use Patch
 
+  setup %{project: project} do
+    project = %{project | project_module: Project}
+    {:ok, project: project}
+  end
+
   describe "excluding modules from expert dependencies" do
     test "expert modules are removed", %{project: project} do
+      patch(Engine.Api, :project_apps, [:project, :sourceror])
       assert [] = complete(project, "Expert.CodeIntelligence|")
     end
 
     test "Expert submodules are removed", %{project: project} do
+      patch(Engine.Api, :project_apps, [:project, :sourceror])
       assert [] = complete(project, "Engin|e")
       assert [] = complete(project, "Forg|e")
     end
 
     test "Expert functions are removed", %{project: project} do
+      patch(Engine.Api, :project_apps, [:project, :sourceror])
       assert [] = complete(project, "Engine.|")
     end
 
     test "Dependency modules are removed", %{project: project} do
+      patch(Engine.Api, :project_apps, [:project, :sourceror])
       assert [] = complete(project, "ElixirSense|")
     end
 
     test "Dependency functions are removed", %{project: project} do
+      patch(Engine.Api, :project_apps, [:project, :sourceror])
       assert [] = complete(project, "Jason.encod|")
     end
 
     test "Dependency protocols are removed", %{project: project} do
+      patch(Engine.Api, :project_apps, [:project, :sourceror])
       assert [] = complete(project, "Jason.Encode|")
     end
 
     test "Dependency structs are removed", %{project: project} do
+      patch(Engine.Api, :project_apps, [:project, :sourceror])
       assert [] = complete(project, "Jason.Fragment|")
     end
 
     test "Dependency exceptions are removed", %{project: project} do
+      patch(Engine.Api, :project_apps, [:project, :sourceror])
       assert [] = complete(project, "Jason.DecodeErro|")
     end
+  end
+
+  test "includes modules from dependencies shared by the project and Expert", %{project: project} do
+    patch(Engine.Api, :project_apps, [:project, :sourceror])
+    assert [sourceror_module] = complete(project, "Sourcer|")
+
+    assert sourceror_module.kind == CompletionItemKind.module()
+    assert sourceror_module.label == "Sourceror"
   end
 
   test "ensure completion works for project", %{project: project} do
@@ -169,7 +190,7 @@ defmodule Expert.CodeIntelligence.CompletionTest do
 
   def with_all_completion_candidates(_) do
     name = "Foo"
-    full_name = "A.B.Foo"
+    full_name = "Project"
 
     all_completions = [
       %Candidate.Behaviour{name: "#{name}-behaviour", full_name: full_name},
