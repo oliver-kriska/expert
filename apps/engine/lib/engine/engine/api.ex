@@ -1,12 +1,11 @@
 defmodule Engine.Api do
+  alias Engine.CodeIntelligence
   alias Forge.Ast.Analysis
   alias Forge.Ast.Env
   alias Forge.Document
   alias Forge.Document.Position
   alias Forge.Document.Range
   alias Forge.Project
-
-  alias Engine.CodeIntelligence
 
   require Logger
 
@@ -33,6 +32,10 @@ defmodule Engine.Api do
 
   def list_modules(%Project{} = project) do
     Engine.call(project, Engine, :list_modules)
+  end
+
+  def project_apps(%Project{} = project) do
+    Engine.call(project, Engine, :list_apps)
   end
 
   def format(%Project{} = project, %Document{} = document) do

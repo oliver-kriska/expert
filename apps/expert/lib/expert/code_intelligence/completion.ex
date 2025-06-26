@@ -17,9 +17,8 @@ defmodule Expert.CodeIntelligence.Completion do
 
   require Logger
 
+  @build_env Mix.env()
   @expert_deps Enum.map([:expert | Mix.Project.deps_apps()], &Atom.to_string/1)
-
-  @expert_dep_modules Enum.map(@expert_deps, &Macro.camelize/1)
 
   def trigger_characters do
     [".", "@", "&", "%", "^", ":", "!", "-", "~"]
@@ -166,9 +165,10 @@ defmodule Expert.CodeIntelligence.Completion do
          %CompletionContext{} = context
        ) do
     debug_local_completions(local_completions)
+    project_apps = Engine.Api.project_apps(project)
 
     for result <- local_completions,
-        displayable?(project, result),
+        displayable?(project, project_apps, result),
         applies_to_context?(project, result, context),
         applies_to_env?(env, result),
         %CompletionItem{} = item <- to_completion_item(result, env) do
@@ -206,7 +206,7 @@ defmodule Expert.CodeIntelligence.Completion do
     |> List.wrap()
   end
 
-  defp displayable?(%Project{} = project, result) do
+  defp displayable?(%Project{} = project, project_apps, result) do
     suggested_module =
       case result do
         %_{full_name: full_name} when is_binary(full_name) -> full_name
@@ -223,14 +223,63 @@ defmodule Expert.CodeIntelligence.Completion do
         true
 
       true ->
-        Enum.reduce_while(@expert_dep_modules, true, fn module, _ ->
-          if String.starts_with?(suggested_module, module) do
-            {:halt, false}
-          else
-            {:cont, true}
-          end
-        end)
+        project_module?(project, project_apps, suggested_module, result)
     end
+  end
+
+  defp project_module?(_, _, "", _), do: true
+
+  # credo:disable-for-next-line Credo.Check.Refactor.CyclomaticComplexity
+  defp project_module?(%Project{} = project, project_apps, suggested_module, result) do
+    module = module_string_to_atom(suggested_module)
+    module_app = Application.get_application(module)
+    project_app = Application.get_application(project.project_module)
+
+    metadata = Map.get(result, :metadata)
+
+    result_app = metadata[:app]
+
+    cond do
+      module_app in project_apps ->
+        true
+
+      # This is useful for some struct field completions, where
+      # a suggested module is not always part of the result struct,
+      # but the application is.
+      # If no application is set though, it's usually part of a result
+      # that is not part of any application yet.
+      result_app in project_apps or is_nil(metadata) ->
+        true
+
+      not is_nil(module_app) and module_app == project_app ->
+        true
+
+      is_nil(module_app) and not is_nil(project.project_module) and
+          module == project.project_module ->
+        true
+
+      true ->
+        # The following cases happen on test cases, due to the application
+        # controller not always recognizing project fixture modules as part
+        # of any application.
+        test_env?() and is_nil(module_app) and is_nil(project.project_module)
+    end
+  end
+
+  # Because the build env is fixed at compile time, dialyzer knows that
+  # in :dev and :prod environments, this function will always return false,
+  # so it produces a warning.
+  @dialyzer {:nowarn_function, test_env?: 0}
+  defp test_env?, do: @build_env == :test
+
+  defp module_string_to_atom(""), do: nil
+
+  defp module_string_to_atom(module_string) do
+    Forge.Ast.Module.to_atom(module_string)
+  rescue
+    _e in ArgumentError ->
+      # Return nil if we can't safely convert the module string to an atom
+      nil
   end
 
   defp applies_to_env?(%Env{} = env, %struct_module{} = result) do

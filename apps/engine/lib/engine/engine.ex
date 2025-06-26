@@ -5,12 +5,13 @@ defmodule Engine do
   context of the remote VM.
   """
 
-  alias Forge.Project
-
   alias Engine.Api.Proxy
   alias Engine.CodeAction
   alias Engine.CodeIntelligence
   alias Engine.ProjectNode
+  alias Forge.Project
+
+  alias Mix.Tasks.Namespace
 
   require Logger
 
@@ -63,6 +64,12 @@ defmodule Engine do
   defdelegate document_symbols(document), to: CodeIntelligence.Symbols, as: :for_document
 
   defdelegate workspace_symbols(query), to: CodeIntelligence.Symbols, as: :for_workspace
+
+  def list_apps do
+    for {app, _, _} <- :application.loaded_applications(),
+        not Namespace.Module.prefixed?(app),
+        do: app
+  end
 
   def start_link(%Project{} = project) do
     :ok = ensure_epmd_started()
