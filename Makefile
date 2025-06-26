@@ -39,4 +39,4 @@ dialyzer.poncho: compile.poncho compile.protocols.poncho
 	$(foreach dir, $(poncho_dirs), cd apps/$(dir) && mix dialyzer && cd ../..;)
 
 package:
-	cd apps/server && mix package
+	cd apps/expert && mix package
