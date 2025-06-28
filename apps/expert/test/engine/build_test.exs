@@ -1,15 +1,15 @@
 defmodule Engine.BuildTest do
   alias Elixir.Features
-
-  alias Forge.EngineApi.Messages
   alias Engine.Build
-  alias Engine.ProjectNodeSupervisor
+  alias Expert.EngineApi
+  alias Expert.ProjectNodeSupervisor
   alias Forge.Document
+  alias Forge.EngineApi.Messages
   alias Forge.Plugin.V1.Diagnostic
   alias Forge.Project
 
   import Messages
-  import Engine.Test.Fixtures
+  import Forge.Test.Fixtures
   import Forge.Test.DiagnosticSupport
   use ExUnit.Case
   use Patch
@@ -29,7 +29,7 @@ defmodule Engine.BuildTest do
       end
 
     source = Document.new(uri, source_code, 0)
-    Engine.call(project, Build, :force_compile_document, [source])
+    EngineApi.call(project, Build, :force_compile_document, [source])
   end
 
   def with_project(project_name) do
@@ -42,8 +42,8 @@ defmodule Engine.BuildTest do
     |> File.rm_rf()
 
     {:ok, _} = start_supervised({ProjectNodeSupervisor, project})
-    {:ok, _, _} = Engine.start_link(project)
-    Engine.Api.register_listener(project, self(), [:all])
+    {:ok, _, _} = EngineApi.start_link(project)
+    EngineApi.register_listener(project, self(), [:all])
 
     {:ok, project}
   end
@@ -72,7 +72,7 @@ defmodule Engine.BuildTest do
   describe "compiling a project" do
     test "sends a message when complete " do
       {:ok, project} = with_project(:project_metadata)
-      Engine.Api.schedule_compile(project, true)
+      EngineApi.schedule_compile(project, true)
 
       assert_receive project_compiled(status: :success)
       assert_receive project_progress(label: "Building " <> project_name)
@@ -82,7 +82,7 @@ defmodule Engine.BuildTest do
     test "receives metadata about the defined modules" do
       {:ok, project} = with_project(:project_metadata)
 
-      Engine.Api.schedule_compile(project, true)
+      EngineApi.schedule_compile(project, true)
       assert_receive module_updated(name: ProjectMetadata, functions: functions)
 
       assert {:zero_arity, 0} in functions
@@ -94,7 +94,7 @@ defmodule Engine.BuildTest do
   describe "compiling an umbrella project" do
     test "it sends a message when compilation is complete" do
       {:ok, project} = with_project(:umbrella)
-      Engine.Api.schedule_compile(project, true)
+      EngineApi.schedule_compile(project, true)
 
       assert_receive project_compiled(status: :success)
       assert_receive project_diagnostics(diagnostics: [])
@@ -119,7 +119,7 @@ defmodule Engine.BuildTest do
   describe "compiling a project that has errors" do
     test "it reports the errors" do
       {:ok, project} = with_project(:compilation_errors)
-      Engine.Api.schedule_compile(project, true)
+      EngineApi.schedule_compile(project, true)
 
       assert_receive project_compiled(status: :error)
       assert_receive project_diagnostics(diagnostics: [%Diagnostic.Result{}])
@@ -132,7 +132,7 @@ defmodule Engine.BuildTest do
     @feature_condition span_in_diagnostic?: false
     @tag execute_if(@feature_condition)
     test "stuff", %{project: project} do
-      Engine.Api.schedule_compile(project, true)
+      EngineApi.schedule_compile(project, true)
 
       assert_receive project_compiled(status: :error)
       assert_receive project_diagnostics(diagnostics: [%Diagnostic.Result{} = diagnostic])
@@ -144,7 +144,7 @@ defmodule Engine.BuildTest do
     @feature_condition span_in_diagnostic?: true
     @tag execute_if(@feature_condition)
     test "stuff when #{inspect(@feature_condition)}", %{project: project} do
-      Engine.Api.schedule_compile(project, true)
+      EngineApi.schedule_compile(project, true)
 
       assert_receive project_compiled(status: :error)
       assert_receive project_diagnostics(diagnostics: [%Diagnostic.Result{} = diagnostic])
@@ -160,7 +160,7 @@ defmodule Engine.BuildTest do
   describe "when compiling a project that has warnings" do
     test "it reports them" do
       {:ok, project} = with_project(:compilation_warnings)
-      Engine.Api.schedule_compile(project, true)
+      EngineApi.schedule_compile(project, true)
 
       assert_receive project_compiled(status: :success)
       assert_receive project_diagnostics(diagnostics: diagnostics)
@@ -565,7 +565,7 @@ defmodule Engine.BuildTest do
   end
 
   def loaded?(project, module) do
-    Engine.call(project, Code, :ensure_loaded?, [module])
+    EngineApi.call(project, Code, :ensure_loaded?, [module])
   end
 
   describe "module sanitization" do
@@ -675,7 +675,7 @@ defmodule Engine.BuildTest do
     describe "exceptions during compilation" do
       test "compiling a project with callback errors" do
         {:ok, project} = with_project(:compilation_callback_errors)
-        Engine.Api.schedule_compile(project, false)
+        EngineApi.schedule_compile(project, false)
         assert_receive project_compiled(status: :error)
         assert_receive project_diagnostics(diagnostics: [diagnostic])
 

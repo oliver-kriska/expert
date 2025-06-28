@@ -1,9 +1,10 @@
-defmodule Engine.ProjectNodeTest do
-  alias Engine.ProjectNode
-  alias Engine.ProjectNodeSupervisor
+defmodule Expert.ProjectNodeTest do
+  alias Expert.EngineApi
+  alias Expert.ProjectNode
+  alias Expert.ProjectNodeSupervisor
 
   import Forge.Test.EventualAssertions
-  import Engine.Test.Fixtures
+  import Forge.Test.Fixtures
 
   use ExUnit.Case, async: false
 
@@ -14,7 +15,7 @@ defmodule Engine.ProjectNodeTest do
   end
 
   test "it should be able to stop a project node and won't restart", %{project: project} do
-    {:ok, _node_name, _} = Engine.start_link(project)
+    {:ok, _node_name, _} = EngineApi.start_link(project)
 
     project_alive? = project |> ProjectNode.name() |> Process.whereis() |> Process.alive?()
 
@@ -28,7 +29,7 @@ defmodule Engine.ProjectNodeTest do
 
     linked_node_process =
       spawn(fn ->
-        {:ok, _node_name, _} = Engine.start_link(project)
+        {:ok, _node_name, _} = EngineApi.start_link(project)
         send(test_pid, :started)
       end)
 

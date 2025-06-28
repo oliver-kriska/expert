@@ -71,6 +71,10 @@ defmodule Expert.MixProject do
       {:burrito, "~> 1.3", only: [:dev, :prod]},
       Mix.Credo.dependency(),
       Mix.Dialyzer.dependency(),
+      # In practice Expert does not hardly depend on Engine, only on its compiled
+      # artifacts, but we need it as a test dependency to set up tests that
+      # assume a roundtrip to a project node is made.
+      {:engine, path: "../engine", env: Mix.env(), only: [:test]},
       {:forge, path: "../forge", env: Mix.env()},
       {:gen_lsp, github: "elixir-tools/gen_lsp", branch: "async"},
       {:jason, "~> 1.4"},

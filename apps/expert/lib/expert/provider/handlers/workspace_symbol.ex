@@ -1,7 +1,7 @@
 defmodule Expert.Provider.Handlers.WorkspaceSymbol do
+  alias Expert.Configuration
   alias Expert.EngineApi
   alias Forge.CodeIntelligence.Symbols
-  alias Expert.Configuration
   alias GenLSP.Enumerations.SymbolKind
   alias GenLSP.Requests
   alias GenLSP.Structures

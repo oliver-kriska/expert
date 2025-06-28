@@ -1,4 +1,4 @@
-defmodule Engine.Test.CodeMod.Case do
+defmodule Forge.Test.CodeMod.Case do
   alias Forge.Document
   alias Forge.Test.CodeSigil
 
@@ -8,7 +8,7 @@ defmodule Engine.Test.CodeMod.Case do
     convert_to_ast? = Keyword.get(opts, :enable_ast_conversion, true)
 
     quote do
-      import Engine.Test.Fixtures
+      import Forge.Test.Fixtures
       import unquote(CodeSigil), only: [sigil_q: 2]
 
       def apply_code_mod(_, _, _) do

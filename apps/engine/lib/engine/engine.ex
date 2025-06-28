@@ -68,7 +68,7 @@ defmodule Engine do
         do: app
   end
 
-  def ensure_apps_started() do
+  def ensure_apps_started do
     apps_to_start = [:elixir, :runtime_tools | @allowed_apps]
 
     Enum.reduce_while(apps_to_start, :ok, fn app_name, _ ->

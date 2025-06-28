@@ -1,5 +1,4 @@
 defmodule Expert.CodeIntelligence.Completion do
-  alias Forge.Completion.Candidate
   alias Expert.CodeIntelligence.Completion.Builder
   alias Expert.CodeIntelligence.Completion.Translatable
   alias Expert.Configuration
@@ -7,6 +6,7 @@ defmodule Expert.CodeIntelligence.Completion do
   alias Expert.Project.Intelligence
   alias Forge.Ast.Analysis
   alias Forge.Ast.Env
+  alias Forge.Completion.Candidate
   alias Forge.Document.Position
   alias Forge.Project
   alias Future.Code, as: Code

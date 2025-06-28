@@ -1,10 +1,10 @@
 defmodule Expert.Provider.Handlers.Hover do
-  alias Forge.CodeIntelligence.Docs
   alias Expert.Configuration
   alias Expert.EngineApi
   alias Expert.Provider.Markdown
   alias Forge.Ast
   alias Forge.Ast.Analysis
+  alias Forge.CodeIntelligence.Docs
   alias Forge.Document
   alias Forge.Document.Position
   alias Forge.Project

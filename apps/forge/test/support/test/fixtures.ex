@@ -1,4 +1,4 @@
-defmodule Engine.Test.Fixtures do
+defmodule Forge.Test.Fixtures do
   alias Forge.Document
   alias Forge.Project
 

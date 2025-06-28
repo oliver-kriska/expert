@@ -1,19 +1,20 @@
 defmodule EngineTest do
+  alias Expert.EngineApi
   alias Forge.Document
   alias Forge.Project
 
   use ExUnit.Case
   use Forge.Test.EventualAssertions
-  import Engine.Test.Fixtures
+  import Forge.Test.Fixtures
 
   def start_project(%Project{} = project) do
-    start_supervised!({Engine.ProjectNodeSupervisor, project})
-    assert {:ok, _, _} = Engine.start_link(project)
+    start_supervised!({Expert.ProjectNodeSupervisor, project})
+    assert {:ok, _, _} = EngineApi.start_link(project)
     :ok
   end
 
   def engine_cwd(project) do
-    Engine.call(project, File, :cwd!, [])
+    EngineApi.call(project, File, :cwd!, [])
   end
 
   describe "detecting an umbrella app" do

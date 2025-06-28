@@ -1,8 +1,8 @@
 defmodule Engine.CodeIntelligence.Symbols do
-  alias Forge.CodeIntelligence.Symbols
   alias Engine.Search
   alias Engine.Search.Indexer
   alias Engine.Search.Indexer.Extractors
+  alias Forge.CodeIntelligence.Symbols
   alias Forge.Document
   alias Forge.Document.Range
   alias Forge.Search.Indexer.Entry

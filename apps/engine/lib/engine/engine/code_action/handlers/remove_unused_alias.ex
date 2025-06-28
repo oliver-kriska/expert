@@ -23,9 +23,9 @@ defmodule Engine.CodeAction.Handlers.RemoveUnusedAlias do
 
   alias Engine.Analyzer
   alias Engine.CodeAction
-  alias Forge.CodeAction.Diagnostic
   alias Forge.Ast
   alias Forge.Ast.Analysis
+  alias Forge.CodeAction.Diagnostic
   alias Forge.Document
   alias Forge.Document.Changes
   alias Forge.Document.Edit

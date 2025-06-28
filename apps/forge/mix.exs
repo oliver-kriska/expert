@@ -17,7 +17,7 @@ defmodule Forge.MixProject do
 
   def application do
     [
-      extra_applications: [:logger, :sasl, :eex, :path_glob]
+      extra_applications: [:logger, :sasl, :eex]
     ]
   end
 

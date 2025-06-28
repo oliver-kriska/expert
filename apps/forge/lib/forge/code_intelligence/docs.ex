@@ -1,5 +1,5 @@
 defmodule Forge.CodeIntelligence.Docs do
-  alias Engine.CodeIntelligence.Docs.Entry
+  alias Forge.CodeIntelligence.Docs.Entry
 
   defstruct [:module, :doc, functions_and_macros: [], callbacks: [], types: []]
 

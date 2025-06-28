@@ -8,10 +8,10 @@ defmodule Engine.Search.Indexer.Source.Reducer do
 
   alias Engine.Search.Indexer.Extractors
   alias Engine.Search.Indexer.Metadata
-  alias Forge.Search.Indexer.Source.Block
   alias Forge.Ast.Analysis
   alias Forge.Document.Position
   alias Forge.Search.Indexer.Entry
+  alias Forge.Search.Indexer.Source.Block
 
   defstruct [:analysis, :entries, :position, :blocks, :block_hierarchy, extractors: []]
 

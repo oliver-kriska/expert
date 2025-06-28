@@ -1,7 +1,7 @@
 defmodule Expert.Project.Diagnostics do
-  alias Forge.EngineApi.Messages
   alias Expert.EngineApi
   alias Expert.Project.Diagnostics.State
+  alias Forge.EngineApi.Messages
   alias Forge.Formats
   alias Forge.Project
   alias GenLSP.Notifications.TextDocumentPublishDiagnostics

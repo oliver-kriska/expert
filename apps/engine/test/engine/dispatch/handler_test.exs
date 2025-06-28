@@ -1,6 +1,6 @@
 defmodule Engine.Dispatch.HandlerTest do
-  alias Forge.EngineApi.Messages
   alias Engine.Dispatch
+  alias Forge.EngineApi.Messages
 
   import Messages
   use ExUnit.Case

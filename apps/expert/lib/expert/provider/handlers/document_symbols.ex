@@ -1,7 +1,7 @@
 defmodule Expert.Provider.Handlers.DocumentSymbols do
+  alias Expert.Configuration
   alias Expert.EngineApi
   alias Forge.CodeIntelligence.Symbols
-  alias Expert.Configuration
   alias Forge.Document
   alias GenLSP.Enumerations.SymbolKind
   alias GenLSP.Requests

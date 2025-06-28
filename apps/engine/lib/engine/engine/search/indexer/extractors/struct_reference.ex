@@ -1,9 +1,9 @@
 defmodule Engine.Search.Indexer.Extractors.StructReference do
   alias Engine.Analyzer
-  alias Forge.Search.Indexer.Entry
   alias Engine.Search.Indexer.Source.Reducer
   alias Engine.Search.Subject
   alias Forge.Ast
+  alias Forge.Search.Indexer.Entry
 
   require Logger
 

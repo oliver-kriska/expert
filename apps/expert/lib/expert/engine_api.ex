@@ -67,10 +67,30 @@ defmodule Expert.EngineApi do
     end
   end
 
-  defp glob_paths do
-    :code.priv_dir(:expert)
-    |> Path.join("lib/**/ebin")
-    |> Path.wildcard()
+  if Mix.env() == :test do
+    @excluded_apps [:patch, :nimble_parsec]
+    @allowed_apps [:engine | Mix.Project.deps_apps()] -- @excluded_apps
+
+    defp app_globs do
+      app_globs = Enum.map(@allowed_apps, fn app_name -> "/**/#{app_name}*/ebin" end)
+      ["/**/priv" | app_globs]
+    end
+
+    def glob_paths do
+      for entry <- :code.get_path(),
+          entry_string = List.to_string(entry),
+          entry_string != ".",
+          Enum.any?(app_globs(), &PathGlob.match?(entry_string, &1, match_dot: true)) do
+        entry
+      end
+    end
+  else
+    defp glob_paths do
+      :expert
+      |> :code.priv_dir()
+      |> Path.join("lib/**/ebin")
+      |> Path.wildcard()
+    end
   end
 
   defp version_manager_path_and_env(manager, root_path) do

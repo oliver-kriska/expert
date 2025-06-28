@@ -12,7 +12,7 @@ defmodule Expert.Test.Expert.CompletionCase do
 
   use ExUnit.CaseTemplate
   import Forge.Test.CursorSupport
-  import Engine.Test.Fixtures
+  import Forge.Test.Fixtures
   import Forge.EngineApi.Messages
 
   setup_all do

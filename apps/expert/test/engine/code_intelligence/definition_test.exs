@@ -1,12 +1,13 @@
 defmodule Engine.CodeIntelligence.DefinitionTest do
-  alias Engine.ProjectNodeSupervisor
   alias Engine.Search
+  alias Expert.EngineApi
+  alias Expert.ProjectNodeSupervisor
   alias Forge.Document
 
   import Forge.EngineApi.Messages
   import Forge.Test.CodeSigil
   import Forge.Test.CursorSupport
-  import Engine.Test.Fixtures
+  import Forge.Test.Fixtures
   import Forge.Test.RangeSupport
 
   use ExUnit.Case, async: false
@@ -44,10 +45,10 @@ defmodule Engine.CodeIntelligence.DefinitionTest do
     project = project(:navigations)
     start_supervised!({Document.Store, derive: [analysis: &Forge.Ast.analyze/1]})
     {:ok, _} = start_supervised({ProjectNodeSupervisor, project})
-    {:ok, _, _} = Engine.start_link(project)
+    {:ok, _, _} = EngineApi.start_link(project)
 
-    Engine.Api.register_listener(project, self(), [:all])
-    Engine.Api.schedule_compile(project, true)
+    EngineApi.register_listener(project, self(), [:all])
+    EngineApi.schedule_compile(project, true)
 
     assert_receive project_compiled(), 5000
     assert_receive project_index_ready(), 5000
@@ -452,7 +453,7 @@ defmodule Engine.CodeIntelligence.DefinitionTest do
          {:ok, document} <- subject_module(project, code),
          :ok <- index(project, referenced_uri),
          {:ok, location} <-
-           Engine.Api.definition(project, document, position) do
+           EngineApi.definition(project, document, position) do
       if is_list(location) do
         {:ok, Enum.map(location, &{&1.document.uri, decorate(&1.document, &1.range)})}
       else
@@ -463,12 +464,12 @@ defmodule Engine.CodeIntelligence.DefinitionTest do
 
   defp index(project, referenced_uris) when is_list(referenced_uris) do
     entries = Enum.flat_map(referenced_uris, &do_index/1)
-    Engine.call(project, Search.Store, :replace, [entries])
+    EngineApi.call(project, Search.Store, :replace, [entries])
   end
 
   defp index(project, referenced_uri) do
     entries = do_index(referenced_uri)
-    Engine.call(project, Search.Store, :replace, [entries])
+    EngineApi.call(project, Search.Store, :replace, [entries])
   end
 
   defp do_index(referenced_uri) do
