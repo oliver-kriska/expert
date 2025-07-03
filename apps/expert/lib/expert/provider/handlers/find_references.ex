@@ -3,14 +3,13 @@ defmodule Expert.Provider.Handlers.FindReferences do
   alias Expert.Configuration
   alias Forge.Ast
   alias Forge.Document
-  alias Forge.Protocol.Response
   alias GenLSP.Requests.TextDocumentReferences
   alias GenLSP.Structures
 
   require Logger
 
   def handle(
-        %TextDocumentReferences{params: %Structures.ReferenceParams{} = params} = request,
+        %TextDocumentReferences{params: %Structures.ReferenceParams{} = params},
         %Configuration{} = config
       ) do
     document = Forge.Document.Container.context_document(params, nil)
@@ -25,7 +24,6 @@ defmodule Expert.Provider.Handlers.FindReferences do
           nil
       end
 
-    response = %Response{id: request.id, result: locations}
-    {:reply, response}
+    {:ok, locations}
   end
 end

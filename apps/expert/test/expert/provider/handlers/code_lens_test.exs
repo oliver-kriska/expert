@@ -68,7 +68,7 @@ defmodule Expert.Provider.Handlers.CodeLensTest do
       mix_exs = File.read!(mix_exs_path)
 
       {:ok, request} = build_request(mix_exs_path)
-      {:reply, %{result: lenses}} = handle(request, project)
+      {:ok, lenses} = handle(request, project)
 
       assert [%Structures.CodeLens{} = code_lens] = lenses
 
@@ -83,7 +83,7 @@ defmodule Expert.Provider.Handlers.CodeLensTest do
         |> Path.join("apps/first/lib/umbrella/first.ex")
         |> build_request()
 
-      assert {:reply, %{result: []}} = handle(request, project)
+      assert {:ok, []} = handle(request, project)
     end
 
     test "does not emite a code lens for an umbrella app's mix.exs", %{project: project} do
@@ -93,7 +93,7 @@ defmodule Expert.Provider.Handlers.CodeLensTest do
         |> Path.join("apps/first/mix.exs")
         |> build_request()
 
-      assert {:reply, %{result: []}} = handle(request, project)
+      assert {:ok, []} = handle(request, project)
     end
   end
 end

@@ -7,7 +7,6 @@
 
   outputs = {
     self,
-    nixpkgs,
     systems,
     ...
   } @ inputs:
@@ -20,12 +19,8 @@
 
       systems = import systems;
 
-      perSystem = {
-        self',
-        pkgs,
-        ...
-      }: let
-        erlang = pkgs.beam.packages.erlang;
+      perSystem = {pkgs, ...}: let
+        erlang = pkgs.beam.packages.erlang_25;
         expert = self.lib.mkExpert {inherit erlang;};
       in {
         formatter = pkgs.alejandra;
@@ -34,7 +29,7 @@
           script = pkgs.writeShellApplication {
             name = "update-hash";
 
-            runtimeInputs = [ pkgs.nixFlakes pkgs.gawk ];
+            runtimeInputs = [pkgs.nixFlakes pkgs.gawk];
 
             text = ''
               nix --extra-experimental-features 'nix-command flakes' \
@@ -56,9 +51,12 @@
         };
 
         devShells.default = pkgs.mkShell {
-          packages =
+          packages = let
+            beamPackages = pkgs.beam.packages;
+          in
             [
-              erlang.elixir
+              beamPackages.erlang_27.erlang
+              beamPackages.erlang_27.elixir_1_17
             ]
             ++ pkgs.lib.optionals pkgs.stdenv.isDarwin [
               pkgs.darwin.apple_sdk.frameworks.CoreFoundation

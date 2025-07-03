@@ -24,7 +24,7 @@ defmodule EngineTest do
         [fixtures_path(), "umbrella", "apps", "first"]
         |> Path.join()
         |> Document.Path.to_uri()
-        |> Project.new()
+        |> then(&Project.new(&1))
 
       start_project(subapp_project)
 

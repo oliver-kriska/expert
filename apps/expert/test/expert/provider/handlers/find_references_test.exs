@@ -4,7 +4,6 @@ defmodule Expert.Provider.Handlers.FindReferencesTest do
   alias Forge.Document
   alias Forge.Document.Location
   alias Forge.Protocol.Convert
-  alias Forge.Protocol.Response
   alias GenLSP.Requests.TextDocumentReferences
   alias GenLSP.Structures
 
@@ -67,8 +66,7 @@ defmodule Expert.Provider.Handlers.FindReferencesTest do
 
       {:ok, request} = build_request(uri, 5, 6)
 
-      assert {:reply, %Response{} = response} = handle(request, project)
-      assert [%Location{} = location] = response.result
+      assert {:ok, [%Location{} = location]} = handle(request, project)
       assert location.uri =~ "file.ex"
     end
 
@@ -77,8 +75,7 @@ defmodule Expert.Provider.Handlers.FindReferencesTest do
 
       {:ok, request} = build_request(uri, 1, 5)
 
-      assert {:reply, %Response{} = response} = handle(request, project)
-      assert response.result == nil
+      assert {:ok, nil} == handle(request, project)
     end
   end
 end

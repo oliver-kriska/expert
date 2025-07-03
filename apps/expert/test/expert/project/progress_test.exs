@@ -2,7 +2,6 @@ defmodule Expert.Project.ProgressTest do
   alias Expert.Configuration
   alias Expert.Project
   alias Expert.Test.DispatchFake
-  alias Expert.Transport
   alias GenLSP.Notifications
   alias GenLSP.Requests
   alias GenLSP.Structures
@@ -47,7 +46,11 @@ defmodule Expert.Project.ProgressTest do
   def with_patched_transport(_) do
     test = self()
 
-    patch(Transport, :write, fn message ->
+    patch(GenLSP, :notify, fn _, message ->
+      send(test, {:transport, message})
+    end)
+
+    patch(GenLSP, :request, fn _, message ->
       send(test, {:transport, message})
     end)
 

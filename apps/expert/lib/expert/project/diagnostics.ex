@@ -1,7 +1,6 @@
 defmodule Expert.Project.Diagnostics do
   alias Engine.Api.Messages
   alias Expert.Project.Diagnostics.State
-  alias Expert.Transport
   alias Forge.Formats
   alias Forge.Project
   alias GenLSP.Notifications.TextDocumentPublishDiagnostics
@@ -94,13 +93,12 @@ defmodule Expert.Project.Diagnostics do
 
   defp publish_diagnostics(%State{} = state) do
     Enum.each(state.entries_by_uri, fn {uri, %State.Entry{} = entry} ->
-      diagnostics_list = State.Entry.diagnostics(entry)
-
-      notification = %TextDocumentPublishDiagnostics{
-        params: %Structures.PublishDiagnosticsParams{uri: uri, diagnostics: diagnostics_list}
-      }
-
-      Transport.write(notification)
+      with {:ok, diagnostics} <-
+             entry |> State.Entry.diagnostics() |> Forge.Protocol.Convert.to_lsp() do
+        GenLSP.notify(Expert.get_lsp(), %TextDocumentPublishDiagnostics{
+          params: %Structures.PublishDiagnosticsParams{uri: uri, diagnostics: diagnostics}
+        })
+      end
     end)
   end
 

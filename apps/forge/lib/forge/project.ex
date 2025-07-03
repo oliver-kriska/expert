@@ -21,16 +21,15 @@ defmodule Forge.Project do
   @type t :: %__MODULE__{
           root_uri: Forge.uri() | nil,
           mix_exs_uri: Forge.uri() | nil,
-          entropy: non_neg_integer()
-          # mix_env: atom(),
-          # mix_target: atom(),
-          # env_variables: %{String.t() => String.t()}
+          entropy: non_neg_integer(),
+          mix_env: atom(),
+          mix_target: atom(),
+          env_variables: %{String.t() => String.t()}
         }
   @type error_with_message :: {:error, message}
 
   @workspace_directory_name ".expert"
 
-  # Public
   @spec new(Forge.uri()) :: t
   def new(root_uri) do
     entropy = :rand.uniform(65_536)
