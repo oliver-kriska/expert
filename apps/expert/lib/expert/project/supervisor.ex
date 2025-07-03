@@ -1,5 +1,5 @@
 defmodule Expert.Project.Supervisor do
-  alias Engine.ProjectNodeSupervisor
+  alias Expert.EngineSupervisor
   alias Expert.Project.Diagnostics
   alias Expert.Project.Intelligence
   alias Expert.Project.Node
@@ -19,22 +19,14 @@ defmodule Expert.Project.Supervisor do
 
   use Supervisor
 
-  def dynamic_supervisor_name do
-    Expert.ProjectSupervisor
-  end
-
-  def options do
-    [name: dynamic_supervisor_name(), strategy: :one_for_one]
-  end
-
   def start_link(%Project{} = project) do
-    Supervisor.start_link(__MODULE__, project, name: supervisor_name(project))
+    Supervisor.start_link(__MODULE__, project, name: name(project))
   end
 
   def init(%Project{} = project) do
     children = [
       {Progress, project},
-      {ProjectNodeSupervisor, project},
+      {EngineSupervisor, project},
       {Node, project},
       {Diagnostics, project},
       {Intelligence, project},
@@ -45,19 +37,19 @@ defmodule Expert.Project.Supervisor do
   end
 
   def start(%Project{} = project) do
-    DynamicSupervisor.start_child(dynamic_supervisor_name(), {__MODULE__, project})
+    DynamicSupervisor.start_child(Expert.Project.DynamicSupervisor.name(), {__MODULE__, project})
   end
 
   def stop(%Project{} = project) do
     pid =
       project
-      |> supervisor_name()
+      |> name()
       |> Process.whereis()
 
-    DynamicSupervisor.terminate_child(dynamic_supervisor_name(), pid)
+    DynamicSupervisor.terminate_child(Expert.Project.DynamicSupervisor.name(), pid)
   end
 
-  defp supervisor_name(%Project{} = project) do
+  defp name(%Project{} = project) do
     :"#{Project.name(project)}::supervisor"
   end
 end
