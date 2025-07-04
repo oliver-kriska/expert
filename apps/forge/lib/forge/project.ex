@@ -21,16 +21,15 @@ defmodule Forge.Project do
   @type t :: %__MODULE__{
           root_uri: Forge.uri() | nil,
           mix_exs_uri: Forge.uri() | nil,
-          entropy: non_neg_integer()
-          # mix_env: atom(),
-          # mix_target: atom(),
-          # env_variables: %{String.t() => String.t()}
+          entropy: non_neg_integer(),
+          mix_env: atom(),
+          mix_target: atom(),
+          env_variables: %{String.t() => String.t()}
         }
   @type error_with_message :: {:error, message}
 
   @workspace_directory_name ".expert"
 
-  # Public
   @spec new(Forge.uri()) :: t
   def new(root_uri) do
     entropy = :rand.uniform(65_536)
@@ -164,6 +163,18 @@ defmodule Forge.Project do
     set_env_vars(project, environment_variables)
   end
 
+  def manager_node_name(%__MODULE__{} = project) do
+    workspace = Forge.Workspace.get_workspace()
+
+    workspace_name =
+      case workspace do
+        nil -> name(project)
+        _ -> Forge.Workspace.name(workspace)
+      end
+
+    :"manager-#{workspace_name}-#{entropy(project)}@127.0.0.1"
+  end
+
   @doc """
   Returns the full path to the project's expert workspace directory
 
@@ -196,6 +207,27 @@ defmodule Forge.Project do
     project
     |> workspace_path()
     |> Path.join("build")
+  end
+
+  @doc """
+  Returns the full path to the directory where expert puts versioned build artifacts
+  """
+  def versioned_build_path(%__MODULE__{} = project) do
+    %{elixir: elixir, erlang: erlang} = Forge.VM.Versions.current()
+    erlang_major = erlang |> String.split(".") |> List.first()
+    elixir_version = Version.parse!(elixir)
+    elixir_major = "#{elixir_version.major}.#{elixir_version.minor}"
+    build_root = build_path(project)
+    Path.join([build_root, "erl-#{erlang_major}", "elixir-#{elixir_major}"])
+  end
+
+  @doc """
+  Returns the full path to the directory where expert puts engine archives
+  """
+  def engine_path(%__MODULE__{} = project) do
+    project
+    |> workspace_path()
+    |> Path.join("engine")
   end
 
   @doc """

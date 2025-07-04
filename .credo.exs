@@ -18,6 +18,8 @@
         {Credo.Check.Readability.PreferImplicitTry, false},
         {Credo.Check.Refactor.CyclomaticComplexity, max_complexity: 10},
         {Credo.Check.Refactor.Nesting, max_nesting: 3},
+        {Credo.Check.Design.TagTODO, false},
+        {Credo.Check.Design.TagFIXME, false},
         {Credo.Check.Refactor.PipeChainStart, []}
       ]
     }

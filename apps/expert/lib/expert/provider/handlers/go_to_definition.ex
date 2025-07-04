@@ -1,7 +1,7 @@
 defmodule Expert.Provider.Handlers.GoToDefinition do
   alias Expert.Configuration
   alias Forge.Project
-  alias Forge.Protocol.Response
+  alias Expert.EngineApi
   alias GenLSP.Requests
   alias GenLSP.Structures
 
@@ -10,19 +10,19 @@ defmodule Expert.Provider.Handlers.GoToDefinition do
   def handle(
         %Requests.TextDocumentDefinition{
           params: %Structures.DefinitionParams{} = params
-        } = request,
+        },
         %Configuration{} = config
       ) do
     document = Forge.Document.Container.context_document(params, nil)
     project = Project.project_for_document(config.projects, document)
 
-    case Engine.Api.definition(project, document, params.position) do
+    case EngineApi.definition(project, document, params.position) do
       {:ok, native_location} ->
-        {:reply, %Response{id: request.id, result: native_location}}
+        {:ok, native_location}
 
       {:error, reason} ->
         Logger.error("GoToDefinition failed: #{inspect(reason)}")
-        {:reply, %Response{id: request.id, result: nil}}
+        {:ok, nil}
     end
   end
 end

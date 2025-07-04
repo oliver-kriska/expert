@@ -1,17 +1,18 @@
 defmodule Expert.Project.DiagnosticsTest do
+  alias Expert.EngineApi
   alias Expert.Test.DispatchFake
-  alias Expert.Transport
   alias Forge.Document
   alias Forge.Plugin.V1.Diagnostic
   alias GenLSP.Notifications.TextDocumentPublishDiagnostics
+  alias GenLSP.Structures
   alias GenLSP.Structures.PublishDiagnosticsParams
 
   use ExUnit.Case
   use Patch
   use DispatchFake
 
-  import Engine.Api.Messages
-  import Engine.Test.Fixtures
+  import Forge.EngineApi.Messages
+  import Forge.Test.Fixtures
 
   setup do
     project = project()
@@ -39,7 +40,15 @@ defmodule Expert.Project.DiagnosticsTest do
   def with_patched_tranport(_) do
     test = self()
 
-    patch(Transport, :write, fn message ->
+    patch(GenLSP, :notify_server, fn _, message ->
+      send(test, {:transport, message})
+    end)
+
+    patch(GenLSP, :notify, fn _, message ->
+      send(test, {:transport, message})
+    end)
+
+    patch(GenLSP, :request, fn _, message ->
       send(test, {:transport, message})
     end)
 
@@ -64,13 +73,27 @@ defmodule Expert.Project.DiagnosticsTest do
       file_diagnostics_message =
         file_diagnostics(diagnostics: [diagnostic(document.uri)], uri: document.uri)
 
-      Engine.Api.broadcast(project, file_diagnostics_message)
-      assert_receive {:transport, %TextDocumentPublishDiagnostics{}}
+      EngineApi.broadcast(project, file_diagnostics_message)
 
-      Document.Store.get_and_update(document.uri, &Document.mark_clean/1)
+      expected_severity = GenLSP.Enumerations.DiagnosticSeverity.error()
 
-      Engine.Api.broadcast(project, project_compile_requested())
-      Engine.Api.broadcast(project, project_diagnostics(diagnostics: []))
+      assert_receive {:transport,
+                      %TextDocumentPublishDiagnostics{
+                        params: %PublishDiagnosticsParams{
+                          diagnostics: [
+                            %Structures.Diagnostic{
+                              message: "stuff broke",
+                              severity: ^expected_severity,
+                              source: nil
+                            }
+                          ]
+                        }
+                      }}
+
+      Document.Store.get_and_update(document.uri, &{:ok, Document.mark_clean(&1)})
+
+      EngineApi.broadcast(project, project_compile_requested())
+      EngineApi.broadcast(project, project_diagnostics(diagnostics: []))
 
       assert_receive {:transport,
                       %TextDocumentPublishDiagnostics{
@@ -86,13 +109,13 @@ defmodule Expert.Project.DiagnosticsTest do
       file_diagnostics_message =
         file_diagnostics(diagnostics: [diagnostic(document.uri)], uri: document.uri)
 
-      Engine.Api.broadcast(project, file_diagnostics_message)
+      EngineApi.broadcast(project, file_diagnostics_message)
       assert_receive {:transport, %TextDocumentPublishDiagnostics{}}, 500
 
       Document.Store.close(document.uri)
 
-      Engine.Api.broadcast(project, project_compile_requested())
-      Engine.Api.broadcast(project, project_diagnostics(diagnostics: []))
+      EngineApi.broadcast(project, project_compile_requested())
+      EngineApi.broadcast(project, project_diagnostics(diagnostics: []))
 
       assert_receive {:transport,
                       %TextDocumentPublishDiagnostics{
@@ -104,14 +127,14 @@ defmodule Expert.Project.DiagnosticsTest do
       document = open_file(project, "defmodule Dummy do\n  .\nend\n")
       # only 3 lines in the file, but elixir compiler gives us a line number of 4
       diagnostic =
-        diagnostic("lib/project.ex",
+        diagnostic(document.uri,
           position: {4, 1},
           message: "missing terminator: end (for \"do\" starting at line 1)"
         )
 
       file_diagnostics_message = file_diagnostics(diagnostics: [diagnostic], uri: document.uri)
 
-      Engine.Api.broadcast(project, file_diagnostics_message)
+      EngineApi.broadcast(project, file_diagnostics_message)
 
       assert_receive {:transport,
                       %TextDocumentPublishDiagnostics{
@@ -119,8 +142,12 @@ defmodule Expert.Project.DiagnosticsTest do
                       }},
                      500
 
-      assert %Diagnostic.Result{} = diagnostic
-      assert diagnostic.position == {4, 1}
+      assert %Structures.Diagnostic{} = diagnostic
+
+      assert diagnostic.range == %GenLSP.Structures.Range{
+               end: %Structures.Position{character: 0, line: 3},
+               start: %Structures.Position{character: 0, line: 3}
+             }
     end
   end
 end

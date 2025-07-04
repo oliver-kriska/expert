@@ -43,6 +43,7 @@ defmodule Expert.Configuration do
   end
 
   defp set(%__MODULE__{} = config) do
+    # FIXME(mhanberg): I don't think this will work once we have workspace support
     :persistent_term.put(__MODULE__, config)
   end
 
@@ -106,15 +107,17 @@ defmodule Expert.Configuration do
     %__MODULE__{old_config | dialyzer_enabled?: enabled?}
   end
 
-  defp maybe_add_watched_extensions(%__MODULE__{} = old_config, %{
-         "additionalWatchedExtensions" => []
-       }) do
+  defp maybe_add_watched_extensions(
+         %__MODULE__{} = old_config,
+         %{"additionalWatchedExtensions" => []}
+       ) do
     {:ok, old_config}
   end
 
-  defp maybe_add_watched_extensions(%__MODULE__{} = old_config, %{
-         "additionalWatchedExtensions" => extensions
-       })
+  defp maybe_add_watched_extensions(
+         %__MODULE__{} = old_config,
+         %{"additionalWatchedExtensions" => extensions}
+       )
        when is_list(extensions) do
     register_id = Id.next()
     request_id = Id.next()

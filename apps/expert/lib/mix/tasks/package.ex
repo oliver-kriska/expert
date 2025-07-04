@@ -66,8 +66,8 @@ defmodule Mix.Tasks.Package do
   to the code search path with the `-pa` argument.
   """
 
+  alias Forge.Namespace
   alias Forge.VM.Versions
-  alias Mix.Tasks.Namespace
 
   @options [
     strict: [
@@ -270,7 +270,7 @@ defmodule Mix.Tasks.Package do
     Namespace.Transform.Configs.apply_to_all(config_dest)
   end
 
-  @priv_apps [:engine]
+  @priv_apps [:expert]
 
   defp copy_priv_files(package_root) do
     priv_dest_dir = priv_path(package_root)

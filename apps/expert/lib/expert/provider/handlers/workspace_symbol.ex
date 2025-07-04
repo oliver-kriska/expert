@@ -1,9 +1,8 @@
 defmodule Expert.Provider.Handlers.WorkspaceSymbol do
-  alias Engine.Api
-  alias Engine.CodeIntelligence.Symbols
   alias Expert.Configuration
+  alias Expert.EngineApi
+  alias Forge.CodeIntelligence.Symbols
   alias Forge.Project
-  alias Forge.Protocol.Response
   alias GenLSP.Enumerations.SymbolKind
   alias GenLSP.Requests
   alias GenLSP.Structures
@@ -21,11 +20,9 @@ defmodule Expert.Provider.Handlers.WorkspaceSymbol do
         []
       end
 
-    response = %Response{id: request.id, result: symbols}
+    Logger.info("WorkspaceSymbol results: #{inspect(symbols, pretty: true)}")
 
-    Logger.info("WorkspaceSymbol results: #{inspect(response, pretty: true)}")
-
-    {:reply, response}
+    {:ok, symbols}
   end
 
   defp gather_symbols(
@@ -35,12 +32,12 @@ defmodule Expert.Provider.Handlers.WorkspaceSymbol do
          }
        ) do
     project
-    |> Api.workspace_symbols(params.query)
+    |> EngineApi.workspace_symbols(params.query)
     |> tap(fn symbols -> Logger.info("syms #{inspect(Enum.take(symbols, 5))}") end)
-    |> Enum.map(&to_response/1)
+    |> Enum.map(&to_lsp_symbol/1)
   end
 
-  def to_response(%Symbols.Workspace{} = root) do
+  def to_lsp_symbol(%Symbols.Workspace{} = root) do
     %Structures.WorkspaceSymbol{
       kind: to_kind(root.type),
       location: to_location(root.link),

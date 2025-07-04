@@ -1,14 +1,14 @@
 defmodule Expert.Project.ProgressTest do
   alias Expert.Configuration
+  alias Expert.EngineApi
   alias Expert.Project
   alias Expert.Test.DispatchFake
-  alias Expert.Transport
   alias GenLSP.Notifications
   alias GenLSP.Requests
   alias GenLSP.Structures
 
-  import Engine.Test.Fixtures
-  import Engine.Api.Messages
+  import Forge.Test.Fixtures
+  import Forge.EngineApi.Messages
 
   use ExUnit.Case
   use Patch
@@ -27,17 +27,17 @@ defmodule Expert.Project.ProgressTest do
 
   def percent_begin(project, label, max) do
     message = percent_progress(stage: :begin, label: label, max: max)
-    Engine.Api.broadcast(project, message)
+    EngineApi.broadcast(project, message)
   end
 
   defp percent_report(project, label, delta, message \\ nil) do
     message = percent_progress(stage: :report, label: label, message: message, delta: delta)
-    Engine.Api.broadcast(project, message)
+    EngineApi.broadcast(project, message)
   end
 
   defp percent_complete(project, label, message) do
     message = percent_progress(stage: :complete, label: label, message: message)
-    Engine.Api.broadcast(project, message)
+    EngineApi.broadcast(project, message)
   end
 
   def progress(stage, label, message \\ "") do
@@ -47,7 +47,11 @@ defmodule Expert.Project.ProgressTest do
   def with_patched_transport(_) do
     test = self()
 
-    patch(Transport, :write, fn message ->
+    patch(GenLSP, :notify, fn _, message ->
+      send(test, {:transport, message})
+    end)
+
+    patch(GenLSP, :request, fn _, message ->
       send(test, {:transport, message})
     end)
 
@@ -66,7 +70,7 @@ defmodule Expert.Project.ProgressTest do
       patch(Configuration, :client_supports?, fn :work_done_progress -> true end)
 
       begin_message = progress(:begin, "mix compile")
-      Engine.Api.broadcast(project, begin_message)
+      EngineApi.broadcast(project, begin_message)
 
       assert_receive {:transport,
                       %Requests.WindowWorkDoneProgressCreate{
@@ -76,7 +80,7 @@ defmodule Expert.Project.ProgressTest do
       assert_receive {:transport, %Notifications.DollarProgress{}}
 
       report_message = progress(:report, "mix compile", "lib/file.ex")
-      Engine.Api.broadcast(project, report_message)
+      EngineApi.broadcast(project, report_message)
 
       assert_receive {:transport,
                       %Notifications.DollarProgress{
@@ -93,7 +97,7 @@ defmodule Expert.Project.ProgressTest do
       patch(Configuration, :client_supports?, fn :work_done_progress -> false end)
 
       begin_message = progress(:begin, "mix compile")
-      Engine.Api.broadcast(project, begin_message)
+      EngineApi.broadcast(project, begin_message)
 
       refute_receive {:transport, %Requests.WindowWorkDoneProgressCreate{params: %{}}}
     end

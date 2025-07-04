@@ -1,11 +1,11 @@
 defmodule Expert.Provider.Handlers.CodeLens do
   alias Expert.Configuration
+  alias Expert.EngineApi
   alias Expert.Provider.Handlers
   alias Forge.Document
   alias Forge.Document.Position
   alias Forge.Document.Range
   alias Forge.Project
-  alias Forge.Protocol.Response
   alias GenLSP.Requests
   alias GenLSP.Structures
 
@@ -13,7 +13,7 @@ defmodule Expert.Provider.Handlers.CodeLens do
   require Logger
 
   def handle(
-        %Requests.TextDocumentCodeLens{params: %Structures.CodeLensParams{} = params} = request,
+        %Requests.TextDocumentCodeLens{params: %Structures.CodeLensParams{} = params},
         %Configuration{} = config
       ) do
     document = Document.Container.context_document(params, nil)
@@ -27,8 +27,7 @@ defmodule Expert.Provider.Handlers.CodeLens do
         lens -> List.wrap(lens)
       end
 
-    response = %Response{id: request.id, result: lenses}
-    {:reply, response}
+    {:ok, lenses}
   end
 
   defp reindex_lens(%Project{} = project, %Document{} = document) do
@@ -60,6 +59,6 @@ defmodule Expert.Provider.Handlers.CodeLens do
     document_path = Path.expand(document.path)
 
     document_path == Project.mix_exs_path(project) and
-      not Engine.Api.index_running?(project)
+      not EngineApi.index_running?(project)
   end
 end

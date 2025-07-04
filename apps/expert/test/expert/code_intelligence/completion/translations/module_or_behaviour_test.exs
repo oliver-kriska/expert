@@ -1,8 +1,10 @@
 defmodule Expert.CodeIntelligence.Completion.Translations.ModuleOrBehaviourTest do
+  alias Expert.EngineApi
   alias GenLSP.Enumerations.CompletionItemKind
   alias GenLSP.Enumerations.InsertTextFormat
 
   use Expert.Test.Expert.CompletionCase
+  use Patch
 
   describe "module completions" do
     test "modules should emit a completion for stdlib modules", %{project: project} do
@@ -262,6 +264,8 @@ defmodule Expert.CodeIntelligence.Completion.Translations.ModuleOrBehaviourTest 
          %{
            project: project
          } do
+      patch(EngineApi, :project_apps, [:project, :ex_unit, :stream_data])
+
       source = ~q[
         use En|
       ]

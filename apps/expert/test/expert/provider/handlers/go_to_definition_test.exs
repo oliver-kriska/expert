@@ -1,4 +1,5 @@
 defmodule Expert.Provider.Handlers.GoToDefinitionTest do
+  alias Expert.EngineApi
   alias Expert.Provider.Handlers
   alias Forge.Document
   alias Forge.Document.Location
@@ -6,8 +7,8 @@ defmodule Expert.Provider.Handlers.GoToDefinitionTest do
   alias GenLSP.Requests.TextDocumentDefinition
   alias GenLSP.Structures
 
-  import Engine.Api.Messages
-  import Engine.Test.Fixtures
+  import Forge.EngineApi.Messages
+  import Forge.Test.Fixtures
 
   use ExUnit.Case, async: false
 
@@ -15,15 +16,15 @@ defmodule Expert.Provider.Handlers.GoToDefinitionTest do
     project = project(:navigations)
 
     start_supervised!(Expert.Application.document_store_child_spec())
-    start_supervised!({DynamicSupervisor, Expert.Project.Supervisor.options()})
+    start_supervised!({DynamicSupervisor, Expert.Project.DynamicSupervisor.options()})
     start_supervised!({Expert.Project.Supervisor, project})
 
-    Engine.Api.register_listener(project, self(), [
+    EngineApi.register_listener(project, self(), [
       project_compiled(),
       project_index_ready()
     ])
 
-    Engine.Api.schedule_compile(project, true)
+    EngineApi.schedule_compile(project, true)
     assert_receive project_compiled(), 5000
     assert_receive project_index_ready(), 5000
 
@@ -63,7 +64,7 @@ defmodule Expert.Provider.Handlers.GoToDefinitionTest do
       uses_file_path = file_path(project, Path.join("lib", "uses.ex"))
       {:ok, request} = build_request(uses_file_path, 4, 17)
 
-      {:reply, %{result: %Location{} = location}} = handle(request, project)
+      {:ok, %Location{} = location} = handle(request, project)
       assert Location.uri(location) == referenced_uri
     end
 
@@ -71,7 +72,7 @@ defmodule Expert.Provider.Handlers.GoToDefinitionTest do
       uses_file_path = file_path(project, Path.join("lib", "uses.ex"))
       {:ok, request} = build_request(uses_file_path, 4, 4)
 
-      {:reply, %{result: %Location{} = location}} = handle(request, project)
+      {:ok, %Location{} = location} = handle(request, project)
       assert Location.uri(location) == referenced_uri
     end
 
@@ -79,14 +80,14 @@ defmodule Expert.Provider.Handlers.GoToDefinitionTest do
       uses_file_path = file_path(project, Path.join("lib", "uses.ex"))
       {:ok, request} = build_request(uses_file_path, 8, 7)
 
-      {:reply, %{result: nil}} = handle(request, project)
+      {:ok, nil} = handle(request, project)
     end
 
     test "does not find built-in modules", %{project: project} do
       uses_file_path = file_path(project, Path.join("lib", "uses.ex"))
       {:ok, request} = build_request(uses_file_path, 8, 4)
 
-      {:reply, %{result: nil}} = handle(request, project)
+      {:ok, nil} = handle(request, project)
     end
   end
 end

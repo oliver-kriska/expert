@@ -1,13 +1,13 @@
 defmodule Expert.Provider.Handlers.Hover do
-  alias Engine.CodeIntelligence.Docs
   alias Expert.Configuration
+  alias Expert.EngineApi
   alias Expert.Provider.Markdown
   alias Forge.Ast
   alias Forge.Ast.Analysis
+  alias Forge.CodeIntelligence.Docs
   alias Forge.Document
   alias Forge.Document.Position
   alias Forge.Project
-  alias Forge.Protocol.Response
   alias GenLSP.Requests
   alias GenLSP.Structures
 
@@ -16,7 +16,7 @@ defmodule Expert.Provider.Handlers.Hover do
   def handle(
         %Requests.TextDocumentHover{
           params: %Structures.HoverParams{} = params
-        } = request,
+        },
         %Configuration{} = config
       ) do
     document = Document.Container.context_document(params, nil)
@@ -35,15 +35,15 @@ defmodule Expert.Provider.Handlers.Hover do
           nil
       end
 
-    {:reply, %Response{id: request.id, result: maybe_hover}}
+    {:ok, maybe_hover}
   end
 
   defp resolve_entity(%Project{} = project, %Analysis{} = analysis, %Position{} = position) do
-    Engine.Api.resolve_entity(project, analysis, position)
+    EngineApi.resolve_entity(project, analysis, position)
   end
 
   defp hover_content({kind, module}, %Project{} = project) when kind in [:module, :struct] do
-    case Engine.Api.docs(project, module, exclude_hidden: false) do
+    case EngineApi.docs(project, module, exclude_hidden: false) do
       {:ok, %Docs{} = module_docs} ->
         header = module_header(kind, module_docs)
         types = module_header_types(kind, module_docs)
@@ -66,7 +66,7 @@ defmodule Expert.Provider.Handlers.Hover do
   end
 
   defp hover_content({:call, module, fun, arity}, %Project{} = project) do
-    with {:ok, %Docs{} = module_docs} <- Engine.Api.docs(project, module),
+    with {:ok, %Docs{} = module_docs} <- EngineApi.docs(project, module),
          {:ok, entries} <- Map.fetch(module_docs.functions_and_macros, fun) do
       sections =
         entries
@@ -79,7 +79,7 @@ defmodule Expert.Provider.Handlers.Hover do
   end
 
   defp hover_content({:type, module, type, arity}, %Project{} = project) do
-    with {:ok, %Docs{} = module_docs} <- Engine.Api.docs(project, module),
+    with {:ok, %Docs{} = module_docs} <- EngineApi.docs(project, module),
          {:ok, entries} <- Map.fetch(module_docs.types, type) do
       case Enum.find(entries, &(&1.arity == arity)) do
         %Docs.Entry{} = entry ->

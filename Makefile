@@ -12,7 +12,10 @@ env.test:
 	export MIX_ENV=test
 
 deps.poncho:
-	$(foreach dir, $(poncho_dirs), cd apps/$(dir) && mix deps.get && cd ../..;)
+	$(foreach dir, $(poncho_dirs), cd apps/$(dir) && echo $(dir) && mix deps.get && cd ../..;)
+
+clean.poncho:
+	$(foreach dir, $(poncho_dirs), cd apps/$(dir) && echo $(dir) && mix clean && cd ../..;)
 
 deps.compile.poncho: deps.poncho
 	$(foreach dir, $(poncho_dirs), cd apps/$(dir) && mix deps.compile && cd ../..;)
@@ -39,4 +42,4 @@ dialyzer.poncho: compile.poncho compile.protocols.poncho
 	$(foreach dir, $(poncho_dirs), cd apps/$(dir) && mix dialyzer && cd ../..;)
 
 package:
-	cd apps/server && mix package
+	cd apps/expert && mix package

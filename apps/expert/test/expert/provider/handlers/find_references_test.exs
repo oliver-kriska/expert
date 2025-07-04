@@ -1,14 +1,14 @@
 defmodule Expert.Provider.Handlers.FindReferencesTest do
+  alias Expert.EngineApi
   alias Expert.Provider.Handlers
   alias Forge.Ast.Analysis
   alias Forge.Document
   alias Forge.Document.Location
   alias Forge.Protocol.Convert
-  alias Forge.Protocol.Response
   alias GenLSP.Requests.TextDocumentReferences
   alias GenLSP.Structures
 
-  import Engine.Test.Fixtures
+  import Forge.Test.Fixtures
 
   use ExUnit.Case, async: false
   use Patch
@@ -51,7 +51,7 @@ defmodule Expert.Provider.Handlers.FindReferencesTest do
 
   describe "find references" do
     test "returns locations that the entity returns", %{project: project, uri: uri} do
-      patch(Engine.Api, :references, fn ^project, %Analysis{document: document}, _position, _ ->
+      patch(EngineApi, :references, fn ^project, %Analysis{document: document}, _position, _ ->
         locations = [
           Location.new(
             Document.Range.new(
@@ -67,18 +67,16 @@ defmodule Expert.Provider.Handlers.FindReferencesTest do
 
       {:ok, request} = build_request(uri, 5, 6)
 
-      assert {:reply, %Response{} = response} = handle(request, project)
-      assert [%Location{} = location] = response.result
+      assert {:ok, [%Location{} = location]} = handle(request, project)
       assert location.uri =~ "file.ex"
     end
 
     test "returns nothing if the entity can't resolve it", %{project: project, uri: uri} do
-      patch(Engine.Api, :references, nil)
+      patch(EngineApi, :references, nil)
 
       {:ok, request} = build_request(uri, 1, 5)
 
-      assert {:reply, %Response{} = response} = handle(request, project)
-      assert response.result == nil
+      assert {:ok, nil} == handle(request, project)
     end
   end
 end

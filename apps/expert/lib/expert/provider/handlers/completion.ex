@@ -5,18 +5,15 @@ defmodule Expert.Provider.Handlers.Completion do
   alias Forge.Document
   alias Forge.Document.Position
   alias Forge.Project
-  alias Forge.Protocol.Response
   alias GenLSP.Enumerations.CompletionTriggerKind
   alias GenLSP.Requests
   alias GenLSP.Structures
   alias GenLSP.Structures.CompletionContext
 
-  require Logger
-
   def handle(
         %Requests.TextDocumentCompletion{
           params: %Structures.CompletionParams{} = params
-        } = request,
+        },
         %Configuration{} = config
       ) do
     document = Document.Container.context_document(params, nil)
@@ -30,8 +27,7 @@ defmodule Expert.Provider.Handlers.Completion do
         params.context || %CompletionContext{trigger_kind: CompletionTriggerKind.invoked()}
       )
 
-    response = %Response{id: request.id, result: completions}
-    {:reply, response}
+    {:ok, completions}
   end
 
   defp document_analysis(%Document{} = document, %Position{} = position) do

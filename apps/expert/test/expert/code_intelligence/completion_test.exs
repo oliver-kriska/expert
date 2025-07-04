@@ -1,6 +1,7 @@
 defmodule Expert.CodeIntelligence.CompletionTest do
-  alias Engine.Completion.Candidate
   alias Expert.CodeIntelligence.Completion.SortScope
+  alias Expert.EngineApi
+  alias Forge.Completion.Candidate
   alias GenLSP.Enumerations.CompletionItemKind
 
   alias GenLSP.Structures.CompletionItem
@@ -9,39 +10,60 @@ defmodule Expert.CodeIntelligence.CompletionTest do
   use Expert.Test.Expert.CompletionCase
   use Patch
 
+  setup %{project: project} do
+    project = %{project | project_module: Project}
+    {:ok, project: project}
+  end
+
   describe "excluding modules from expert dependencies" do
     test "expert modules are removed", %{project: project} do
+      patch(EngineApi, :project_apps, [:project, :sourceror])
       assert [] = complete(project, "Expert.CodeIntelligence|")
     end
 
     test "Expert submodules are removed", %{project: project} do
+      patch(EngineApi, :project_apps, [:project, :sourceror])
       assert [] = complete(project, "Engin|e")
       assert [] = complete(project, "Forg|e")
     end
 
     test "Expert functions are removed", %{project: project} do
+      patch(EngineApi, :project_apps, [:project, :sourceror])
       assert [] = complete(project, "Engine.|")
     end
 
     test "Dependency modules are removed", %{project: project} do
+      patch(EngineApi, :project_apps, [:project, :sourceror])
       assert [] = complete(project, "ElixirSense|")
     end
 
     test "Dependency functions are removed", %{project: project} do
+      patch(EngineApi, :project_apps, [:project, :sourceror])
       assert [] = complete(project, "Jason.encod|")
     end
 
     test "Dependency protocols are removed", %{project: project} do
+      patch(EngineApi, :project_apps, [:project, :sourceror])
       assert [] = complete(project, "Jason.Encode|")
     end
 
     test "Dependency structs are removed", %{project: project} do
+      patch(EngineApi, :project_apps, [:project, :sourceror])
       assert [] = complete(project, "Jason.Fragment|")
     end
 
     test "Dependency exceptions are removed", %{project: project} do
+      patch(EngineApi, :project_apps, [:project, :sourceror])
       assert [] = complete(project, "Jason.DecodeErro|")
     end
+  end
+
+  test "includes modules from dependencies shared by the project and Expert", %{project: project} do
+    patch(EngineApi, :project_apps, [:project, :sourceror])
+    assert [sourceror_module] = complete(project, "Sourcer|")
+
+    assert sourceror_module.kind == CompletionItemKind.module()
+    assert sourceror_module.label == "Sourceror"
   end
 
   test "ensure completion works for project", %{project: project} do
@@ -152,7 +174,7 @@ defmodule Expert.CodeIntelligence.CompletionTest do
         origin: nil
       }
 
-      patch(Engine.Api, :complete, [candidate])
+      patch(EngineApi, :complete, [candidate])
 
       [completion] = complete(project, " @type a|")
       assert completion.label == "any()"
@@ -160,7 +182,7 @@ defmodule Expert.CodeIntelligence.CompletionTest do
 
     test "typespecs with no full_name are completed", %{project: project} do
       candidate = %Candidate.Struct{full_name: nil, metadata: %{}, name: "Struct"}
-      patch(Engine.Api, :complete, [candidate])
+      patch(EngineApi, :complete, [candidate])
 
       [completion] = complete(project, " %Stru|")
       assert completion.label == "Struct"
@@ -169,7 +191,7 @@ defmodule Expert.CodeIntelligence.CompletionTest do
 
   def with_all_completion_candidates(_) do
     name = "Foo"
-    full_name = "A.B.Foo"
+    full_name = "Project"
 
     all_completions = [
       %Candidate.Behaviour{name: "#{name}-behaviour", full_name: full_name},
@@ -213,7 +235,7 @@ defmodule Expert.CodeIntelligence.CompletionTest do
       %Candidate.Variable{name: "#{name}-variable"}
     ]
 
-    patch(Engine.Api, :complete, all_completions)
+    patch(EngineApi, :complete, all_completions)
     :ok
   end
 

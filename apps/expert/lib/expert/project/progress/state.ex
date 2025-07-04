@@ -2,13 +2,12 @@ defmodule Expert.Project.Progress.State do
   alias Expert.Configuration
   alias Expert.Project.Progress.Percentage
   alias Expert.Project.Progress.Value
-  alias Expert.Transport
   alias Forge.Project
   alias Forge.Protocol.Id
   alias GenLSP.Requests
   alias GenLSP.Structures
 
-  import Engine.Api.Messages
+  import Forge.EngineApi.Messages
 
   defstruct project: nil, progress_by_label: %{}
 
@@ -20,8 +19,8 @@ defmodule Expert.Project.Progress.State do
     progress = Value.begin(label)
     progress_by_label = Map.put(state.progress_by_label, label, progress)
 
-    write_work_done(progress.token)
-    write(progress)
+    write_work_done(Expert.get_lsp(), progress.token)
+    write(Expert.get_lsp(), progress)
 
     %__MODULE__{state | progress_by_label: progress_by_label}
   end
@@ -29,8 +28,8 @@ defmodule Expert.Project.Progress.State do
   def begin(%__MODULE__{} = state, percent_progress(label: label, max: max)) do
     progress = Percentage.begin(label, max)
     progress_by_label = Map.put(state.progress_by_label, label, progress)
-    write_work_done(progress.token)
-    write(progress)
+    write_work_done(Expert.get_lsp(), progress.token)
+    write(Expert.get_lsp(), progress)
 
     %__MODULE__{state | progress_by_label: progress_by_label}
   end
@@ -42,7 +41,7 @@ defmodule Expert.Project.Progress.State do
         {new_value, new_value}
       end)
 
-    write(progress)
+    write(Expert.get_lsp(), progress)
     %__MODULE__{state | progress_by_label: progress_by_label}
   end
 
@@ -56,7 +55,7 @@ defmodule Expert.Project.Progress.State do
         {new_percentage, new_percentage}
       end)
 
-    write(progress)
+    write(Expert.get_lsp(), progress)
     %__MODULE__{state | progress_by_label: progress_by_label}
   end
 
@@ -66,7 +65,7 @@ defmodule Expert.Project.Progress.State do
 
     case progress do
       %Value{} = progress ->
-        progress |> Value.complete(message) |> write
+        write(Expert.get_lsp(), Value.complete(progress, message))
 
       _ ->
         :ok
@@ -81,7 +80,7 @@ defmodule Expert.Project.Progress.State do
 
     case progress do
       %Percentage{} = progress ->
-        progress |> Percentage.complete(message) |> write()
+        write(Expert.get_lsp(), Percentage.complete(progress, message))
 
       nil ->
         :ok
@@ -90,22 +89,23 @@ defmodule Expert.Project.Progress.State do
     %__MODULE__{state | progress_by_label: progress_by_label}
   end
 
-  defp write_work_done(token) do
+  defp write_work_done(lsp, token) do
     if Configuration.client_supports?(:work_done_progress) do
-      progress = %Requests.WindowWorkDoneProgressCreate{
+      GenLSP.request(lsp, %Requests.WindowWorkDoneProgressCreate{
         id: Id.next(),
         params: %Structures.WorkDoneProgressCreateParams{token: token}
-      }
-
-      Transport.write(progress)
+      })
     end
   end
 
-  defp write(%progress_module{token: token} = progress) when not is_nil(token) do
+  defp write(lsp, %progress_module{token: token} = progress) when not is_nil(token) do
     if Configuration.client_supports?(:work_done_progress) do
-      progress |> progress_module.to_protocol() |> Transport.write()
+      GenLSP.notify(
+        lsp,
+        progress_module.to_protocol(progress)
+      )
     end
   end
 
-  defp write(_), do: :ok
+  defp write(_, _), do: :ok
 end

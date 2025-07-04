@@ -1,9 +1,7 @@
 defmodule Expert.Provider.Handlers.Commands do
   alias Expert.Configuration
-  alias Expert.Window
+  alias Expert.EngineApi
   alias Forge.Project
-  alias Forge.Protocol.ErrorResponse
-  alias Forge.Protocol.Response
   alias GenLSP.Enumerations.ErrorCodes
   alias GenLSP.Requests
   alias GenLSP.Structures
@@ -26,8 +24,7 @@ defmodule Expert.Provider.Handlers.Commands do
   end
 
   def handle(
-        %Requests.WorkspaceExecuteCommand{params: %Structures.ExecuteCommandParams{} = params} =
-          request,
+        %Requests.WorkspaceExecuteCommand{params: %Structures.ExecuteCommandParams{} = params},
         %Configuration{} = config
       ) do
     response =
@@ -35,42 +32,38 @@ defmodule Expert.Provider.Handlers.Commands do
         @reindex_name ->
           project_names = Enum.map_join(config.projects, ", ", &Project.name/1)
           Logger.info("Reindex #{project_names}")
-          reindex_all(config.projects, request.id)
+          reindex_all(config.projects)
 
         invalid ->
           message = "#{invalid} is not a valid command"
-          internal_error(request.id, message)
+          internal_error(message)
       end
 
     {:reply, response}
   end
 
-  defp reindex_all(projects, request_id) do
-    result =
-      Enum.reduce_while(projects, :ok, fn project, _ ->
-        case Engine.Api.reindex(project) do
-          :ok ->
-            {:cont, :ok}
+  defp reindex_all(projects) do
+    Enum.reduce_while(projects, :ok, fn project, _ ->
+      case EngineApi.reindex(project) do
+        :ok ->
+          {:cont, "ok"}
 
-          error ->
-            Window.show_error_message("Indexing #{Project.name(project)} failed")
-            Logger.error("Indexing command failed due to #{inspect(error)}")
+        error ->
+          GenLSP.notify(Expert.get_lsp(), %GenLSP.Notifications.WindowShowMessage{
+            params: %GenLSP.Structures.ShowMessageParams{
+              type: GenLSP.Enumerations.MessageType.error(),
+              message: "Indexing #{Project.name(project)} failed"
+            }
+          })
 
-            {:halt, internal_error(request_id, "Could not reindex: #{error}")}
-        end
-      end)
+          Logger.error("Indexing command failed due to #{inspect(error)}")
 
-    if result == :ok do
-      %Response{id: request_id, result: "ok"}
-    else
-      result
-    end
+          {:halt, internal_error("Could not reindex: #{error}")}
+      end
+    end)
   end
 
-  defp internal_error(request_id, message) do
-    %ErrorResponse{
-      id: request_id,
-      error: %GenLSP.ErrorResponse{code: ErrorCodes.internal_error(), message: message}
-    }
+  defp internal_error(message) do
+    %GenLSP.ErrorResponse{code: ErrorCodes.internal_error(), message: message}
   end
 end

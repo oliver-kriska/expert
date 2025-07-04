@@ -1,6 +1,5 @@
 alias Forge.Project
 
-
 other_project =
   [
     File.cwd!(),
