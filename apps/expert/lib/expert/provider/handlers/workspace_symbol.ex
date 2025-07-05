@@ -1,4 +1,5 @@
 defmodule Expert.Provider.Handlers.WorkspaceSymbol do
+  alias Expert.ActiveProjects
   alias Expert.Configuration
   alias Expert.EngineApi
   alias Forge.CodeIntelligence.Symbols
@@ -11,11 +12,13 @@ defmodule Expert.Provider.Handlers.WorkspaceSymbol do
 
   def handle(
         %Requests.WorkspaceSymbol{params: %Structures.WorkspaceSymbolParams{} = params} = request,
-        %Configuration{} = config
+        %Configuration{}
       ) do
+    projects = ActiveProjects.projects()
+
     symbols =
       if String.length(params.query) > 1 do
-        Enum.flat_map(config.projects, &gather_symbols(&1, request))
+        Enum.flat_map(projects, &gather_symbols(&1, request))
       else
         []
       end

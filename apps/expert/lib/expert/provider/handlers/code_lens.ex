@@ -1,4 +1,5 @@
 defmodule Expert.Provider.Handlers.CodeLens do
+  alias Expert.ActiveProjects
   alias Expert.Configuration
   alias Expert.EngineApi
   alias Expert.Provider.Handlers
@@ -14,10 +15,11 @@ defmodule Expert.Provider.Handlers.CodeLens do
 
   def handle(
         %Requests.TextDocumentCodeLens{params: %Structures.CodeLensParams{} = params},
-        %Configuration{} = config
+        %Configuration{}
       ) do
     document = Document.Container.context_document(params, nil)
-    project = Project.project_for_document(config.projects, document)
+    projects = ActiveProjects.projects()
+    project = Project.project_for_document(projects, document)
 
     document = Document.Container.context_document(params, nil)
 

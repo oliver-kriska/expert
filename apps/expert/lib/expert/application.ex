@@ -18,6 +18,7 @@ defmodule Expert.Application do
       {GenLSP.Assigns, [name: Expert.Assigns]},
       {Task.Supervisor, name: :expert_task_queue},
       {GenLSP.Buffer, name: Expert.Buffer},
+      {Expert.ActiveProjects, []},
       {Expert,
        buffer: Expert.Buffer,
        task_supervisor: :expert_task_queue,

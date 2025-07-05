@@ -1,4 +1,5 @@
 defmodule Expert.Provider.Handlers.Hover do
+  alias Expert.ActiveProjects
   alias Expert.Configuration
   alias Expert.EngineApi
   alias Expert.Provider.Markdown
@@ -17,10 +18,11 @@ defmodule Expert.Provider.Handlers.Hover do
         %Requests.TextDocumentHover{
           params: %Structures.HoverParams{} = params
         },
-        %Configuration{} = config
+        %Configuration{}
       ) do
     document = Document.Container.context_document(params, nil)
-    project = Project.project_for_document(config.projects, document)
+    projects = ActiveProjects.projects()
+    project = Project.project_for_document(projects, document)
 
     maybe_hover =
       with {:ok, _document, %Ast.Analysis{} = analysis} <-

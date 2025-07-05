@@ -1,4 +1,5 @@
 defmodule Expert.Provider.Handlers.Commands do
+  alias Expert.ActiveProjects
   alias Expert.Configuration
   alias Expert.EngineApi
   alias Forge.Project
@@ -25,14 +26,16 @@ defmodule Expert.Provider.Handlers.Commands do
 
   def handle(
         %Requests.WorkspaceExecuteCommand{params: %Structures.ExecuteCommandParams{} = params},
-        %Configuration{} = config
+        %Configuration{}
       ) do
+    projects = ActiveProjects.projects()
+
     response =
       case params.command do
         @reindex_name ->
-          project_names = Enum.map_join(config.projects, ", ", &Project.name/1)
+          project_names = Enum.map_join(projects, ", ", &Project.name/1)
           Logger.info("Reindex #{project_names}")
-          reindex_all(config.projects)
+          reindex_all(projects)
 
         invalid ->
           message = "#{invalid} is not a valid command"

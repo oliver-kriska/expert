@@ -1,4 +1,5 @@
 defmodule Expert.Provider.Handlers.DocumentSymbols do
+  alias Expert.ActiveProjects
   alias Expert.Configuration
   alias Expert.EngineApi
   alias Forge.CodeIntelligence.Symbols
@@ -8,9 +9,10 @@ defmodule Expert.Provider.Handlers.DocumentSymbols do
   alias GenLSP.Requests
   alias GenLSP.Structures
 
-  def handle(%Requests.TextDocumentDocumentSymbol{} = request, %Configuration{} = config) do
+  def handle(%Requests.TextDocumentDocumentSymbol{} = request, %Configuration{}) do
     document = Document.Container.context_document(request.params, nil)
-    project = Project.project_for_document(config.projects, document)
+    projects = ActiveProjects.projects()
+    project = Project.project_for_document(projects, document)
 
     symbols =
       project

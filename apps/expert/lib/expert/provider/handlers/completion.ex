@@ -1,4 +1,5 @@
 defmodule Expert.Provider.Handlers.Completion do
+  alias Expert.ActiveProjects
   alias Expert.CodeIntelligence
   alias Expert.Configuration
   alias Forge.Ast
@@ -14,10 +15,11 @@ defmodule Expert.Provider.Handlers.Completion do
         %Requests.TextDocumentCompletion{
           params: %Structures.CompletionParams{} = params
         },
-        %Configuration{} = config
+        %Configuration{}
       ) do
     document = Document.Container.context_document(params, nil)
-    project = Project.project_for_document(config.projects, document)
+    projects = ActiveProjects.projects()
+    project = Project.project_for_document(projects, document)
 
     completions =
       CodeIntelligence.Completion.complete(

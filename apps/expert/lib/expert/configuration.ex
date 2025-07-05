@@ -5,20 +5,17 @@ defmodule Expert.Configuration do
 
   alias Expert.Configuration.Support
   alias Expert.Dialyzer
-  alias Forge.Project
   alias Forge.Protocol.Id
   alias GenLSP.Notifications.WorkspaceDidChangeConfiguration
   alias GenLSP.Requests
   alias GenLSP.Structures
 
-  defstruct projects: [],
-            support: nil,
+  defstruct support: nil,
             client_name: nil,
             additional_watched_extensions: nil,
             dialyzer_enabled?: false
 
   @type t :: %__MODULE__{
-          projects: [Project.t()],
           support: support | nil,
           client_name: String.t() | nil,
           additional_watched_extensions: [String.t()] | nil,
@@ -29,16 +26,11 @@ defmodule Expert.Configuration do
 
   @dialyzer {:nowarn_function, set_dialyzer_enabled: 2}
 
-  @spec new([Structures.WorkspaceFolder.t()], map(), String.t() | nil) :: t
-  def new(workspace_folders, %Structures.ClientCapabilities{} = client_capabilities, client_name) do
+  @spec new(map(), String.t() | nil) :: t
+  def new(%Structures.ClientCapabilities{} = client_capabilities, client_name) do
     support = Support.new(client_capabilities)
 
-    projects =
-      for %{uri: uri} <- workspace_folders do
-        Project.new(uri)
-      end
-
-    %__MODULE__{support: support, projects: projects, client_name: client_name}
+    %__MODULE__{support: support, client_name: client_name}
     |> tap(&set/1)
   end
 
@@ -146,31 +138,5 @@ defmodule Expert.Configuration do
 
   defp maybe_add_watched_extensions(%__MODULE__{} = old_config, _) do
     {:ok, old_config}
-  end
-
-  @spec add_projects(t, [Project.t()]) :: t
-  def add_projects(%__MODULE__{} = config, projects) do
-    new_config =
-      for project <- projects, reduce: config do
-        config ->
-          if Enum.any?(config.projects, &(&1.root_uri == project.root_uri)) do
-            config
-          else
-            projects = [project | config.projects]
-            %__MODULE__{config | projects: projects}
-          end
-      end
-
-    set(new_config)
-
-    new_config
-  end
-
-  @spec remove_projects(t, [String.t()]) :: t
-  def remove_projects(%__MODULE__{} = config, projects) do
-    new_projects = Enum.reject(config.projects, &(&1.root_uri in projects))
-    new_config = %__MODULE__{config | projects: new_projects}
-    set(new_config)
-    new_config
   end
 end

@@ -1,4 +1,5 @@
 defmodule Expert.Provider.Handlers.Formatting do
+  alias Expert.ActiveProjects
   alias Expert.Configuration
   alias Expert.EngineApi
   alias Forge.Document.Changes
@@ -10,10 +11,11 @@ defmodule Expert.Provider.Handlers.Formatting do
 
   def handle(
         %Requests.TextDocumentFormatting{params: %Structures.DocumentFormattingParams{} = params},
-        %Configuration{} = config
+        %Configuration{}
       ) do
     document = Forge.Document.Container.context_document(params, nil)
-    project = Project.project_for_document(config.projects, document)
+    projects = ActiveProjects.projects()
+    project = Project.project_for_document(projects, document)
 
     case EngineApi.format(project, document) do
       {:ok, %Changes{} = document_edits} ->

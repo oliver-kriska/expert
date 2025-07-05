@@ -1,4 +1,5 @@
 defmodule Expert.State do
+  alias Expert.ActiveProjects
   alias Expert.CodeIntelligence
   alias Expert.Configuration
   alias Expert.EngineApi
@@ -56,12 +57,20 @@ defmodule Expert.State do
     |> Forge.Workspace.new()
     |> Forge.Workspace.set_workspace()
 
-    config = Configuration.new(event.workspace_folders, event.capabilities, client_name)
+    config = Configuration.new(event.capabilities, client_name)
     new_state = %__MODULE__{state | configuration: config, initialized?: true}
 
     response = initialize_result()
 
-    for project <- config.projects do
+    projects =
+      for %{uri: uri} <- event.workspace_folders do
+        Project.new(uri)
+      end
+      |> Enum.filter(& &1.mix_project?)
+
+    ActiveProjects.set_projects(projects)
+
+    for project <- projects do
       ensure_project_node_started(project)
     end
 
@@ -106,12 +115,11 @@ defmodule Expert.State do
   end
 
   def apply(%__MODULE__{} = state, %Notifications.WorkspaceDidChangeWorkspaceFolders{
-        params:
-          %Structures.DidChangeWorkspaceFoldersParams{
-            event: %Structures.WorkspaceFoldersChangeEvent{added: added, removed: removed}
-          } = params
+        params: %Structures.DidChangeWorkspaceFoldersParams{
+          event: %Structures.WorkspaceFoldersChangeEvent{added: added, removed: removed}
+        }
       }) do
-    workspace_folders = [added | state.workspace_folders] -- removed
+    workspace_folders = Enum.uniq((added ++ state.workspace_folders) -- removed)
 
     removed_projects =
       for %{uri: uri} <- removed do
@@ -128,12 +136,12 @@ defmodule Expert.State do
         project
       end
 
-    config =
-      state.configuration
-      |> Configuration.add_projects(added_projects)
-      |> Configuration.remove_projects(removed_projects)
+    projects =
+      Enum.uniq((added_projects ++ ActiveProjects.projects()) -- removed_projects)
 
-    state = %__MODULE__{state | configuration: config, workspace_folders: workspace_folders}
+    ActiveProjects.set_projects(projects)
+
+    state = %__MODULE__{state | workspace_folders: workspace_folders}
 
     {:ok, state}
   end
@@ -141,7 +149,8 @@ defmodule Expert.State do
   def apply(%__MODULE__{} = state, %GenLSP.Notifications.TextDocumentDidChange{params: params}) do
     uri = params.text_document.uri
     version = params.text_document.version
-    project = Project.project_for_uri(state.configuration.projects, uri)
+    projects = ActiveProjects.projects()
+    project = Project.project_for_uri(projects, uri)
 
     case Document.Store.get_and_update(
            uri,
@@ -174,10 +183,26 @@ defmodule Expert.State do
       language_id: language_id
     } = did_open.params.text_document
 
+    config = state.configuration
+
+    project =
+      case Enum.find(ActiveProjects.projects(), &Project.within_project?(&1, uri)) do
+        nil ->
+          Project.find_project(uri)
+
+        project ->
+          project
+      end
+
+    if project do
+      ensure_project_node_started(project)
+      ActiveProjects.add_projects([project])
+    end
+
     case Document.Store.open(uri, text, version, language_id) do
       :ok ->
         Logger.info("################### opened #{uri}")
-        {:ok, state}
+        {:ok, %{state | configuration: config}}
 
       error ->
         Logger.error("################## Could not open #{uri} #{inspect(error)}")
@@ -245,14 +270,14 @@ defmodule Expert.State do
   defp ensure_project_node_started(project) do
     case Expert.Project.Supervisor.start(project) do
       {:ok, _pid} ->
-        Logger.info("Project node started for #{project.name}")
+        Logger.info("Project node started for #{Project.name(project)}")
 
-      {:error, {reason, pid}} when reason in [:alread_started, :already_present] ->
+      {:error, {reason, pid}} when reason in [:already_started, :already_present] ->
         {:ok, pid}
 
       {:error, reason} ->
         Logger.error(
-          "Failed to start project node for #{project.name}: #{inspect(reason, pretty: true)}"
+          "Failed to start project node for #{Project.name(project)}: #{inspect(reason, pretty: true)}"
         )
     end
   end

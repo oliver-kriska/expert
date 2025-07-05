@@ -15,6 +15,7 @@ defmodule Expert.Provider.Handlers.FindReferencesTest do
 
   setup_all do
     start_supervised(Expert.Application.document_store_child_spec())
+    start_supervised!({Expert.ActiveProjects, []})
     :ok
   end
 
@@ -45,7 +46,8 @@ defmodule Expert.Provider.Handlers.FindReferencesTest do
   end
 
   def handle(request, project) do
-    config = Expert.Configuration.new(projects: [project])
+    Expert.ActiveProjects.add_projects([project])
+    config = Expert.Configuration.new()
     Handlers.FindReferences.handle(request, config)
   end
 

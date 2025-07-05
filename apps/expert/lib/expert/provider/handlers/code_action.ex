@@ -1,4 +1,5 @@
 defmodule Expert.Provider.Handlers.CodeAction do
+  alias Expert.ActiveProjects
   alias Expert.Configuration
   alias Expert.EngineApi
   alias Forge.CodeAction
@@ -8,10 +9,11 @@ defmodule Expert.Provider.Handlers.CodeAction do
 
   def handle(
         %Requests.TextDocumentCodeAction{params: %Structures.CodeActionParams{} = params},
-        %Configuration{} = config
+        %Configuration{}
       ) do
     document = Forge.Document.Container.context_document(params, nil)
-    project = Project.project_for_document(config.projects, document)
+    projects = ActiveProjects.projects()
+    project = Project.project_for_document(projects, document)
     diagnostics = Enum.map(params.context.diagnostics, &to_code_action_diagnostic/1)
 
     code_actions =
