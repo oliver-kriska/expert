@@ -18,7 +18,8 @@ defmodule Expert.State do
   defstruct configuration: nil,
             initialized?: false,
             shutdown_received?: false,
-            in_flight_requests: %{}
+            in_flight_requests: %{},
+            workspace_folders: []
 
   @supported_code_actions [
     Enumerations.CodeActionKind.quick_fix(),
@@ -55,10 +56,14 @@ defmodule Expert.State do
     |> Forge.Workspace.new()
     |> Forge.Workspace.set_workspace()
 
-    config = Configuration.new(event.root_uri, event.capabilities, client_name)
+    config = Configuration.new(event.workspace_folders, event.capabilities, client_name)
     new_state = %__MODULE__{state | configuration: config, initialized?: true}
 
     response = initialize_result()
+
+    for project <- config.projects do
+      ensure_project_node_started(project)
+    end
 
     {:ok, response, new_state}
   end
@@ -100,6 +105,39 @@ defmodule Expert.State do
     {:ok, state}
   end
 
+  def apply(%__MODULE__{} = state, %Notifications.WorkspaceDidChangeWorkspaceFolders{
+        params:
+          %Structures.DidChangeWorkspaceFoldersParams{
+            event: %Structures.WorkspaceFoldersChangeEvent{added: added, removed: removed}
+          } = params
+      }) do
+    workspace_folders = [added | state.workspace_folders] -- removed
+
+    removed_projects =
+      for %{uri: uri} <- removed do
+        project = Project.new(uri)
+        Logger.info("Stopping project at uri #{uri}")
+        Expert.Project.Supervisor.stop(project)
+        project
+      end
+
+    added_projects =
+      for %{uri: uri} <- added do
+        project = Project.new(uri)
+        ensure_project_node_started(project)
+        project
+      end
+
+    config =
+      state.configuration
+      |> Configuration.add_projects(added_projects)
+      |> Configuration.remove_projects(removed_projects)
+
+    state = %__MODULE__{state | configuration: config, workspace_folders: workspace_folders}
+
+    {:ok, state}
+  end
+
   def apply(%__MODULE__{} = state, %GenLSP.Notifications.TextDocumentDidChange{params: params}) do
     uri = params.text_document.uri
     version = params.text_document.version
@@ -135,18 +173,6 @@ defmodule Expert.State do
       version: version,
       language_id: language_id
     } = did_open.params.text_document
-
-    project = Project.find_project(uri)
-    config = state.configuration
-
-    state =
-      if is_nil(project) do
-        state
-      else
-        maybe_start_project(project, config)
-        config = Configuration.add_project(config, project)
-        %__MODULE__{state | configuration: config}
-      end
 
     case Document.Store.open(uri, text, version, language_id) do
       :ok ->
@@ -216,19 +242,18 @@ defmodule Expert.State do
     {:ok, state}
   end
 
-  defp maybe_start_project(project, config) do
-    already_started? =
-      Enum.any?(config.projects, fn p ->
-        p.root_uri == project.root_uri
-      end)
+  defp ensure_project_node_started(project) do
+    case Expert.Project.Supervisor.start(project) do
+      {:ok, _pid} ->
+        Logger.info("Project node started for #{project.name}")
 
-    if already_started? do
-      :ok
-    else
-      Logger.info("Starting project at uri #{project.root_uri}")
-      result = Expert.Project.Supervisor.start(project)
-      Logger.info("result: #{inspect(result)}")
-      :ok
+      {:error, {reason, pid}} when reason in [:alread_started, :already_present] ->
+        {:ok, pid}
+
+      {:error, reason} ->
+        Logger.error(
+          "Failed to start project node for #{project.name}: #{inspect(reason, pretty: true)}"
+        )
     end
   end
 
@@ -269,7 +294,13 @@ defmodule Expert.State do
         hover_provider: true,
         references_provider: true,
         text_document_sync: sync_options,
-        workspace_symbol_provider: true
+        workspace_symbol_provider: true,
+        workspace: %{
+          workspace_folders: %Structures.WorkspaceFoldersServerCapabilities{
+            supported: true,
+            change_notifications: true
+          }
+        }
       }
 
     %GenLSP.Structures.InitializeResult{

@@ -29,11 +29,16 @@ defmodule Expert.Configuration do
 
   @dialyzer {:nowarn_function, set_dialyzer_enabled: 2}
 
-  @spec new(Forge.uri(), map(), String.t() | nil) :: t
-  def new(_root_uri, %Structures.ClientCapabilities{} = client_capabilities, client_name) do
+  @spec new([Structures.WorkspaceFolder.t()], map(), String.t() | nil) :: t
+  def new(workspace_folders, %Structures.ClientCapabilities{} = client_capabilities, client_name) do
     support = Support.new(client_capabilities)
 
-    %__MODULE__{support: support, projects: [], client_name: client_name}
+    projects =
+      for %{uri: uri} <- workspace_folders do
+        Project.new(uri)
+      end
+
+    %__MODULE__{support: support, projects: projects, client_name: client_name}
     |> tap(&set/1)
   end
 
@@ -143,17 +148,29 @@ defmodule Expert.Configuration do
     {:ok, old_config}
   end
 
-  @spec add_project(t, Project.t()) :: t
-  def add_project(%__MODULE__{} = config, %Project{} = project) do
-    if Enum.any?(config.projects, &(&1.root_uri == project.root_uri)) do
-      config
-    else
-      projects = [project | config.projects]
-      new_config = %__MODULE__{config | projects: projects}
+  @spec add_projects(t, [Project.t()]) :: t
+  def add_projects(%__MODULE__{} = config, projects) do
+    new_config =
+      for project <- projects, reduce: config do
+        config ->
+          if Enum.any?(config.projects, &(&1.root_uri == project.root_uri)) do
+            config
+          else
+            projects = [project | config.projects]
+            %__MODULE__{config | projects: projects}
+          end
+      end
 
-      set(new_config)
+    set(new_config)
 
-      new_config
-    end
+    new_config
+  end
+
+  @spec remove_projects(t, [String.t()]) :: t
+  def remove_projects(%__MODULE__{} = config, projects) do
+    new_projects = Enum.reject(config.projects, &(&1.root_uri in projects))
+    new_config = %__MODULE__{config | projects: new_projects}
+    set(new_config)
+    new_config
   end
 end

@@ -1,7 +1,7 @@
 defmodule Expert.Provider.Handlers.GoToDefinition do
   alias Expert.Configuration
-  alias Forge.Project
   alias Expert.EngineApi
+  alias Forge.Project
   alias GenLSP.Requests
   alias GenLSP.Structures
 
