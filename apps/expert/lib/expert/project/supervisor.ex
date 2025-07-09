@@ -39,7 +39,7 @@ defmodule Expert.Project.Supervisor do
     DynamicSupervisor.terminate_child(Expert.Project.DynamicSupervisor.name(), pid)
   end
 
-  defp name(%Project{} = project) do
+  def name(%Project{} = project) do
     :"#{Project.name(project)}::supervisor"
   end
 end

@@ -51,7 +51,7 @@ defmodule Expert.State do
         _ -> nil
       end
 
-    root_path = Forge.Document.Path.from_uri(event.root_uri)
+    root_path = Document.Path.from_uri(event.root_uri)
 
     root_path
     |> Forge.Workspace.new()
@@ -126,8 +126,19 @@ defmodule Expert.State do
     removed_projects =
       for %{uri: uri} <- removed do
         project = Project.new(uri)
-        Logger.info("Stopping project at uri #{uri}")
+
         Expert.Project.Supervisor.stop(project)
+
+        GenLSP.notify(
+          Expert.get_lsp(),
+          %GenLSP.Notifications.WindowLogMessage{
+            params: %GenLSP.Structures.LogMessageParams{
+              type: GenLSP.Enumerations.MessageType.info(),
+              message: "Stopping project node for #{Project.name(project)}"
+            }
+          }
+        )
+
         project
       end
 
@@ -138,10 +149,8 @@ defmodule Expert.State do
         project
       end
 
-    projects =
-      Enum.uniq((added_projects ++ ActiveProjects.projects()) -- removed_projects)
-
-    ActiveProjects.set_projects(projects)
+    ActiveProjects.add_projects(added_projects)
+    ActiveProjects.remove_projects(removed_projects)
 
     state = %__MODULE__{state | workspace_folders: workspace_folders}
 
@@ -188,12 +197,8 @@ defmodule Expert.State do
     config = state.configuration
 
     project =
-      case Enum.find(ActiveProjects.projects(), &Project.within_project?(&1, uri)) do
-        nil ->
-          Project.find_project(uri)
-
-        project ->
-          project
+      with nil <- Enum.find(ActiveProjects.projects(), &Project.within_project?(&1, uri)) do
+        Project.find_project(uri)
       end
 
     if project do
@@ -203,11 +208,10 @@ defmodule Expert.State do
 
     case Document.Store.open(uri, text, version, language_id) do
       :ok ->
-        Logger.info("################### opened #{uri}")
         {:ok, %{state | configuration: config}}
 
       error ->
-        Logger.error("################## Could not open #{uri} #{inspect(error)}")
+        Logger.error("Could not open #{uri} #{inspect(error)}")
         error
     end
   end
@@ -274,6 +278,16 @@ defmodule Expert.State do
       {:ok, _pid} ->
         Logger.info("Project node started for #{Project.name(project)}")
 
+        GenLSP.notify(
+          Expert.get_lsp(),
+          %GenLSP.Notifications.WindowLogMessage{
+            params: %GenLSP.Structures.LogMessageParams{
+              type: GenLSP.Enumerations.MessageType.info(),
+              message: "Started project node for #{Project.name(project)}"
+            }
+          }
+        )
+
       {:error, {reason, pid}} when reason in [:already_started, :already_present] ->
         {:ok, pid}
 
@@ -281,6 +295,18 @@ defmodule Expert.State do
         Logger.error(
           "Failed to start project node for #{Project.name(project)}: #{inspect(reason, pretty: true)}"
         )
+
+        GenLSP.notify(
+          Expert.get_lsp(),
+          %GenLSP.Notifications.WindowLogMessage{
+            params: %GenLSP.Structures.LogMessageParams{
+              type: GenLSP.Enumerations.MessageType.error(),
+              message: "Failed to start project node for #{Project.name(project)}"
+            }
+          }
+        )
+
+        {:error, reason}
     end
   end
 

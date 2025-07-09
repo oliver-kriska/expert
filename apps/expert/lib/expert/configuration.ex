@@ -26,7 +26,7 @@ defmodule Expert.Configuration do
 
   @dialyzer {:nowarn_function, set_dialyzer_enabled: 2}
 
-  @spec new(map(), String.t() | nil) :: t
+  @spec new(Structures.ClientCapabilities.t(), String.t() | nil) :: t
   def new(%Structures.ClientCapabilities{} = client_capabilities, client_name) do
     support = Support.new(client_capabilities)
 
