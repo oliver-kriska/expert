@@ -94,10 +94,7 @@ defmodule ExpertTest do
 
       assert_notification(
         "window/logMessage",
-        %{
-          "type" => 3,
-          "message" => ^expected_message
-        }
+        %{"message" => ^expected_message}
       )
 
       assert [project] = Expert.ActiveProjects.projects()
@@ -126,10 +123,7 @@ defmodule ExpertTest do
 
       assert_notification(
         "window/logMessage",
-        %{
-          "type" => 3,
-          "message" => ^expected_message
-        }
+        %{"message" => ^expected_message}
       )
 
       assert [_project_1] = Expert.ActiveProjects.projects()
@@ -155,10 +149,7 @@ defmodule ExpertTest do
 
       assert_notification(
         "window/logMessage",
-        %{
-          "type" => 3,
-          "message" => ^expected_message
-        }
+        %{"message" => ^expected_message}
       )
 
       assert [project_1, project_2] = Expert.ActiveProjects.projects()
@@ -185,10 +176,7 @@ defmodule ExpertTest do
 
       assert_notification(
         "window/logMessage",
-        %{
-          "type" => 3,
-          "message" => ^expected_message
-        }
+        %{"message" => ^expected_message}
       )
 
       assert [project] = Expert.ActiveProjects.projects()
@@ -216,10 +204,7 @@ defmodule ExpertTest do
 
       assert_notification(
         "window/logMessage",
-        %{
-          "type" => 3,
-          "message" => ^expected_message
-        }
+        %{"message" => ^expected_message}
       )
 
       assert [] = Expert.ActiveProjects.projects()
@@ -245,10 +230,7 @@ defmodule ExpertTest do
 
       assert_notification(
         "window/logMessage",
-        %{
-          "type" => 3,
-          "message" => ^expected_message
-        }
+        %{"message" => ^expected_message}
       )
 
       file_uri = Path.join([secondary_project.root_uri, "lib", "secondary.ex"])
@@ -274,10 +256,7 @@ defmodule ExpertTest do
 
       assert_notification(
         "window/logMessage",
-        %{
-          "type" => 3,
-          "message" => ^expected_message
-        }
+        %{"message" => ^expected_message}
       )
 
       assert [_main, project] = Expert.ActiveProjects.projects()

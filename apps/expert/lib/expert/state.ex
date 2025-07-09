@@ -129,14 +129,9 @@ defmodule Expert.State do
 
         Expert.Project.Supervisor.stop(project)
 
-        GenLSP.notify(
+        GenLSP.log(
           Expert.get_lsp(),
-          %GenLSP.Notifications.WindowLogMessage{
-            params: %GenLSP.Structures.LogMessageParams{
-              type: GenLSP.Enumerations.MessageType.info(),
-              message: "Stopping project node for #{Project.name(project)}"
-            }
-          }
+          "Stopping project node for #{Project.name(project)}"
         )
 
         project
@@ -278,15 +273,7 @@ defmodule Expert.State do
       {:ok, _pid} ->
         Logger.info("Project node started for #{Project.name(project)}")
 
-        GenLSP.notify(
-          Expert.get_lsp(),
-          %GenLSP.Notifications.WindowLogMessage{
-            params: %GenLSP.Structures.LogMessageParams{
-              type: GenLSP.Enumerations.MessageType.info(),
-              message: "Started project node for #{Project.name(project)}"
-            }
-          }
-        )
+        GenLSP.log(Expert.get_lsp(), "Started project node for #{Project.name(project)}")
 
       {:error, {reason, pid}} when reason in [:already_started, :already_present] ->
         {:ok, pid}
@@ -296,14 +283,9 @@ defmodule Expert.State do
           "Failed to start project node for #{Project.name(project)}: #{inspect(reason, pretty: true)}"
         )
 
-        GenLSP.notify(
+        GenLSP.log(
           Expert.get_lsp(),
-          %GenLSP.Notifications.WindowLogMessage{
-            params: %GenLSP.Structures.LogMessageParams{
-              type: GenLSP.Enumerations.MessageType.error(),
-              message: "Failed to start project node for #{Project.name(project)}"
-            }
-          }
+          "Failed to start project node for #{Project.name(project)}"
         )
 
         {:error, reason}
