@@ -19,8 +19,7 @@ defmodule Expert.State do
   defstruct configuration: nil,
             initialized?: false,
             shutdown_received?: false,
-            in_flight_requests: %{},
-            workspace_folders: []
+            in_flight_requests: %{}
 
   @supported_code_actions [
     Enumerations.CodeActionKind.quick_fix(),
@@ -121,8 +120,6 @@ defmodule Expert.State do
           event: %Structures.WorkspaceFoldersChangeEvent{added: added, removed: removed}
         }
       }) do
-    workspace_folders = Enum.uniq((added ++ state.workspace_folders) -- removed)
-
     removed_projects =
       for %{uri: uri} <- removed do
         project = Project.new(uri)
@@ -146,8 +143,6 @@ defmodule Expert.State do
 
     ActiveProjects.add_projects(added_projects)
     ActiveProjects.remove_projects(removed_projects)
-
-    state = %__MODULE__{state | workspace_folders: workspace_folders}
 
     {:ok, state}
   end
