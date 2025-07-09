@@ -70,9 +70,11 @@ defmodule Expert.State do
 
     ActiveProjects.set_projects(projects)
 
-    for project <- projects do
-      ensure_project_node_started(project)
-    end
+    Task.start_link(fn ->
+      for project <- projects do
+        ensure_project_node_started(project)
+      end
+    end)
 
     {:ok, response, new_state}
   end

@@ -1,8 +1,8 @@
 defmodule Expert do
+  alias Expert.Protocol.Convert
+  alias Expert.Protocol.Id
   alias Expert.Provider.Handlers
   alias Expert.State
-  alias Forge.Protocol.Convert
-  alias Forge.Protocol.Id
   alias GenLSP.Requests
   alias GenLSP.Structures
 
@@ -48,7 +48,7 @@ defmodule Expert do
     case State.initialize(state, request) do
       {:ok, response, state} ->
         lsp = assign(lsp, state: state)
-        {:ok, response} = Forge.Protocol.Convert.to_lsp(response)
+        {:ok, response} = Expert.Protocol.Convert.to_lsp(response)
 
         {:reply, response, lsp}
 
@@ -65,10 +65,10 @@ defmodule Expert do
   def handle_request(%mod{} = request, lsp) when mod in @server_specific_messages do
     GenLSP.error(lsp, "handling server specific request #{Macro.to_string(mod)}")
 
-    with {:ok, request} <- Forge.Protocol.Convert.to_native(request),
+    with {:ok, request} <- Expert.Protocol.Convert.to_native(request),
          {:ok, response, state} <- apply_to_state(assigns(lsp).state, request),
-         {:ok, response} <- Forge.Protocol.Convert.to_lsp(response) do
-      {:reply, Forge.Protocol.Convert.to_lsp(response), assign(lsp, state: state)}
+         {:ok, response} <- Expert.Protocol.Convert.to_lsp(response) do
+      {:reply, Expert.Protocol.Convert.to_lsp(response), assign(lsp, state: state)}
     else
       error ->
         message = "Failed to handle #{mod}, #{inspect(error)}"
@@ -88,7 +88,7 @@ defmodule Expert do
     with {:ok, handler} <- fetch_handler(request),
          {:ok, request} <- Convert.to_native(request),
          {:ok, response} <- handler.handle(request, state.configuration),
-         {:ok, response} <- Forge.Protocol.Convert.to_lsp(response) do
+         {:ok, response} <- Expert.Protocol.Convert.to_lsp(response) do
       {:reply, response, lsp}
     else
       {:error, {:unhandled, _}} ->
