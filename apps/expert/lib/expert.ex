@@ -234,6 +234,9 @@ defmodule Expert do
       %GenLSP.Requests.WorkspaceSymbol{} ->
         {:ok, Handlers.WorkspaceSymbol}
 
+      %GenLSP.Requests.TextDocumentFoldingRange{} ->
+        {:ok, Handlers.FoldingRange}
+
       %request_module{} ->
         {:error, {:unhandled, request_module}}
     end
