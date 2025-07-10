@@ -18,6 +18,7 @@ defmodule Expert.State do
 
   defstruct configuration: nil,
             initialized?: false,
+            engine_initialized?: false,
             shutdown_received?: false,
             in_flight_requests: %{}
 
@@ -69,10 +70,12 @@ defmodule Expert.State do
 
     ActiveProjects.set_projects(projects)
 
-    Task.start_link(fn ->
+    Task.Supervisor.start_child(:expert_task_queue, fn ->
       for project <- projects do
         ensure_project_node_started(project)
       end
+
+      send(Expert, :engine_initialized)
     end)
 
     {:ok, response, new_state}
