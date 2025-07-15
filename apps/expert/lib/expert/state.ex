@@ -127,12 +127,7 @@ defmodule Expert.State do
       for %{uri: uri} <- removed do
         project = Project.new(uri)
 
-        Expert.Project.Supervisor.stop(project)
-
-        GenLSP.log(
-          Expert.get_lsp(),
-          "Stopping project node for #{Project.name(project)}"
-        )
+        stop_project_node(project)
 
         project
       end
@@ -288,6 +283,15 @@ defmodule Expert.State do
 
         {:error, reason}
     end
+  end
+
+  defp stop_project_node(project) do
+    Expert.Project.Supervisor.stop(project)
+
+    GenLSP.log(
+      Expert.get_lsp(),
+      "Stopping project node for #{Project.name(project)}"
+    )
   end
 
   def initialize_result do

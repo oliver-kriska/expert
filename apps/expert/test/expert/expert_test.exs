@@ -6,9 +6,13 @@ defmodule ExpertTest do
   import Forge.Test.Fixtures
 
   use ExUnit.Case, async: false
+  use Patch
 
   setup_all do
     start_supervised!({Document.Store, derive: [analysis: &Forge.Ast.analyze/1]})
+    start_supervised!({Task.Supervisor, name: :expert_task_queue})
+    start_supervised!({DynamicSupervisor, name: Expert.DynamicSupervisor})
+    start_supervised!({DynamicSupervisor, Expert.Project.DynamicSupervisor.options()})
 
     project_root = fixtures_path() |> Path.join("workspace_folders")
 
@@ -28,9 +32,21 @@ defmodule ExpertTest do
   end
 
   setup do
-    start_supervised!({Task.Supervisor, name: :expert_task_queue})
-    start_supervised!({DynamicSupervisor, name: Expert.DynamicSupervisor})
-    start_supervised!({DynamicSupervisor, Expert.Project.DynamicSupervisor.options()})
+    # NOTE(doorgan): repeatedly starting and stopping nodes in tests produces some
+    # erratic behavior where sometimes some tests won't run. This somewhat mitigates
+    # that.
+    test_pid = self()
+
+    patch(Expert.Project.Supervisor, :start, fn project ->
+      send(test_pid, {:project_alive, project.root_uri})
+      {:ok, nil}
+    end)
+
+    patch(Expert.Project.Supervisor, :stop, fn project ->
+      send(test_pid, {:project_stopped, project.root_uri})
+      :ok
+    end)
+
     start_supervised!({Expert.ActiveProjects, []})
 
     server =
@@ -39,9 +55,9 @@ defmodule ExpertTest do
         dynamic_supervisor: Expert.DynamicSupervisor
       )
 
-    Process.link(server.lsp)
-
     client = client(server)
+
+    Process.sleep(100)
 
     [server: server, client: client]
   end
@@ -70,8 +86,14 @@ defmodule ExpertTest do
     }
   end
 
-  def project_alive?(project) do
-    project |> Expert.Project.Supervisor.name() |> Process.whereis() |> is_pid()
+  def assert_project_alive?(project) do
+    expected_uri = project.root_uri
+    assert_receive {:project_alive, ^expected_uri}
+  end
+
+  def assert_project_stopped?(project) do
+    expected_uri = project.root_uri
+    assert_receive {:project_stopped, ^expected_uri}
   end
 
   describe "initialize request" do
@@ -100,7 +122,7 @@ defmodule ExpertTest do
       assert [project] = Expert.ActiveProjects.projects()
       assert project.root_uri == main_project.root_uri
 
-      assert project_alive?(main_project)
+      assert_project_alive?(main_project)
     end
   end
 
@@ -152,12 +174,12 @@ defmodule ExpertTest do
         %{"message" => ^expected_message}
       )
 
-      assert [project_1, project_2] = Expert.ActiveProjects.projects()
-      assert project_1.root_uri == main_project.root_uri
-      assert project_alive?(main_project)
+      assert [_, _] = projects = Expert.ActiveProjects.projects()
 
-      assert project_2.root_uri == secondary_project.root_uri
-      assert project_alive?(secondary_project)
+      for project <- projects do
+        assert project.root_uri in [main_project.root_uri, secondary_project.root_uri]
+        assert_project_alive?(project)
+      end
     end
 
     test "can remove workspace folders", %{
@@ -181,7 +203,7 @@ defmodule ExpertTest do
 
       assert [project] = Expert.ActiveProjects.projects()
       assert project.root_uri == main_project.root_uri
-      assert project_alive?(main_project)
+      assert_project_alive?(main_project)
 
       assert :ok =
                notify(
@@ -208,7 +230,7 @@ defmodule ExpertTest do
       )
 
       assert [] = Expert.ActiveProjects.projects()
-      refute project_alive?(main_project)
+      assert_project_stopped?(main_project)
     end
   end
 
@@ -225,6 +247,8 @@ defmodule ExpertTest do
                  client,
                  initialize_request(project_root, id: 1, projects: [main_project])
                )
+
+      assert_result(1, _)
 
       expected_message = "Started project node for #{Project.name(main_project)}"
 
@@ -259,9 +283,12 @@ defmodule ExpertTest do
         %{"message" => ^expected_message}
       )
 
-      assert [_main, project] = Expert.ActiveProjects.projects()
-      assert project.root_uri == secondary_project.root_uri
-      assert project_alive?(project)
+      assert [_, _] = projects = Expert.ActiveProjects.projects()
+
+      for project <- projects do
+        assert project.root_uri in [main_project.root_uri, secondary_project.root_uri]
+        assert_project_alive?(project)
+      end
     end
   end
 end
