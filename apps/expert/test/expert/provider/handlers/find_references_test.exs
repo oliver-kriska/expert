@@ -53,7 +53,12 @@ defmodule Expert.Provider.Handlers.FindReferencesTest do
 
   describe "find references" do
     test "returns locations that the entity returns", %{project: project, uri: uri} do
-      patch(EngineApi, :references, fn ^project, %Analysis{document: document}, _position, _ ->
+      project_uri = project.root_uri
+
+      patch(EngineApi, :references, fn %{root_uri: ^project_uri},
+                                       %Analysis{document: document},
+                                       _position,
+                                       _ ->
         locations = [
           Location.new(
             Document.Range.new(
