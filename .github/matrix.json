@@ -1,0 +1,24 @@
+{
+  "include": [
+    {
+      "otp": "25",
+      "elixir": "1.15.8",
+      "project": "engine"
+    },
+    {
+      "otp": "25",
+      "elixir": "1.15.8",
+      "project": "expert"
+    },
+    {
+      "otp": "25",
+      "elixir": "1.15.8",
+      "project": "expert_credo"
+    },
+    {
+      "otp": "25",
+      "elixir": "1.15.8",
+      "project": "forge"
+    }
+  ]
+}

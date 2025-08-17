@@ -17,56 +17,51 @@ run project +ARGS:
     eval "{{ ARGS }}"
 
 [doc('Compile the given project.')]
-compile project: (deps project)
-  cd apps/{{ project }} && mix compile
+compile project *args="": (deps project)
+  cd apps/{{ project }} && mix compile {{ args }}
 
 [doc('Run tests in the given project')]
 test project="all" *args="":
+  @just mix {{ project }} test {{args}}
+
+[doc('Run a mix command in one or all projects. Use `just test` to run tests.')]
+mix project="all" *args="":
     #!/usr/bin/env bash
-    set -euo pipefail
+    set -euxo pipefail
 
     case {{ project }} in
       all)
         for proj in {{ apps }}; do
-          (cd "apps/$proj" && mix test {{args}})
+          (cd "apps/$proj" && mix {{args}})
         done
       ;;
       *)
-         (cd "apps/{{ project }}" && mix test {{args}})
+         (cd "apps/{{ project }}" && mix {{args}})
       ;;
     esac
 
-[doc('Run a mix command in one or all projects. Use `just test` to run tests.')]
-mix cmd *project:
-    #!/usr/bin/env bash
-
-    if [ -n "{{ project }}" ]; then
-      cd apps/{{ project }}
-      mix {{ cmd }}
-    else
-      for project in {{ apps }}; do
-      (
-        cd apps/"$project"
-
-        mix {{ cmd }}
-      )
-      done
-    fi
-
 [doc('Lint all projects or just a single project')]
-lint *project:
+lint *project="all":
   #!/usr/bin/env bash
   set -euxo pipefail
 
-  just mix "format --check-formatted" {{ project }}
-  just mix credo {{ project }}
-  just mix dialyzer {{ project }}
+  just mix {{ project }} format --check-formatted
+  just mix {{ project }} credo
+  just mix {{ project }} dialyzer
 
 build-engine:
-  #!/usr/bin/env bash
+    #!/usr/bin/env bash
+    set -euxo pipefail
 
-  cd apps/engine
-  mix build
+    cd apps/engine
+    MIX_ENV=dev mix compile
+    namespaced_dir=_build/dev_ns
+    rm -rf $namespaced_dir
+    mkdir -p $namespaced_dir
+
+    cp -r _build/dev/ "$namespaced_dir"
+
+    MIX_ENV=dev mix namespace "$namespaced_dir"
 
 
 [doc('Build a release for the local system')]
@@ -97,6 +92,10 @@ release-plain: (compile "engine")
     #!/usr/bin/env bash
     cd apps/expert
     MIX_ENV=prod mix release plain --overwrite
+
+[doc('Compiles .github/matrix.json')]
+compile-ci-matrix:
+  elixir matrix.exs
 
 default: release-local
 
