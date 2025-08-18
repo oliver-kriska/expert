@@ -55,11 +55,11 @@ build-engine:
 
     cd apps/engine
     MIX_ENV=dev mix compile
-    namespaced_dir=_build/dev_ns
+    namespaced_dir=_build/dev_ns/
     rm -rf $namespaced_dir
     mkdir -p $namespaced_dir
 
-    cp -r _build/dev/ "$namespaced_dir"
+    cp -a _build/dev/. "$namespaced_dir"
 
     MIX_ENV=dev mix namespace "$namespaced_dir"
 
