@@ -19,6 +19,11 @@ jobs:
       - uses: mlugg/setup-zig@v2
         with:
           version: "0.14.1"
+
+      - run: just deps expert
+      - run: just deps engine
+      - name: Set release version to latest rev
+        run: sed -i "$ s/$/-$(git rev-parse --short HEAD)/" version.txt
       - run: just release-all
         env:
           MIX_ENV: prod
