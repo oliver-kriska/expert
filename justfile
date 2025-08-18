@@ -82,7 +82,7 @@ release-local: (deps "expert") (compile "engine") build-engine
     EXPERT_RELEASE_MODE=burrito BURRITO_TARGET="windows_amd64" MIX_ENV=prod mix release --no-compile
 
 [doc('Build releases for all target platforms')]
-release-all: (compile "engine")
+release-all: (deps "expert") (compile "engine") build-engine
     #!/usr/bin/env bash
     cd apps/expert
     EXPERT_RELEASE_MODE=burrito MIX_ENV=prod mix release
