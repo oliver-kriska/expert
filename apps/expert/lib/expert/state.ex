@@ -191,7 +191,9 @@ defmodule Expert.State do
       end
 
     if project do
-      ensure_project_node_started(project)
+      Task.Supervisor.start_child(:expert_task_queue, fn ->
+        ensure_project_node_started(project)
+      end)
       ActiveProjects.add_projects([project])
     end
 
