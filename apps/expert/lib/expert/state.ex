@@ -63,10 +63,17 @@ defmodule Expert.State do
     response = initialize_result()
 
     projects =
-      for %{uri: uri} <- event.workspace_folders do
-        Project.new(uri)
+      case event.workspace_folders do
+        nil ->
+          find_projects(event.root_uri)
+
+        _ ->
+          for %{uri: uri} <- event.workspace_folders,
+              project = Project.new(uri),
+              project.mix_project? do
+            project
+          end
       end
-      |> Enum.filter(& &1.mix_project?)
 
     ActiveProjects.set_projects(projects)
 
@@ -87,6 +94,34 @@ defmodule Expert.State do
 
   def default_configuration(%__MODULE__{configuration: config}) do
     Configuration.default(config)
+  end
+
+  defp find_projects(root_uri) do
+    root_path = Forge.Document.Path.from_uri(root_uri)
+    root_mix_exs = Path.join(root_path, "mix.exs")
+
+    projects =
+      if File.exists?(root_mix_exs) do
+        [Project.new(root_uri)]
+      else
+        find_multiroot_projects(root_path)
+      end
+
+    if projects == [], do: [Project.new(root_uri)], else: projects
+  end
+
+  defp find_multiroot_projects(root_path) do
+    mix_exs_blob = Path.join([root_path, "**", "mix.exs"])
+
+    for mix_exs_path <- Path.wildcard(mix_exs_blob),
+        "deps" not in Path.split(mix_exs_path) do
+      project_uri =
+        mix_exs_path
+        |> Path.dirname()
+        |> Forge.Document.Path.to_uri()
+
+      Project.new(project_uri)
+    end
   end
 
   def apply(%__MODULE__{initialized?: false}, request) do

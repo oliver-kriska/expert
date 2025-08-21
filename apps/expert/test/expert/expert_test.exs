@@ -64,7 +64,14 @@ defmodule ExpertTest do
 
   def initialize_request(root_path, opts \\ []) do
     id = opts[:id] || 1
-    projects = opts[:projects] || []
+    projects = Keyword.get(opts, :projects, [])
+
+    workspace_folders =
+      if not is_nil(projects) do
+        Enum.map(projects, fn project ->
+          %{uri: project.root_uri, name: Project.name(project)}
+        end)
+      end
 
     %{
       method: "initialize",
@@ -78,10 +85,7 @@ defmodule ExpertTest do
             workspaceFolders: true
           }
         },
-        workspaceFolders:
-          Enum.map(projects, fn project ->
-            %{uri: project.root_uri, name: Project.name(project)}
-          end)
+        workspaceFolders: workspace_folders
       }
     }
   end
@@ -231,6 +235,31 @@ defmodule ExpertTest do
 
       assert [] = Expert.ActiveProjects.projects()
       assert_project_stopped?(main_project)
+    end
+
+    test "supports missing workspace_folders in the request", %{
+      client: client,
+      project_root: project_root,
+      main_project: main_project,
+      secondary_project: secondary_project
+    } do
+      assert :ok =
+               request(
+                 client,
+                 initialize_request(project_root, id: 1, projects: nil)
+               )
+
+      assert_result(1, %{
+        "capabilities" => %{"workspace" => %{"workspaceFolders" => %{"supported" => true}}}
+      })
+
+      assert [_, _] = projects = Expert.ActiveProjects.projects()
+
+      for project <- projects do
+        assert project.root_uri in [main_project.root_uri, secondary_project.root_uri]
+
+        assert_project_alive?(project)
+      end
     end
   end
 
