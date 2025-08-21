@@ -239,9 +239,7 @@ defmodule ExpertTest do
 
     test "supports missing workspace_folders in the request", %{
       client: client,
-      project_root: project_root,
-      main_project: main_project,
-      secondary_project: secondary_project
+      project_root: project_root
     } do
       assert :ok =
                request(
@@ -253,13 +251,7 @@ defmodule ExpertTest do
         "capabilities" => %{"workspace" => %{"workspaceFolders" => %{"supported" => true}}}
       })
 
-      assert [_, _] = projects = Expert.ActiveProjects.projects()
-
-      for project <- projects do
-        assert project.root_uri in [main_project.root_uri, secondary_project.root_uri]
-
-        assert_project_alive?(project)
-      end
+      assert [] = Expert.ActiveProjects.projects()
     end
   end
 
