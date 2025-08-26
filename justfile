@@ -87,7 +87,10 @@ release-local: (deps "expert") (compile "engine") build-engine
 release-all: (deps "expert") (compile "engine") build-engine
     #!/usr/bin/env bash
     cd apps/expert
-    EXPERT_RELEASE_MODE=burrito MIX_ENV={{ env('MIX_ENV', 'prod')}} mix release --no-compile
+
+    set -euxo pipefail
+
+    EXPERT_RELEASE_MODE=burrito MIX_ENV={{ env('MIX_ENV', 'prod')}} mix release --overwrite
 
 [doc('Build a plain release without burrito')]
 release-plain: (compile "engine")
