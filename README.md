@@ -38,7 +38,7 @@ editor to this binary.
 
 Thank you to our corporate sponsors! If you'd like to start sponsoring the project, please read more below.
 
-<div style="background: white;">
+<div align="center" style="background: white;">
   <img style="display: block;" height="100" src="./assets/sponsors/fly.png">
   <img style="display: block;" height="100" src="./assets/sponsors/tauspace.png">
   <img style="display: block;" height="100" src="./assets/sponsors/river.png">
