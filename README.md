@@ -34,6 +34,22 @@ just release-local
 This will build the Expert binary and place it in the `apps/expert/burrito_out` directory. You can then point your
 editor to this binary.
 
+## Sponsorship
+
+Thank you to our corporate sponsors! If you'd like to start sponsoring the project, please read more below.
+
+![Fly](./assets/sponsors/fly.png)
+![Tauspace](./assets/sponsors/tauspace.png)
+![River](./assets/sponsors/river.png)
+
+### Corporate
+
+For companies wanting to directly sponsor full time work on Expert, please reach out to Dan Janowski: EEF Chair of Sponsorship WG at danj@erlef.org.
+
+### Individual
+
+Individuals can donate using GitHub sponsors. Team members are listed in the sidebar.
+
 ### Other resources
 
 - [Architecture](pages/architecture.md)
