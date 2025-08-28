@@ -40,7 +40,11 @@ Thank you to our corporate sponsors! If you'd like to start sponsoring the proje
 
 <div align="center" style="background: white;">
   <img style="display: block;" height="100" src="./assets/sponsors/fly.png">
+</div>
+<div align="center" style="background: white;">
   <img style="display: block;" height="100" src="./assets/sponsors/tauspace.png">
+</div>
+<div align="center" style="background: white;">
   <img style="display: block;" height="100" src="./assets/sponsors/river.png">
 </div>
 
