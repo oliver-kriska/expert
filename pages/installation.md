@@ -149,15 +149,16 @@ for Eglot:
 ### Visual Studio Code
 
 Click on the extensions button on the sidebar, then search for
-`lexical`, then click `install`.  By default, the extension will automatically
-download the latest version of Expert. Expert is derived from the Lexical codebase,
-but the extension will install the new Expert executable.
+`lexical`, then click `install`.
+
+This is a stop gap until we create a dedicated Expert extension, so youll need to configure it to
+use the Expert executable instead. 
 
 To change to a local executable, go to `Settings -> Extensions -> Lexical` and
 type `/my/home/projects/expert/apps/expert/burrito_out/expert_linux_amd64` into the text box in
 the `Server: Release path override` section.
 
-### neovim
+### Neovim
 
 Expert requires neovim `>= 0.9.0`.
 
