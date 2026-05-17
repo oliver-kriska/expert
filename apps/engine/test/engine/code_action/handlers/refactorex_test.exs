@@ -1,11 +1,15 @@
 defmodule Engine.CodeAction.Handlers.RefactorexTest do
   use Forge.Test.CodeMod.Case
+  use Patch
+
+  import Forge.Test.CodeSigil
+  import Forge.Test.RangeSupport
 
   alias Engine.CodeAction.Handlers.Refactorex
+  alias Engine.CodeMod.Format
   alias Forge.Document
-
-  import Forge.Test.RangeSupport
-  import Forge.Test.CodeSigil
+  alias Forge.Document.Position
+  alias Forge.Document.Range
 
   def apply_code_mod(original_text, _ast, options) do
     document = Document.new("file:///file.ex", original_text, 0)
@@ -82,5 +86,77 @@ defmodule Engine.CodeAction.Handlers.RefactorexTest do
         end
       end]
     )
+  end
+
+  test "Refactorex respects formatter line length" do
+    patch(Format, :formatter_for_file, fn _project, _path ->
+      {nil, [line_length: 120, locals_without_parens: []]}
+    end)
+
+    assert_refactored(
+      "Remove pipe",
+      ~q[
+      defmodule Foo do
+        def my_func(%{} = map, %{key1: _key1, key2: _key2, key3: _key3, key4: _key4, key5: _key5} = other) do
+          «»map |> Map.merge(other)
+        end
+      end],
+      ~q[
+      defmodule Foo do
+        def my_func(%{} = map, %{key1: _key1, key2: _key2, key3: _key3, key4: _key4, key5: _key5} = other) do
+          Map.merge(map, other)
+        end
+      end]
+    )
+  end
+
+  test "Refactorex formats when formatter line length is missing" do
+    patch(Format, :formatter_for_file, fn _project, _path ->
+      {nil, [locals_without_parens: []]}
+    end)
+
+    assert_refactored(
+      "Remove pipe",
+      ~q[
+      defmodule Foo do
+        def my_func(%{} = map, %{key1: _key1, key2: _key2, key3: _key3, key4: _key4, key5: _key5} = other) do
+          «»map |> Map.merge(other)
+        end
+      end],
+      ~q[
+      defmodule Foo do
+        def my_func(
+              %{} = map,
+              %{key1: _key1, key2: _key2, key3: _key3, key4: _key4, key5: _key5} = other
+            ) do
+          Map.merge(map, other)
+        end
+      end]
+    )
+  end
+
+  describe "line_or_selection field-level comparison" do
+    test "detects cursor position when start and end share same line/character but differ in metadata" do
+      code = ~q[
+        def my_func(unused) do
+        end
+      ]
+
+      document = Document.new("file:///file.ex", code, 0)
+
+      %Position{} = start_pos = Position.new(document, 1, 5)
+
+      end_pos = %Position{start_pos | starting_index: 0}
+
+      assert start_pos.line == end_pos.line
+      assert start_pos.character == end_pos.character
+      refute start_pos == end_pos
+
+      range = Range.new(start_pos, end_pos)
+
+      actions = Refactorex.actions(document, range, [])
+
+      assert Enum.any?(actions, &(&1.title == "Underscore variables not used"))
+    end
   end
 end

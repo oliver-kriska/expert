@@ -44,6 +44,20 @@ defmodule Forge.Ast.Analysis do
     }
   end
 
+  def new({:error, ast, parse_error, comments}, %Document{} = document) do
+    scopes = traverse(ast, document)
+    comments_by_line = Map.new(comments, fn comment -> {comment.line, comment} end)
+
+    %__MODULE__{
+      ast: ast,
+      document: document,
+      scopes: scopes,
+      comments_by_line: comments_by_line,
+      parse_error: {:error, parse_error, comments},
+      valid?: false
+    }
+  end
+
   def new(error, document) do
     %__MODULE__{
       document: document,
@@ -149,7 +163,7 @@ defmodule Forge.Ast.Analysis do
         end
       )
 
-    unless length(state.scopes) == 1 do
+    if length(state.scopes) != 1 do
       raise RuntimeError,
             "invariant not met, :scopes should only contain the global scope: #{inspect(state)}"
     end
@@ -320,11 +334,25 @@ defmodule Forge.Ast.Analysis do
        ) do
     base_segments = expand_alias(aliases, state)
 
-    Enum.reduce(aliases_nodes, state, fn {:__aliases__, _, segments}, state ->
-      alias =
-        Alias.explicit(state.document, quoted, base_segments ++ segments, List.last(segments))
+    Enum.reduce(aliases_nodes, state, fn
+      {:__aliases__, _, segments}, state ->
+        alias =
+          Alias.explicit(state.document, quoted, base_segments ++ segments, List.last(segments))
 
-      State.push_alias(state, alias)
+        State.push_alias(state, alias)
+
+      # Syntactically incorrect code might result in something different than a tuple with :__aliases__
+      # as the first element. For example:
+      #
+      # alias Foo.{Bar
+      # results in :__cursor__ as the first element
+      #
+      # alias Foo.{Bar,
+      # results in :__block__
+      #
+      # In such case we just skip the node.
+      {type, _, _}, state when type in [:__cursor__, :__block__] ->
+        state
     end)
   end
 
@@ -414,21 +442,33 @@ defmodule Forge.Ast.Analysis do
     state
   end
 
-  defp maybe_push_implicit_alias(%State{} = state, [first_segment | _], document, quoted)
+  defp maybe_push_implicit_alias(
+         %State{} = state,
+         [first_segment | _] = module_segments,
+         document,
+         quoted
+       )
        when is_atom(first_segment) do
     segments =
       case State.current_module(state) do
         # the head element of top-level modules can be aliased, so we
         # must expand them
         [] ->
-          expand_alias([first_segment], state)
+          expand_alias(module_segments, state)
 
-        # if we have a current module, we prefix the first segment with it
+        # if we have a current module, we prefix the segments with it
         current_module ->
-          current_module ++ [first_segment]
+          current_module ++ module_segments
       end
 
-    implicit_alias = Alias.implicit(document, quoted, segments, first_segment)
+    implicit_alias =
+      Alias.implicit(
+        document,
+        quoted,
+        segments,
+        module_segments
+      )
+
     State.push_alias(state, implicit_alias)
   end
 
@@ -456,7 +496,7 @@ defmodule Forge.Ast.Analysis do
     alias_map = state |> State.current_scope() |> Scope.alias_map()
 
     case alias_map do
-      %{^first => existing_alias} ->
+      %{[^first] => existing_alias} ->
         existing_alias.module ++ rest
 
       _ ->

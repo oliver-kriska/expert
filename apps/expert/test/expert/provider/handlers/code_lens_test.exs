@@ -1,4 +1,12 @@
 defmodule Expert.Provider.Handlers.CodeLensTest do
+  use ExUnit.Case, async: false
+  use Patch
+
+  import Forge.EngineApi.Messages
+  import Forge.Test.Fixtures
+  import Forge.Test.RangeSupport
+
+  alias Expert.Document.Context
   alias Expert.EngineApi
   alias Expert.Protocol.Convert
   alias Expert.Protocol.Id
@@ -8,19 +16,18 @@ defmodule Expert.Provider.Handlers.CodeLensTest do
   alias GenLSP.Requests.TextDocumentCodeLens
   alias GenLSP.Structures
 
-  import Forge.EngineApi.Messages
-  import Forge.Test.Fixtures
-  import Forge.Test.RangeSupport
-
-  use ExUnit.Case, async: false
-  use Patch
-
   setup_all do
+    start_supervised!({DynamicSupervisor, Expert.EngineBuild.DynamicSupervisor.options()})
+    start_supervised!(Expert.EngineBuilds)
+    start_supervised!({Forge.NodePortMapper, []})
     start_supervised(Document.Store)
     project = project(:umbrella)
 
+    start_supervised!({Expert.Project.Store, []})
     start_supervised!({DynamicSupervisor, Expert.Project.DynamicSupervisor.options()})
     start_supervised!({Expert.Project.Supervisor, project})
+
+    Expert.Configuration.new() |> Expert.Configuration.set()
 
     EngineApi.register_listener(project, self(), [project_compiled()])
     EngineApi.schedule_compile(project, true)
@@ -28,6 +35,11 @@ defmodule Expert.Provider.Handlers.CodeLensTest do
     assert_receive project_compiled(), 5000
 
     {:ok, project: project}
+  end
+
+  setup do
+    :persistent_term.erase(Expert.Configuration)
+    :ok
   end
 
   defp with_indexing_enabled(_) do
@@ -57,8 +69,10 @@ defmodule Expert.Provider.Handlers.CodeLensTest do
   end
 
   def handle(request, project) do
-    config = Expert.Configuration.new(project: project)
-    Handlers.CodeLens.handle(request, config)
+    Expert.Project.Store.add_projects([project])
+    document = Document.Container.context_document(request, nil)
+    context = Context.new(document.uri, document, project)
+    Handlers.CodeLens.handle(request, context)
   end
 
   describe "code lens for mix.exs" do
@@ -87,11 +101,27 @@ defmodule Expert.Provider.Handlers.CodeLensTest do
       assert {:ok, []} = handle(request, project)
     end
 
-    test "does not emite a code lens for an umbrella app's mix.exs", %{project: project} do
+    test "does not emit a code lens for an umbrella app's mix.exs", %{project: project} do
       {:ok, request} =
         project
         |> Project.project_path()
         |> Path.join("apps/first/mix.exs")
+        |> build_request()
+
+      assert {:ok, []} = handle(request, project)
+    end
+  end
+
+  describe "code lens when mix.exs path is nil" do
+    setup [:with_indexing_enabled]
+
+    test "returns empty lenses when project has no mix.exs", %{project: project} do
+      patch(Project, :mix_exs_path, nil)
+
+      {:ok, request} =
+        project
+        |> Project.project_path()
+        |> Path.join("apps/first/lib/umbrella/first.ex")
         |> build_request()
 
       assert {:ok, []} = handle(request, project)

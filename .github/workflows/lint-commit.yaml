@@ -10,19 +10,22 @@ on:
 permissions:
   pull-requests: write
 
+defaults:
+  run:
+    shell: bash
+
 jobs:
   commitlint:
     runs-on: ubuntu-latest
     name: commitlint
     steps:
-      - uses: actions/checkout@v5
-      - uses: amannn/action-semantic-pull-request@v6
+      - uses: amannn/action-semantic-pull-request@48f256284bd46cdaab1048c3721360e808335d50 # v6.1.1
         id: lint-pr-title
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           subjectPattern: ^(?![A-Z]).+$
-      - uses: marocchino/sticky-pull-request-comment@v2
+      - uses: marocchino/sticky-pull-request-comment@0ea0beb66eb9baf113663a64ec522f60e49231c0 # v3.0.4
         if: always() && (steps.lint-pr-title.outputs.error_message != null)
         with:
           header: pr-title-lint-error
@@ -35,7 +38,11 @@ jobs:
 
             ```
             feat(engine): add new completions styles
-            bug: correctly index project symbols
+            fix: correctly index project symbols
+            test: fixing flaky test
+            docs: updating readme
+            ci: changing a github action
+            chore: changing something like tool versions or non code related thing
             ```
 
             Details:
@@ -45,8 +52,7 @@ jobs:
             ```
 
       - if: ${{ steps.lint-pr-title.outputs.error_message == null }}
-        uses: marocchino/sticky-pull-request-comment@v2
+        uses: marocchino/sticky-pull-request-comment@0ea0beb66eb9baf113663a64ec522f60e49231c0 # v3.0.4
         with:
           header: pr-title-lint-error
           delete: true
-

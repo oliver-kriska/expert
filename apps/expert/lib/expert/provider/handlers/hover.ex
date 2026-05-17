@@ -1,5 +1,8 @@
 defmodule Expert.Provider.Handlers.Hover do
-  alias Expert.Configuration
+  @behaviour Expert.Provider.Handler
+
+  alias Engine.Search.Store
+  alias Expert.Document.Context
   alias Expert.EngineApi
   alias Expert.Provider.Markdown
   alias Forge.Ast
@@ -8,30 +11,33 @@ defmodule Expert.Provider.Handlers.Hover do
   alias Forge.Document
   alias Forge.Document.Position
   alias Forge.Project
+  alias Forge.Search.Indexer.Entry
   alias GenLSP.Requests
   alias GenLSP.Structures
 
-  require Logger
-
+  @impl Expert.Provider.Handler
   def handle(
-        %Requests.TextDocumentHover{
-          params: %Structures.HoverParams{} = params
-        },
-        %Configuration{} = config
+        %Requests.TextDocumentHover{params: %Structures.HoverParams{} = params},
+        %Context{} = context
       ) do
-    document = Document.Container.context_document(params, nil)
+    %Context{document: document, project: project} = context
 
     maybe_hover =
       with {:ok, _document, %Ast.Analysis{} = analysis} <-
              Document.Store.fetch(document.uri, :analysis),
-           {:ok, entity, range} <- resolve_entity(config.project, analysis, params.position),
-           {:ok, markdown} <- hover_content(entity, config.project) do
+           {:ok, entity, range} <- resolve_entity(project, analysis, params.position),
+           {:ok, markdown} <- hover_content(entity, project) do
         content = Markdown.to_content(markdown)
         %Structures.Hover{contents: content, range: range}
       else
-        error ->
-          Logger.warning("Could not resolve hover request, got: #{inspect(error)}")
+        {:error, reason} when reason in [:no_code, :no_doc, :no_type] ->
           nil
+
+        :error ->
+          nil
+
+        _ ->
+          try_elixir_sense(project, document, params.position)
       end
 
     {:ok, maybe_hover}
@@ -39,6 +45,17 @@ defmodule Expert.Provider.Handlers.Hover do
 
   defp resolve_entity(%Project{} = project, %Analysis{} = analysis, %Position{} = position) do
     EngineApi.resolve_entity(project, analysis, position)
+  end
+
+  defp try_elixir_sense(project, document, position) do
+    case EngineApi.hover(project, document, position) do
+      {:ok, markdown, range} ->
+        content = Markdown.to_content(markdown)
+        %Structures.Hover{contents: content, range: range}
+
+      {:error, _} ->
+        nil
+    end
   end
 
   defp hover_content({kind, module}, %Project{} = project) when kind in [:module, :struct] do
@@ -65,15 +82,24 @@ defmodule Expert.Provider.Handlers.Hover do
   end
 
   defp hover_content({:call, module, fun, arity}, %Project{} = project) do
-    with {:ok, %Docs{} = module_docs} <- EngineApi.docs(project, module),
-         {:ok, entries} <- Map.fetch(module_docs.functions_and_macros, fun) do
+    {target_module, target_fun, target_arity, indexed?, resolved_delegate?} =
+      resolve_call_target(project, module, fun, arity)
+
+    with {:ok, %Docs{} = module_docs} <- EngineApi.docs(project, target_module),
+         {:ok, entries} <- Map.fetch(module_docs.functions_and_macros, target_fun) do
       sections =
         entries
         |> Enum.sort_by(& &1.arity)
-        |> Enum.filter(&(&1.arity >= arity))
+        |> Enum.filter(&(&1.arity >= target_arity))
         |> Enum.map(&entry_content/1)
 
       {:ok, Markdown.join_sections(sections, Markdown.separator())}
+    else
+      _ when resolved_delegate? ->
+        {:error, :not_found}
+
+      _ ->
+        maybe_fallback_error(indexed?)
     end
   end
 
@@ -90,8 +116,26 @@ defmodule Expert.Provider.Handlers.Hover do
     end
   end
 
+  defp hover_content({:module_attribute, module, attribute_name}, %Project{} = project) do
+    case module_attribute_definition_text(project, module, attribute_name) do
+      {:ok, definition_text} ->
+        {:ok, Markdown.code_block(definition_text)}
+
+      {:error, _} ->
+        # Fall back to just showing the attribute name
+        {:ok, Markdown.code_block("@#{attribute_name}")}
+    end
+  end
+
   defp hover_content(type, _) do
     {:error, {:unsupported, type}}
+  end
+
+  defp maybe_fallback_error(true), do: :error
+  defp maybe_fallback_error(false), do: {:error, :not_found}
+
+  defp resolve_call_target(project, module, fun, arity) do
+    EngineApi.call(project, Store, :resolve_mfa, [module, fun, arity])
   end
 
   defp module_header(:module, %Docs{module: module}) do
@@ -118,7 +162,7 @@ defmodule Expert.Provider.Handlers.Hover do
   defp module_footer(:module, docs) do
     callbacks = format_callbacks(docs.callbacks)
 
-    unless empty?(callbacks) do
+    if !empty?(callbacks) do
       Markdown.section(callbacks, header: "Callbacks")
     end
   end
@@ -148,6 +192,52 @@ defmodule Expert.Provider.Handlers.Hover do
       """)
 
     Markdown.join_sections([header, entry_doc_content(entry.doc)])
+  end
+
+  defp module_attribute_definition_text(%Project{} = project, module, attribute_name) do
+    case EngineApi.call(project, Store, :exact, [
+           "@#{attribute_name}",
+           [type: :module_attribute, subtype: :definition]
+         ]) do
+      {:ok, []} ->
+        {:error, :no_definition}
+
+      {:ok, entries} ->
+        entries
+        |> filter_entries_by_module(module)
+        |> fetch_first_definition_text(project)
+
+      error ->
+        error
+    end
+  end
+
+  defp filter_entries_by_module(entries, nil), do: entries
+
+  defp filter_entries_by_module(entries, module) do
+    module_hint = module |> Module.split() |> List.last() |> Macro.underscore()
+
+    filtered =
+      Enum.filter(entries, fn %Entry{path: path} ->
+        String.contains?(String.downcase(path), module_hint)
+      end)
+
+    if filtered == [], do: entries, else: filtered
+  end
+
+  defp fetch_first_definition_text([], _project), do: {:error, :no_definition}
+
+  defp fetch_first_definition_text([%Entry{path: path, range: range} | _], project) do
+    uri = Document.Path.ensure_uri(path)
+
+    case EngineApi.call(project, Document.Store, :open_temporary, [uri]) do
+      {:ok, document} ->
+        text = Document.fragment(document, range.start, range.end)
+        {:ok, String.trim(text)}
+
+      error ->
+        error
+    end
   end
 
   @one_line_header_cutoff 50

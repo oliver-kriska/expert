@@ -1,5 +1,6 @@
 defmodule Engine.MixProject do
   use Mix.Project
+
   Code.require_file("../../mix_includes.exs")
 
   def project do
@@ -16,7 +17,7 @@ defmodule Engine.MixProject do
     ]
   end
 
-  def version() do
+  def version do
     "../../version.txt" |> File.read!() |> String.trim()
   end
 
@@ -44,17 +45,18 @@ defmodule Engine.MixProject do
 
   defp deps do
     [
-      {:benchee, "~> 1.3", only: :test},
+      {:deps_nix, "~> 2.4", only: :dev},
       Mix.Credo.dependency(),
       Mix.Dialyzer.dependency(),
       {:elixir_sense,
-       github: "elixir-lsp/elixir_sense", ref: "e3ddc403554050221a2fd19a10a896fa7525bc02"},
+       github: "elixir-lsp/elixir_sense", ref: "fb9ee0e68db8b46fbff4d7a78ee4bb7f63db0669"},
       {:forge, path: "../forge"},
-      {:gen_lsp, "~> 0.11"},
+      {:gen_lsp, "~> 0.11.3"},
       {:patch, "~> 0.15", only: [:dev, :test], runtime: false},
+      {:quokka, "~> 2.12", only: [:dev, :test], runtime: false},
       {:path_glob, "~> 0.2"},
       {:phoenix_live_view, "~> 1.0", only: [:test], runtime: false},
-      {:sourceror, "~> 1.9"},
+      {:sourceror, "~> 1.10.1"},
       {:stream_data, "~> 1.1", only: [:test], runtime: false},
       {:refactorex, "~> 0.1.52"}
     ]

@@ -1,5 +1,6 @@
 defmodule Forge.MixProject do
   use Mix.Project
+
   Code.require_file("../../mix_includes.exs")
 
   def project do
@@ -11,11 +12,12 @@ defmodule Forge.MixProject do
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       compilers: [:yecc] ++ Mix.compilers(),
-      dialyzer: Mix.Dialyzer.config()
+      dialyzer: Mix.Dialyzer.config(),
+      test_ignore_filters: [&String.starts_with?(&1, "test/fixtures")]
     ]
   end
 
-  def version() do
+  def version do
     "../../version.txt" |> File.read!() |> String.trim()
   end
 
@@ -36,13 +38,16 @@ defmodule Forge.MixProject do
   defp deps do
     [
       {:benchee, "~> 1.3", only: :test},
+      {:briefly, "~> 0.5"},
       Mix.Credo.dependency(),
       Mix.Dialyzer.dependency(),
-      {:gen_lsp, "~> 0.11"},
-      {:snowflake, "~> 1.0"},
-      {:sourceror, "~> 1.9"},
+      {:deps_nix, "~> 2.4", only: :dev},
+      {:gen_lsp, "~> 0.11.3"},
+      {:sourceror, "~> 1.10.1"},
+      {:spitfire, "~> 0.3.5"},
       {:stream_data, "~> 1.1", only: [:test], runtime: false},
-      {:patch, "~> 0.15", only: [:test], optional: true, runtime: false}
+      {:patch, "~> 0.15", only: [:test], optional: true, runtime: false},
+      {:quokka, "~> 2.12", only: [:dev, :test], runtime: false}
     ]
   end
 end

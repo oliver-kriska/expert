@@ -1,43 +1,61 @@
 {
-  mixRelease,
-  fetchMixDeps,
-  elixir,
-  writeScript,
-}:
-mixRelease rec {
-  pname = "expert";
-  version = "development";
+  beamPackages,
+  callPackages,
+  lib,
+}: let
+  version = builtins.readFile ../version.txt;
 
-  src = ./..;
-
-  mixFodDeps = fetchMixDeps {
-    inherit pname;
+  engineDeps = callPackages ../apps/engine/deps.nix {
+    inherit lib beamPackages;
+  };
+in
+  beamPackages.mixRelease rec {
+    pname = "expert";
     inherit version;
 
-    src = ./..;
+    src = lib.fileset.toSource {
+      root = ./..;
+      fileset = lib.fileset.unions [
+        ../apps
+        ../mix_credo.exs
+        ../mix_dialyzer.exs
+        ../mix_includes.exs
+        ../version.txt
+      ];
+    };
 
-    sha256 = builtins.readFile ./hash;
-  };
+    mixNixDeps = callPackages ../apps/expert/deps.nix {
+      inherit lib beamPackages;
+    };
 
-  installPhase = ''
-    runHook preInstall
+    mixReleaseName = "plain";
 
-    mix do compile --no-deps-check, package --path "$out"
+    preConfigure = ''
+      # copy the logic from mixRelease to build a deps dir for engine
+      mkdir -p apps/engine/deps
+      ${lib.concatMapAttrsStringSep "\n" (name: dep: ''
+          dep_path="apps/engine/deps/${name}"
+          if [ -d "${dep}/src" ]; then
+            ln -sv ${dep}/src $dep_path
+          fi
+        '')
+        engineDeps}
 
-    runHook postInstall
-  '';
-
-  preFixup = let
-    activate_version_manager = writeScript "activate_version_manager.sh" ''
-    true
+        cd apps/expert
     '';
-  in ''
-    substituteInPlace "$out/bin/start_expert.sh" --replace 'elixir_command=' 'elixir_command="${elixir}/bin/"'
-    rm "$out/bin/activate_version_manager.sh"
-    ln -s ${activate_version_manager} "$out/bin/activate_version_manager.sh"
 
-    mv "$out/bin" "$out/binsh"
+    postInstall = ''
+      mv $out/bin/plain $out/bin/expert
+      wrapProgram $out/bin/expert --add-flag "eval" --add-flag "System.no_halt(true); Application.ensure_all_started(:xp_expert)"
+    '';
 
-    makeWrapper "$out/binsh/start_expert.sh" "$out/bin/expert" --set RELEASE_COOKIE expert
-  '';
-}
+    removeCookie = false;
+
+    passthru = {
+      # not used by package, but exposed for repl and direct build access
+      # e.g. nix build .#expert.mixNixDeps.jason
+      inherit engineDeps mixNixDeps;
+    };
+
+    meta.mainProgram = "expert";
+  }

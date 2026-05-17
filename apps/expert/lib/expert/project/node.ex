@@ -3,6 +3,15 @@ defmodule Expert.Project.Node do
   A genserver responsible for starting the remote node and cleaning up the build directory if it crashes
   """
 
+  use GenServer
+
+  alias Expert.EngineApi
+  alias Expert.EngineNode
+  alias Expert.Progress
+  alias Forge.Project
+
+  require Logger
+
   defmodule State do
     defstruct [:project, :node, :supervisor_pid]
 
@@ -11,30 +20,19 @@ defmodule Expert.Project.Node do
     end
   end
 
-  alias Forge.Project
-
-  alias Expert.EngineApi
-  alias Expert.EngineNode
-  alias Expert.Project.Progress
-
-  require Logger
-
-  use GenServer
-  use Progress.Support
-
   def start_link(%Project{} = project) do
     GenServer.start_link(__MODULE__, project, name: name(project))
   end
 
   def child_spec(%Project{} = project) do
     %{
-      id: {__MODULE__, Project.name(project)},
+      id: {__MODULE__, Project.unique_name(project)},
       start: {__MODULE__, :start_link, [project]}
     }
   end
 
   def name(%Project{} = project) do
-    :"#{Project.name(project)}::node"
+    :"#{Project.unique_name(project)}::node"
   end
 
   def node_name(%Project{} = project) do
@@ -51,9 +49,22 @@ defmodule Expert.Project.Node do
 
   @impl GenServer
   def init(%Project{} = project) do
-    case with_progress(project, "Project Node", fn -> start_node(project) end) do
+    project_name = Project.name(project)
+
+    result =
+      Progress.with_progress("[#{project_name}] Starting engine node", fn token ->
+        result = start_node(project, token)
+
+        {:done, result, "Engine node started"}
+      end)
+
+    case result do
       {:ok, state} ->
         {:ok, state, {:continue, :trigger_build}}
+
+      {:error, {:bootstrap, reason}} ->
+        message = bootstrap_error_message(reason)
+        {:stop, {:shutdown, {:bootstrap_error, message}}}
 
       error ->
         {:stop, error}
@@ -92,8 +103,8 @@ defmodule Expert.Project.Node do
 
   # private api
 
-  defp start_node(%Project{} = project) do
-    with {:ok, node, node_pid} <- EngineNode.start(project) do
+  defp start_node(%Project{} = project, token \\ Progress.noop_token()) do
+    with {:ok, node, node_pid} <- EngineNode.start(project, token) do
       Node.monitor(node, true)
       {:ok, State.new(project, node, node_pid)}
     end
@@ -105,6 +116,15 @@ defmodule Expert.Project.Node do
     case File.rm_rf(build_path) do
       {:ok, _deleted} -> :ok
       error -> error
+    end
+  end
+
+  defp bootstrap_error_message(reason) do
+    case reason do
+      :eacces -> "Project directory has insufficient permissions. It needs to be writable."
+      :erofs -> "Project is in a read-only filesystem"
+      :enospc -> "No disk space available"
+      _ -> "Unable to bootstrap engine: #{inspect(reason)}"
     end
   end
 end

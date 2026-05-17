@@ -1,7 +1,7 @@
 defmodule Expert.CodeIntelligence.Completion.Translations.ModuleAttributeTest do
-  alias GenLSP.Enumerations.CompletionItemKind
-
   use Expert.Test.Expert.CompletionCase
+
+  alias GenLSP.Enumerations.CompletionItemKind
 
   describe "module attributes" do
     test "@moduledoc completions", %{project: project} do
@@ -249,6 +249,47 @@ defmodule Expert.CodeIntelligence.Completion.Translations.ModuleAttributeTest do
           $0
         end
           def my_function do
+            :ok
+          end
+        end
+      ]
+    end
+
+    test "with a function with guards after it", %{project: project} do
+      source = ~q[
+        defmodule MyModule do
+          @spe|
+          def my_function(arg1, arg2, arg3) when is_binary(arg1) do
+            :ok
+          end
+        end
+      ]
+
+      assert {:ok, [spec_my_function, spec]} =
+               project
+               |> complete(source)
+               |> fetch_completion(kind: CompletionItemKind.property())
+
+      assert spec_my_function.label == "@spec my_function"
+
+      assert apply_completion(spec_my_function) == ~q[
+        defmodule MyModule do
+          @spec my_function(${1:term()}, ${2:term()}, ${3:term()}) :: ${0:term()}
+          def my_function(arg1, arg2, arg3) when is_binary(arg1) do
+            :ok
+          end
+        end
+      ]
+
+      assert spec.label == "@spec"
+
+      assert apply_completion(spec) == ~q[
+        defmodule MyModule do
+          @spec ${1:function}(${2:term()}) :: ${3:term()}
+        def ${1:function}(${4:args}) do
+          $0
+        end
+          def my_function(arg1, arg2, arg3) when is_binary(arg1) do
             :ok
           end
         end

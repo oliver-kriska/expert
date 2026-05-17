@@ -1,12 +1,12 @@
 defmodule Engine.CodeIntelligence.Entity do
   alias Forge.Ast
   alias Forge.Ast.Analysis
+  alias Forge.Ast.Detection
   alias Forge.Document
   alias Forge.Document.Position
   alias Forge.Document.Range
   alias Forge.Formats
   alias Future.Code, as: Code
-
   alias Sourceror.Zipper
 
   require Logger
@@ -30,18 +30,30 @@ defmodule Engine.CodeIntelligence.Entity do
   """
   @spec resolve(Analysis.t(), Position.t()) :: {:ok, resolved, Range.t()} | {:error, term()}
   def resolve(%Analysis{} = analysis, %Position{} = position) do
-    analysis = Ast.reanalyze_to(analysis, position)
+    analysis =
+      analysis
+      |> Ast.reanalyze_to(position)
+      |> Engine.CodeIntelligence.Heex.maybe_normalize(position)
 
     with :ok <- check_commented(analysis, position),
+         :ok <- check_in_string(analysis, position),
          {:ok, surround_context} <- Ast.surround_context(analysis, position),
          {:ok, resolved, {begin_pos, end_pos}} <-
            resolve(surround_context, analysis, position) do
       Logger.info("Resolved entity: #{inspect(resolved)}")
       {:ok, resolved, to_range(analysis.document, begin_pos, end_pos)}
     else
-      :error -> {:error, :not_found}
-      {:error, :surround_context} -> maybe_local_capture_func(analysis, position)
-      {:error, _} = error -> error
+      :error ->
+        {:error, :not_found}
+
+      {:error, :surround_context} ->
+        case maybe_local_capture_func(analysis, position) do
+          {:ok, _, _} = result -> result
+          _ -> {:error, :not_found}
+        end
+
+      {:error, _} = error ->
+        error
     end
   end
 
@@ -54,11 +66,11 @@ defmodule Engine.CodeIntelligence.Entity do
   end
 
   defp check_commented(%Analysis{} = analysis, %Position{} = position) do
-    if Analysis.commented?(analysis, position) do
-      :error
-    else
-      :ok
-    end
+    if Analysis.commented?(analysis, position), do: {:error, :no_code}, else: :ok
+  end
+
+  defp check_in_string(%Analysis{} = analysis, %Position{} = position) do
+    if Detection.String.detected?(analysis, position), do: {:error, :no_code}, else: :ok
   end
 
   defp resolve(%{context: context, begin: begin_pos, end: end_pos}, analysis, position) do
@@ -107,19 +119,26 @@ defmodule Engine.CodeIntelligence.Entity do
   end
 
   defp resolve({:local_arity, chars}, node_range, analysis, position) do
-    current_module = current_module(analysis, position)
+    fun = List.to_atom(chars)
 
     with {:ok, %Zipper{node: {:/, _, [_, {:__block__, _, [arity]}]}} = zipper} <-
            Ast.zipper_at(analysis.document, position),
          true <- inside_capture?(zipper) do
-      {:ok, {:call, current_module, List.to_atom(chars), arity}, node_range}
+      module =
+        case fetch_module_for_function(analysis, position, fun, arity) do
+          {:ok, mod} -> mod
+          _ -> current_module(analysis, position)
+        end
+
+      {:ok, {:call, module, fun, arity}, node_range}
     else
       _ ->
         {:error, :not_found}
     end
   end
 
-  defp resolve({:struct, charlist}, {{start_line, start_col}, end_pos}, analysis, position) do
+  defp resolve({:struct, charlist}, {{start_line, start_col}, end_pos}, analysis, position)
+       when is_list(charlist) do
     # exclude the leading % from the node range so that it can be
     # resolved like a normal module alias
     node_range = {{start_line, start_col + 1}, end_pos}
@@ -130,13 +149,27 @@ defmodule Engine.CodeIntelligence.Entity do
     end
   end
 
+  # `Code.Fragment.surround_context` wraps a dot-call in `{:struct, ...}` when
+  # there's a `%` (with optional whitespace) before the alias on the same line.
+  # In valid Elixir `%Foo.bar()` isn't a struct, so this only fires from EEx's
+  # `<% Foo.bar() ... %>`. Drop the `:struct` wrapper and resolve as a dot call.
+  defp resolve(
+         {:struct, {:dot, _, _} = dot_context},
+         {{start_line, start_col}, end_pos},
+         analysis,
+         position
+       ) do
+    node_range = {{start_line, start_col + 1}, end_pos}
+    resolve(dot_context, node_range, analysis, position)
+  end
+
   defp resolve({:dot, alias_node, fun_chars}, node_range, analysis, position) do
     fun = List.to_atom(fun_chars)
 
     with {:ok, module} <- expand_alias(alias_node, analysis, position) do
       case Ast.path_at(analysis, position) do
         {:ok, path} ->
-          arity = arity_at_position(path, position)
+          arity = resolve_arity(path, position, analysis)
           kind = kind_of_call(path, position)
           {:ok, {kind, module, fun, arity}, node_range}
 
@@ -150,7 +183,7 @@ defmodule Engine.CodeIntelligence.Entity do
     fun = List.to_atom(fun_chars)
 
     with {:ok, path} <- Ast.path_at(analysis, position),
-         arity = arity_at_position(path, position),
+         arity = resolve_arity(path, position, analysis),
          {module, ^fun, ^arity} <-
            Engine.Analyzer.resolve_local_call(analysis, position, fun, arity) do
       {:ok, {:call, module, fun, arity}, node_range}
@@ -265,32 +298,26 @@ defmodule Engine.CodeIntelligence.Entity do
     end
   end
 
+  # fetch the alias segments from ancestor `scope` macros
+  # e.g. `scope "/foo", FooWeb.Controllers`
+  # the alias module is `FooWeb.Controllers`, and the segments is `[:FooWeb, :Controllers]`
   defp fetch_phoenix_scope_alias_segments(analysis, position) do
-    # fetch the alias segments from the `scope` macro
-    # e.g. `scope "/foo", FooWeb.Controllers`
-    # the alias module is `FooWeb.Controllers`, and the segments is `[:FooWeb, :Controllers]`
-    path =
+    # Ast.cursor_path returns nodes from innermost to outermost,
+    # so we need to reverse.
+    segments =
       analysis
       |> Ast.cursor_path(position)
       |> Enum.filter(&match?({:scope, _, [_ | _]}, &1))
-      # There might be nested `scope` macros, we need the immediate ancestor
-      |> List.last()
+      |> Enum.reverse()
+      |> Enum.flat_map(fn
+        {:scope, _, [_, {:__aliases__, _, segments} | _]} -> segments
+        _ -> []
+      end)
 
-    if path do
-      {_, paths} =
-        path
-        |> Zipper.zip()
-        |> Zipper.traverse([], fn
-          %Zipper{node: {:scope, _, [_, {:__aliases__, _, segments} | _]}} = zipper, acc ->
-            {zipper, [segments | acc]}
-
-          zipper, acc ->
-            {zipper, acc}
-        end)
-
-      {:ok, paths |> Enum.reverse() |> List.flatten()}
-    else
+    if segments == [] do
       :error
+    else
+      {:ok, segments}
     end
   end
 
@@ -344,6 +371,10 @@ defmodule Engine.CodeIntelligence.Entity do
   defp uppercase?(after_dot) when is_binary(after_dot) do
     first_char = String.at(after_dot, 0)
     String.upcase(first_char) == first_char
+  end
+
+  defp expand_alias({:var, ~c"__MODULE__"}, analysis, %Position{} = position) do
+    Engine.Analyzer.current_module(analysis, position)
   end
 
   defp expand_alias({:alias, {:local_or_var, prefix}, charlist}, analysis, %Position{} = position) do
@@ -431,6 +462,13 @@ defmodule Engine.CodeIntelligence.Entity do
 
   defp arity_at_position([], _position), do: 0
 
+  defp resolve_arity(path, %Position{} = position, %Analysis{} = _analysis) do
+    case Enum.find(path, &match?({:sigil_H, _, _}, &1)) do
+      nil -> arity_at_position(path, position)
+      sigil -> Engine.CodeIntelligence.Heex.arity(sigil, position, &arity_at_position/2)
+    end
+  end
+
   # Walk up the path to see whether we're in the right-hand argument of
   # a `::` type operator, which would make the kind a `:type`, not a call.
   # Calls that occur on the right of a `::` type operator have kind `:type`
@@ -476,20 +514,8 @@ defmodule Engine.CodeIntelligence.Entity do
 
   defp fetch_module_for_function(analysis, position, function_name, arity) do
     with :error <- fetch_module_for_local_function(analysis, position, function_name, arity) do
-      fetch_module_for_imported_function(analysis, position, function_name, arity)
+      Engine.Analyzer.import_module_for(analysis, position, function_name, arity)
     end
-  end
-
-  defp fetch_module_for_imported_function(analysis, position, function_name, arity) do
-    analysis
-    |> Engine.Analyzer.imports_at(position)
-    |> Enum.find_value({:error, :not_found}, fn
-      {imported_module, ^function_name, ^arity} ->
-        {:ok, imported_module}
-
-      _ ->
-        false
-    end)
   end
 
   defp fetch_module_for_local_function(analysis, position, function_name, arity) do
@@ -522,8 +548,13 @@ defmodule Engine.CodeIntelligence.Entity do
       range = Ast.Range.fetch!(zipper.node, analysis.document)
       range = put_in(range.end.character, range.start.character + function_name_length)
 
-      current_module = current_module(analysis, position)
-      {:ok, {:call, current_module, local_func_name, arity}, range}
+      module =
+        case fetch_module_for_function(analysis, position, local_func_name, arity) do
+          {:ok, mod} -> mod
+          _ -> current_module(analysis, position)
+        end
+
+      {:ok, {:call, module, local_func_name, arity}, range}
     else
       _ ->
         {:error, :not_found}

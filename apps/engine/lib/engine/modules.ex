@@ -237,13 +237,13 @@ defmodule Engine.Modules do
   defp expired?(nil), do: true
 
   defp expired?(expires) do
-    DateTime.compare(DateTime.utc_now(), expires) == :gt
+    DateTime.after?(DateTime.utc_now(), expires)
   end
 
   defp rebuild_cache do
     {amount, unit} = @cache_timeout
 
-    expires = DateTime.add(DateTime.utc_now(), amount, unit)
+    expires = DateTime.add(DateTime.utc_now(), amount, unit, Calendar.UTCOnlyTimeZoneDatabase)
 
     module_map =
       Map.new(:code.all_available(), fn {module_charlist, _path, already_loaded?} ->

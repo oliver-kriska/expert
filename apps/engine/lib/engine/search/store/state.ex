@@ -1,12 +1,12 @@
 defmodule Engine.Search.Store.State do
+  import Forge.EngineApi.Messages
+
   alias Engine.Dispatch
   alias Engine.Search.Fuzzy
-  alias Forge.EngineApi.Messages
   alias Forge.Project
   alias Forge.Search.Indexer.Entry
 
   require Logger
-  import Messages
 
   defstruct [
     :project,
@@ -83,6 +83,10 @@ defmodule Engine.Search.Store.State do
     end
   end
 
+  def exact(%__MODULE__{loaded?: false}, _subject, _constraints) do
+    {:error, :loading}
+  end
+
   def exact(%__MODULE__{} = state, subject, constraints) do
     type = Keyword.get(constraints, :type, :_)
     subtype = Keyword.get(constraints, :subtype, :_)
@@ -91,6 +95,10 @@ defmodule Engine.Search.Store.State do
       l when is_list(l) -> {:ok, l}
       error -> error
     end
+  end
+
+  def prefix(%__MODULE__{loaded?: false}, _prefix, _constraints) do
+    {:error, :loading}
   end
 
   def prefix(%__MODULE__{} = state, prefix, constraints) do
@@ -104,6 +112,10 @@ defmodule Engine.Search.Store.State do
       error ->
         error
     end
+  end
+
+  def fuzzy(%__MODULE__{loaded?: false}, _subject, _constraints) do
+    {:error, :loading}
   end
 
   def fuzzy(%__MODULE__{} = state, subject, constraints) do
@@ -122,11 +134,68 @@ defmodule Engine.Search.Store.State do
     end
   end
 
+  def all(%__MODULE__{loaded?: false}, _) do
+    {:error, :loading}
+  end
+
+  def all(%__MODULE__{} = state, constraints) do
+    type = Keyword.get(constraints, :type, :_)
+    subtype = Keyword.get(constraints, :subtype, :_)
+
+    entries =
+      state.backend.reduce([], fn
+        %Entry{} = entry, acc ->
+          if matches_constraints?(entry, type, subtype) do
+            [entry | acc]
+          else
+            acc
+          end
+
+        _, acc ->
+          acc
+      end)
+
+    {:ok, entries}
+  end
+
+  def resolve_mfa(%__MODULE__{} = state, module, function, arity) do
+    mfa = Forge.Formats.mfa(module, function, arity)
+
+    case exact(state, mfa, subtype: :definition) do
+      {:ok, [%Entry{type: {:function, :delegate}, metadata: %{original_mfa: original_mfa}} | _]} ->
+        case Forge.Code.parse_mfa(original_mfa) do
+          {target_module, target_fun, target_arity} ->
+            {target_module, target_fun, target_arity, true, true}
+
+          nil ->
+            {module, function, arity, true, false}
+        end
+
+      {:ok, [%Entry{type: {:function, _}} | _]} ->
+        {module, function, arity, true, false}
+
+      _ ->
+        {module, function, arity, false, false}
+    end
+  end
+
+  defp matches_constraints?(%Entry{type: t, subtype: st}, type, subtype) do
+    (type == :_ or t == type) and (subtype == :_ or st == subtype)
+  end
+
+  def siblings(%__MODULE__{loaded?: false}, _entry) do
+    {:error, :loading}
+  end
+
   def siblings(%__MODULE__{} = state, entry) do
     case state.backend.siblings(entry) do
       l when is_list(l) -> {:ok, l}
       error -> error
     end
+  end
+
+  def parent(%__MODULE__{loaded?: false}, _entry) do
+    {:error, :loading}
   end
 
   def parent(%__MODULE__{} = state, entry) do
@@ -178,9 +247,11 @@ defmodule Engine.Search.Store.State do
 
       {:ok, %__MODULE__{state | fuzzy: fuzzy}}
     end
+  catch
+    :exit, {:timeout, _} ->
+      Logger.warning("Timeout updating index for path: #{path}")
+      {:ok, state}
   end
-
-  require Logger
 
   defp prepare_backend_async(%__MODULE__{async_load_ref: nil} = state, backend_result) do
     task =

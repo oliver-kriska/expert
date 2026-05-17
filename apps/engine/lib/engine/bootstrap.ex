@@ -11,7 +11,15 @@ defmodule Engine.Bootstrap do
 
   require Logger
 
-  def init(%Project{} = project, document_store_entropy, app_configs) do
+  def init(
+        %Project{} = project,
+        document_store_entropy,
+        app_configs,
+        manager_node,
+        logger_global_metadata
+      ) do
+    :logger.update_primary_config(%{metadata: logger_global_metadata})
+
     Forge.Document.Store.set_entropy(document_store_entropy)
 
     Application.put_all_env(app_configs)
@@ -25,13 +33,29 @@ defmodule Engine.Bootstrap do
          {:ok, _} <- Application.ensure_all_started(:mix),
          {:ok, _} <- Application.ensure_all_started(:logger) do
       project = maybe_load_mix_exs(project)
-      Engine.set_project(project)
-      Mix.env(:test)
-      ExUnit.start()
-      start_logger(project)
-      maybe_change_directory(project)
-      Project.ensure_workspace(project)
+
+      with :ok <- Project.ensure_workspace(project) do
+        Engine.set_project(project)
+        Engine.set_manager_node(manager_node)
+        Mix.env(:test)
+        set_mix_build_path(project)
+        ExUnit.start()
+        start_logger(project)
+        maybe_change_directory(project)
+        :ok
+      end
     end
+  end
+
+  # There is a bug in elixir 1.19.1 where the partition child processes
+  # for parallel dependency compilation do not inherit the parent process's
+  # Mix.Project config, which causes them to write compiled artifacts to the
+  # default _build directory instead of expert build path.
+  # This ensures the build path is set regardless of elixir version.
+  defp set_mix_build_path(%Project{} = project) do
+    versioned_build = Project.versioned_build_path(project)
+    build_path = Path.join(versioned_build, Atom.to_string(Mix.env()))
+    System.put_env("MIX_BUILD_PATH", build_path)
   end
 
   defp maybe_append_hex_path do
@@ -63,6 +87,7 @@ defmodule Engine.Bootstrap do
         max_no_bytes: 1_000_000,
         max_no_files: 1
       },
+      formatter: Logger.Formatter.new(metadata: [:instance_id]),
       level: :info
     }
 
@@ -70,7 +95,7 @@ defmodule Engine.Bootstrap do
     LogFilter.hook_into_logger()
   end
 
-  defp maybe_change_directory(%Project{} = project) do
+  defp maybe_change_directory(%Project{kind: :mix} = project) do
     current_dir = File.cwd!()
 
     # Note about the following code:
@@ -86,9 +111,13 @@ defmodule Engine.Bootstrap do
         |> Path.expand()
       end)
 
-    unless current_dir == configured_root do
+    if current_dir != configured_root do
       File.cd!(configured_root)
     end
+  end
+
+  defp maybe_change_directory(%Project{}) do
+    :ok
   end
 
   defp maybe_load_mix_exs(%Project{} = project) do

@@ -1,4 +1,10 @@
 defmodule Expert.Test.Expert.CompletionCase do
+  use ExUnit.CaseTemplate
+
+  import Forge.EngineApi.Messages
+  import Forge.Test.CursorSupport
+  import Forge.Test.Fixtures
+
   alias Expert.CodeIntelligence.Completion
   alias Expert.EngineApi
   alias Forge.Ast
@@ -10,14 +16,13 @@ defmodule Expert.Test.Expert.CompletionCase do
   alias GenLSP.Structures.CompletionItem
   alias GenLSP.Structures.CompletionList
 
-  use ExUnit.CaseTemplate
-  import Forge.Test.CursorSupport
-  import Forge.Test.Fixtures
-  import Forge.EngineApi.Messages
-
   setup_all do
     project = project()
 
+    start_supervised!({DynamicSupervisor, Expert.EngineBuild.DynamicSupervisor.options()})
+    start_supervised!(Expert.EngineBuilds)
+    start_supervised!({Expert.Project.Store, []})
+    start_supervised!({Forge.NodePortMapper, []})
     start_supervised!({DynamicSupervisor, Expert.Project.DynamicSupervisor.options()})
     start_supervised!({Expert.Project.Supervisor, project})
 
@@ -26,7 +31,7 @@ defmodule Expert.Test.Expert.CompletionCase do
       project_index_ready()
     ])
 
-    EngineApi.schedule_compile(project, true)
+    Expert.Project.Node.trigger_build(project)
     assert_receive project_compiled(), 5000
     assert_receive project_index_ready(), 5000
     {:ok, project: project}
@@ -53,9 +58,10 @@ defmodule Expert.Test.Expert.CompletionCase do
     file_path =
       case Keyword.fetch(opts, :path) do
         {:ok, path} ->
-          if Path.expand(path) == path do
-            # it's absolute
-            path
+          if String.starts_with?(path, "/") do
+            # On Windows, absolute paths start with the drive name, but we write
+            # tests mostly assuming Linux/macos. This handles that discrepancy.
+            if Forge.OS.windows?(), do: Path.expand(path), else: path
           else
             Path.join(root_path, path)
           end
@@ -89,7 +95,10 @@ defmodule Expert.Test.Expert.CompletionCase do
   def fetch_completion(completions, label_prefix) when is_binary(label_prefix) do
     matcher = &String.starts_with?(&1.label, label_prefix)
 
-    case completions |> completion_items() |> Enum.filter(matcher) do
+    completions
+    |> completion_items()
+    |> Enum.filter(matcher)
+    |> case do
       [] -> {:error, :not_found}
       [found] -> {:ok, found}
       found when is_list(found) -> {:ok, found}
@@ -101,7 +110,10 @@ defmodule Expert.Test.Expert.CompletionCase do
       Map.get(completion, :kind) == kind
     end
 
-    case completions |> completion_items() |> Enum.filter(matcher) do
+    completions
+    |> completion_items()
+    |> Enum.filter(matcher)
+    |> case do
       [] -> {:error, :not_found}
       [found] -> {:ok, found}
       found when is_list(found) -> {:ok, found}
@@ -119,7 +131,10 @@ defmodule Expert.Test.Expert.CompletionCase do
       end)
     end
 
-    case completions |> completion_items() |> Enum.filter(matcher) do
+    completions
+    |> completion_items()
+    |> Enum.filter(matcher)
+    |> case do
       [] -> {:error, :not_found}
       [found] -> {:ok, found}
       found when is_list(found) -> {:ok, found}

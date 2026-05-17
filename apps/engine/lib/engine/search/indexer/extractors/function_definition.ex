@@ -6,25 +6,32 @@ defmodule Engine.Search.Indexer.Extractors.FunctionDefinition do
   alias Forge.Ast.Analysis
   alias Forge.Search.Indexer.Entry
 
-  @function_definitions [:def, :defp]
+  @function_definitions [:def, :defp, :defmacro, :defmacrop]
 
   def extract({definition, _, [{fn_name, _, args} = def_ast, body]} = ast, %Reducer{} = reducer)
       when is_atom(fn_name) and definition in @function_definitions do
     with {:ok, detail_range} <- Ast.Range.fetch(def_ast, reducer.analysis.document),
          {:ok, module} <- Analyzer.current_module(reducer.analysis, detail_range.start),
          {fun_name, arity} when is_atom(fun_name) <- fun_name_and_arity(def_ast) do
-      entry =
-        Entry.block_definition(
-          reducer.analysis.document.path,
-          Reducer.current_block(reducer),
-          Subject.mfa(module, fun_name, arity),
-          type(definition),
-          block_range(reducer.analysis, ast),
-          detail_range,
-          Application.get_application(module)
-        )
+      min_arity = arity - count_defaults(extract_args(def_ast))
+      block_r = block_range(reducer.analysis, ast)
+      fun_type = type(definition)
+      app = Engine.ApplicationCache.application(module)
 
-      {:ok, entry, [args, body]}
+      entries =
+        for a <- min_arity..arity do
+          Entry.block_definition(
+            reducer.analysis.document.path,
+            Reducer.current_block(reducer),
+            Subject.mfa(module, fun_name, a),
+            fun_type,
+            block_r,
+            detail_range,
+            app
+          )
+        end
+
+      {:ok, entries, [args, body]}
     else
       _ ->
         :ignored
@@ -49,7 +56,7 @@ defmodule Engine.Search.Indexer.Extractors.FunctionDefinition do
           Subject.mfa(module, delegate_name, arity),
           {:function, :delegate},
           detail_range,
-          Application.get_application(module)
+          Engine.ApplicationCache.application(module)
         )
 
       {:ok, Entry.put_metadata(entry, metadata)}
@@ -86,8 +93,17 @@ defmodule Engine.Search.Indexer.Extractors.FunctionDefinition do
     end
   end
 
+  defp extract_args({:when, _, [{_fun_name, _, fun_args} | _]}), do: fun_args || []
+  defp extract_args({_fun_name, _, fun_args}), do: fun_args || []
+
+  defp count_defaults(args) do
+    Enum.count(args, &match?({:\\, _, _}, &1))
+  end
+
   defp type(:def), do: {:function, :public}
   defp type(:defp), do: {:function, :private}
+  defp type(:defmacro), do: {:macro, :public}
+  defp type(:defmacrop), do: {:macro, :private}
 
   defp fun_name_and_arity({:when, _, [{fun_name, _, fun_args} | _]}) do
     # a function with guards

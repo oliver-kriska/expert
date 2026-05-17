@@ -1,15 +1,16 @@
 defmodule Expert.Project.Diagnostics do
+  use GenServer
+
+  import Forge.EngineApi.Messages
+
   alias Expert.EngineApi
   alias Expert.Project.Diagnostics.State
-  alias Forge.EngineApi.Messages
   alias Forge.Formats
   alias Forge.Project
   alias GenLSP.Notifications.TextDocumentPublishDiagnostics
   alias GenLSP.Structures
 
-  import Messages
   require Logger
-  use GenServer
 
   def start_link(%Project{} = project) do
     GenServer.start_link(__MODULE__, [project], name: name(project))
@@ -17,7 +18,7 @@ defmodule Expert.Project.Diagnostics do
 
   def child_spec(%Project{} = project) do
     %{
-      id: {__MODULE__, Project.name(project)},
+      id: {__MODULE__, Project.unique_name(project)},
       start: {__MODULE__, :start_link, [project]}
     }
   end
@@ -104,6 +105,6 @@ defmodule Expert.Project.Diagnostics do
   end
 
   defp name(%Project{} = project) do
-    :"#{Project.name(project)}::diagnostics"
+    :"#{Project.unique_name(project)}::diagnostics"
   end
 end

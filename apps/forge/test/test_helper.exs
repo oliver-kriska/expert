@@ -1,2 +1,2 @@
-Application.ensure_all_started(:snowflake)
+Forge.Identifier.start()
 ExUnit.start()

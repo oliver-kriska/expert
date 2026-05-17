@@ -1,4 +1,10 @@
 defmodule Expert.Provider.Handlers.CodeActionTest do
+  use ExUnit.Case, async: false
+
+  import Forge.EngineApi.Messages
+  import Forge.Test.Fixtures
+
+  alias Expert.Document.Context
   alias Expert.EngineApi
   alias Expert.Protocol.Convert
   alias Expert.Provider.Handlers
@@ -6,17 +12,19 @@ defmodule Expert.Provider.Handlers.CodeActionTest do
   alias GenLSP.Requests.TextDocumentCodeAction
   alias GenLSP.Structures
 
-  import Forge.EngineApi.Messages
-  import Forge.Test.Fixtures
-
-  use ExUnit.Case, async: false
-
   setup_all do
+    start_supervised!({DynamicSupervisor, Expert.EngineBuild.DynamicSupervisor.options()})
+    start_supervised!(Expert.EngineBuilds)
+    start_supervised!({Forge.NodePortMapper, []})
     start_supervised!({Document.Store, derive: [analysis: &Forge.Ast.analyze/1]})
     project = project(:navigations)
 
+    start_supervised!({Expert.Project.Store, []})
     start_supervised!({DynamicSupervisor, Expert.Project.DynamicSupervisor.options()})
     start_supervised!({Expert.Project.Supervisor, project})
+
+    Expert.Project.Store.set_projects([project])
+    Expert.Configuration.new() |> Expert.Configuration.set()
 
     EngineApi.register_listener(project, self(), [project_compiled()])
     EngineApi.schedule_compile(project, true)
@@ -24,6 +32,11 @@ defmodule Expert.Provider.Handlers.CodeActionTest do
     assert_receive project_compiled(), 5000
 
     {:ok, project: project}
+  end
+
+  setup do
+    :persistent_term.erase(Expert.Configuration)
+    :ok
   end
 
   def build_request(path, {start_line, start_char}, {end_line, end_char}) do
@@ -61,8 +74,9 @@ defmodule Expert.Provider.Handlers.CodeActionTest do
   end
 
   def handle(request, project) do
-    config = Expert.Configuration.new(project: project)
-    Handlers.CodeAction.handle(request, config)
+    document = Document.Container.context_document(request, nil)
+    context = Context.new(document.uri, document, project)
+    Handlers.CodeAction.handle(request, context)
   end
 
   describe "handle code actions" do

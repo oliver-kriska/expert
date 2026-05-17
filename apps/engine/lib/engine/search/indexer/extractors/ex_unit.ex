@@ -1,5 +1,6 @@
 defmodule Engine.Search.Indexer.Extractors.ExUnit do
   alias Engine.Analyzer
+  alias Engine.Module.Loader
   alias Engine.Search.Indexer.Metadata
   alias Engine.Search.Indexer.Source.Reducer
   alias Forge.Ast
@@ -9,64 +10,100 @@ defmodule Engine.Search.Indexer.Extractors.ExUnit do
   alias Forge.Formats
   alias Forge.Search.Indexer.Entry
 
-  require Logger
-
   # setup block i.e. setup do... or setup arg do...
   def extract({setup_fn, _, args} = setup, %Reducer{} = reducer)
-      when setup_fn in [:setup, :setup_all] and length(args) > 0 do
-    {:ok, module} = Analyzer.current_module(reducer.analysis, Reducer.position(reducer))
-    arity = arity_for(args)
-    subject = Formats.mfa(module, setup_fn, arity)
-    setup_type = :"ex_unit_#{setup_fn}"
+      when setup_fn in [:setup, :setup_all] and (is_list(args) and args != []) do
+    position = Reducer.position(reducer)
 
-    entry =
+    with true <- exunit_in_scope?(reducer, position),
+         {:ok, module} <- Analyzer.current_module(reducer.analysis, position) do
+      arity = arity_for(args)
+      subject = Formats.mfa(module, setup_fn, arity)
+      setup_type = :"ex_unit_#{setup_fn}"
+
       case Metadata.location(setup) do
-        {:block, _, _, _} ->
-          block_entry(reducer, setup, setup_type, subject)
-
-        {:expression, _} ->
-          expression_entry(reducer, setup, setup_type, subject)
+        {:block, _, _, _} -> block_entry(reducer, setup, setup_type, subject)
+        {:expression, _} -> expression_entry(reducer, setup, setup_type, subject)
       end
-
-    {:ok, entry}
+    else
+      _ -> :ignored
+    end
   end
 
   # Test block test "test name" do ... or test "test name", arg do
   def extract({:test, _, [{_, _, [test_name]} | _] = args} = test, %Reducer{} = reducer)
       when is_binary(test_name) do
-    {:ok, module} = Analyzer.current_module(reducer.analysis, Reducer.position(reducer))
-    arity = arity_for(args)
-    module_name = Formats.module(module)
-    subject = "#{module_name}.[\"#{test_name}\"]/#{arity}"
+    position = Reducer.position(reducer)
 
-    entry =
+    with true <- exunit_in_scope?(reducer, position),
+         {:ok, module} <- Analyzer.current_module(reducer.analysis, position) do
+      arity = arity_for(args)
+      module_name = Formats.module(module)
+      subject = "#{module_name}.[\"#{test_name}\"]/#{arity}"
+
       case Metadata.location(test) do
-        {:block, _, _, _} ->
-          # a test with a body
-          block_entry(reducer, test, :ex_unit_test, subject)
-
-        {:expression, _} ->
-          # a pending test
-          expression_entry(reducer, test, :ex_unit_test, subject)
+        {:block, _, _, _} -> block_entry(reducer, test, :ex_unit_test, subject)
+        {:expression, _} -> expression_entry(reducer, test, :ex_unit_test, subject)
       end
-
-    {:ok, entry}
+    else
+      _ -> :ignored
+    end
   end
 
   # describe blocks
-  def extract({:describe, _, [{_, _, [describe_name]} | _] = args} = test, %Reducer{} = reducer) do
-    {:ok, module} = Analyzer.current_module(reducer.analysis, Reducer.position(reducer))
-    arity = arity_for(args)
-    module_name = Formats.module(module)
-    subject = "#{module_name}[\"#{describe_name}\"]/#{arity}"
+  def extract({:describe, _, [{_, _, [describe_name]} | _] = args} = test, %Reducer{} = reducer)
+      when is_binary(describe_name) do
+    position = Reducer.position(reducer)
 
-    entry = block_entry(reducer, test, :ex_unit_describe, subject)
+    with true <- exunit_in_scope?(reducer, position),
+         {:ok, module} <- Analyzer.current_module(reducer.analysis, position) do
+      arity = arity_for(args)
+      module_name = Formats.module(module)
+      subject = "#{module_name}[\"#{describe_name}\"]/#{arity}"
 
-    {:ok, entry}
+      block_entry(reducer, test, :ex_unit_describe, subject)
+    else
+      _ -> :ignored
+    end
   end
 
   def extract(_ign, _) do
     :ignored
+  end
+
+  defp exunit_in_scope?(%Reducer{} = reducer, %Position{} = position) do
+    current_module =
+      case Analyzer.current_module(reducer.analysis, position) do
+        {:ok, module} -> module
+        _ -> nil
+      end
+
+    exunit_module?(current_module) or
+      exunit_from_uses?(reducer, position) or
+      ExUnit.Case in Analyzer.requires_at(reducer.analysis, position) or
+      exunit_imported?(reducer, position)
+  end
+
+  defp exunit_from_uses?(%Reducer{} = reducer, %Position{} = position) do
+    uses = Analyzer.uses_at(reducer.analysis, position)
+
+    ExUnit.Case in uses or
+      ExUnit.CaseTemplate in uses or
+      Enum.any?(uses, &exunit_module?/1)
+  end
+
+  defp exunit_module?(module) when is_atom(module) do
+    Loader.ensure_loaded?(module) and
+      (function_exported?(module, :__ex_unit__, 1) or
+         function_exported?(module, :__ex_unit__, 2))
+  end
+
+  defp exunit_module?(_), do: false
+
+  defp exunit_imported?(%Reducer{} = reducer, %Position{} = position) do
+    Enum.any?(Analyzer.imports_at(reducer.analysis, position), fn {mod, _, _} ->
+      mod == ExUnit.Case
+    end)
   end
 
   defp expression_entry(%Reducer{} = reducer, ast, type, subject) do
@@ -74,10 +111,12 @@ defmodule Engine.Search.Indexer.Extractors.ExUnit do
     block = Reducer.current_block(reducer)
 
     {:ok, module} = Analyzer.current_module(reducer.analysis, Reducer.position(reducer))
-    app = Application.get_application(module)
-    detail_range = detail_range(reducer.analysis, ast)
+    app = Engine.ApplicationCache.application(module)
 
-    Entry.definition(path, block, subject, type, detail_range, app)
+    case detail_range(reducer.analysis, ast) do
+      nil -> :ignored
+      range -> {:ok, Entry.definition(path, block, subject, type, range, app)}
+    end
   end
 
   defp block_entry(%Reducer{} = reducer, ast, type, subject) do
@@ -85,10 +124,24 @@ defmodule Engine.Search.Indexer.Extractors.ExUnit do
     block = Reducer.current_block(reducer)
 
     {:ok, module} = Analyzer.current_module(reducer.analysis, Reducer.position(reducer))
-    app = Application.get_application(module)
-    detail_range = detail_range(reducer.analysis, ast)
-    block_range = block_range(reducer.analysis, ast)
-    Entry.block_definition(path, block, subject, type, block_range, detail_range, app)
+    app = Engine.ApplicationCache.application(module)
+
+    case detail_range(reducer.analysis, ast) do
+      nil ->
+        :ignored
+
+      detail_range ->
+        {:ok,
+         Entry.block_definition(
+           path,
+           block,
+           subject,
+           type,
+           block_range(reducer.analysis, ast),
+           detail_range,
+           app
+         )}
+    end
   end
 
   defp block_range(%Analysis{} = analysis, ast) do
@@ -113,6 +166,9 @@ defmodule Engine.Search.Indexer.Extractors.ExUnit do
           Position.new(analysis.document, start_line, start_column),
           Position.new(analysis.document, end_line, end_column)
         )
+
+      _ ->
+        nil
     end
   end
 

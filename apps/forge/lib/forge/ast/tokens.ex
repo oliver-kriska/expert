@@ -154,6 +154,10 @@ defmodule Forge.Ast.Tokens do
           range = {{line, column}, end_pos}
           {end_pos, [{:literal, literal, range} | acc]}
 
+        {_, {end_line, end_column, _}, []}, {_, acc} ->
+          range = {{end_line, end_column}, {end_line, end_column}}
+          {{end_line, end_column}, [{:interpolation, [], range} | acc]}
+
         {_, {end_line, end_column, _}, interp}, {_, acc} ->
           start_pos = get_start_pos(interp)
           range = {start_pos, {end_line, end_column}}
@@ -164,6 +168,11 @@ defmodule Forge.Ast.Tokens do
   end
 
   defp get_start_pos([{:eol, {start_line, start_column, _}} | _]) do
+    {start_line, start_column}
+  end
+
+  defp get_start_pos([{token, {start_line, start_column, _}} | _])
+       when token in [:"(", :"[", :"{", :%, :%{}] do
     {start_line, start_column}
   end
 

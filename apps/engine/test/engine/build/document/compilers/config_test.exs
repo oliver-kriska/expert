@@ -1,10 +1,11 @@
 defmodule Engine.Build.Document.Compilers.ConfigTest do
-  alias Engine.Build.Document.Compilers
-  alias Forge.Document
-
   use ExUnit.Case
+  use Patch
+
+  import Engine.Build.Document.Compilers.Config
   import Forge.Test.CodeSigil
-  import Compilers.Config
+
+  alias Forge.Document
 
   def document_with_path(left, right) do
     left
@@ -55,6 +56,12 @@ defmodule Engine.Build.Document.Compilers.ConfigTest do
       refute recognizes?(document_with_path(config_dir(), "foo.yaml"))
       refute recognizes?(document_with_path(config_dir(), "foo.eex"))
       refute recognizes?(document_with_path(config_dir(), "foo.heex"))
+    end
+
+    test "returns false when no Mix project is loaded" do
+      patch(Engine.Mix, :loaded?, false)
+
+      refute recognizes?(document_with_path("/tmp/config/test.exs"))
     end
   end
 

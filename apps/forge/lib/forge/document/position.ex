@@ -12,6 +12,8 @@ defmodule Forge.Document.Position do
   the position: `%Forge.Document.Position{line: 1, character: 1}` starts before the "H" in "Hello"
   """
 
+  use Forge.StructAccess
+
   alias Forge.Document
   alias Forge.Document.Lines
 
@@ -36,8 +38,6 @@ defmodule Forge.Document.Position do
           starting_index: non_neg_integer(),
           valid?: boolean()
         }
-
-  use Forge.StructAccess
 
   @spec new(line_container(), line(), character()) :: t
   def new(%Document{} = document, line, character)
@@ -106,8 +106,6 @@ end
 
 defimpl Inspect, for: Forge.Document.Position do
   import Inspect.Algebra
-
-  def inspect(nil, _), do: "nil"
 
   def inspect(pos, _) do
     concat(["XpPos", to_string(pos)])

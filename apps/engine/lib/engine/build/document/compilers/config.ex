@@ -2,28 +2,32 @@ defmodule Engine.Build.Document.Compilers.Config do
   @moduledoc """
   A compiler for elixir configuration
   """
+  @behaviour Engine.Build.Document.Compiler
+
   alias Elixir.Features
-  alias Engine.Build
   alias Engine.Build.Error.Location
   alias Forge.Document
   alias Forge.Plugin.V1.Diagnostic
 
-  @elixir_source "Elixir"
-
-  @behaviour Build.Document.Compiler
   require Logger
+
+  @elixir_source "Elixir"
 
   @impl true
   def enabled?, do: true
 
   @impl true
   def recognizes?(%Document{} = document) do
-    in_config_dir? =
-      document.path
-      |> Path.dirname()
-      |> String.starts_with?(config_dir())
+    if Engine.Mix.loaded?() do
+      in_config_dir? =
+        document.path
+        |> Path.dirname()
+        |> String.starts_with?(config_dir())
 
-    in_config_dir? and Path.extname(document.path) == ".exs"
+      in_config_dir? and Path.extname(document.path) == ".exs"
+    else
+      false
+    end
   end
 
   @impl true

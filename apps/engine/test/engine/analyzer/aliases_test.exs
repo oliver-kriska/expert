@@ -1,13 +1,13 @@
 defmodule Engine.Analyzer.AliasesTest do
+  use ExUnit.Case
+
+  import Forge.Test.CodeSigil
+  import Forge.Test.CursorSupport
+  import Forge.Test.RangeSupport
+
   alias Engine.Analyzer
   alias Forge.Ast
   alias Forge.Document
-
-  import Forge.Test.CursorSupport
-  import Forge.Test.CodeSigil
-  import Forge.Test.RangeSupport
-
-  use ExUnit.Case
 
   def aliases_at_cursor(text) do
     {position, document} = pop_cursor(text, as: :document)
@@ -15,6 +15,7 @@ defmodule Engine.Analyzer.AliasesTest do
     document
     |> Ast.analyze()
     |> Analyzer.aliases_at(position)
+    |> Map.new(fn {k, v} -> {k |> concat_without_prefix(), v} end)
   end
 
   defp scope_aliases(text) do
@@ -25,9 +26,15 @@ defmodule Engine.Analyzer.AliasesTest do
       |> Ast.analyze()
       |> Ast.Analysis.scopes_at(position)
       |> Enum.flat_map(& &1.aliases)
-      |> Map.new(&{&1.as, &1})
+      |> Map.new(&{&1.as |> concat_without_prefix(), &1})
 
     {aliases, document}
+  end
+
+  # Acts like Module.concat/1 for elixir modules but skips the "Elixir." prefix.
+  defp concat_without_prefix(segments) do
+    # Used only in tests, atom table growth is not a concern here.
+    segments |> Enum.join(".") |> String.to_atom()
   end
 
   describe "top level aliases" do
@@ -260,6 +267,23 @@ defmodule Engine.Analyzer.AliasesTest do
       assert aliases[:"@protocol"] == MyProtocol
       assert aliases[:"@for"] == Atom
     end
+
+    test "skips unquote-based aliases in quoted blocks" do
+      aliases =
+        ~q<
+          defmodule TopLevel do
+            defmacro __using__(module) do
+              quote do
+                alias unquote(module).Helpers|
+              end
+            end
+          end
+        >
+        |> aliases_at_cursor()
+
+      assert is_map(aliases)
+      refute Map.has_key?(aliases, :Helpers)
+    end
   end
 
   describe "alias ranges" do
@@ -430,6 +454,22 @@ defmodule Engine.Analyzer.AliasesTest do
         |> aliases_at_cursor()
 
       assert aliases[:__MODULE__] == Parent.Child
+    end
+
+    test "doted parent and child" do
+      aliases =
+        ~q[
+          defmodule Parent.Foo do
+            defmodule Bar.Baz do
+              |
+            end
+          end
+        ]
+        |> aliases_at_cursor()
+
+      assert aliases[:"Bar.Baz"] == Parent.Foo.Bar.Baz
+      assert aliases[:"Parent.Foo"] == Parent.Foo
+      assert aliases[:__MODULE__] == Parent.Foo.Bar.Baz
     end
   end
 

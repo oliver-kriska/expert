@@ -10,8 +10,14 @@ defmodule Engine.Analyzer.Aliases do
       [%Scope{} = scope | _] ->
         scope
         |> Scope.alias_map(position)
-        |> Map.new(fn {as, %Alias{} = alias} ->
-          {as, Alias.to_module(alias)}
+        |> Enum.reduce(%{}, fn {as, %Alias{} = alias}, acc ->
+          segments = alias.module
+
+          if is_list(segments) and Enum.all?(segments, &is_atom/1) do
+            Map.put(acc, as, Alias.to_module(alias))
+          else
+            acc
+          end
         end)
 
       [] ->
@@ -36,10 +42,8 @@ defmodule Engine.Analyzer.Aliases do
 
       [prefix | suffix] ->
         case aliases do
-          %{^prefix => _} ->
-            current_module = resolve_alias(aliases, prefix, suffix)
-
-            Module.concat([current_module | suffix])
+          %{[^prefix] => _} ->
+            resolve_alias(aliases, prefix, suffix)
 
           _ ->
             Module.concat(module)
@@ -54,7 +58,7 @@ defmodule Engine.Analyzer.Aliases do
   defp resolve_alias(aliases, prefix, suffix) do
     current_module =
       aliases
-      |> Map.get(prefix)
+      |> Map.get(List.wrap(prefix))
       |> Alias.to_module()
 
     Module.concat([current_module | suffix])

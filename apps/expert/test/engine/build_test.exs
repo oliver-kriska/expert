@@ -1,19 +1,19 @@
 defmodule Engine.BuildTest do
+  use ExUnit.Case
+  use Patch
+
+  import Forge.EngineApi.Messages
+  import Forge.Test.DiagnosticSupport
+  import Forge.Test.Fixtures
+
   alias Elixir.Features
   alias Engine.Build
   alias Expert.EngineApi
   alias Expert.EngineNode
   alias Expert.EngineSupervisor
   alias Forge.Document
-  alias Forge.EngineApi.Messages
   alias Forge.Plugin.V1.Diagnostic
   alias Forge.Project
-
-  import Messages
-  import Forge.Test.Fixtures
-  import Forge.Test.DiagnosticSupport
-  use ExUnit.Case
-  use Patch
 
   def compile_document(%Project{} = project, file_path \\ nil, source_code) do
     uri =
@@ -42,6 +42,11 @@ defmodule Engine.BuildTest do
     |> Project.workspace_path()
     |> File.rm_rf()
 
+    {:ok, _} =
+      start_supervised({DynamicSupervisor, Expert.EngineBuild.DynamicSupervisor.options()})
+
+    {:ok, _} = start_supervised(Expert.EngineBuilds)
+    {:ok, _} = start_supervised(Forge.NodePortMapper)
     {:ok, _} = start_supervised({EngineSupervisor, project})
     {:ok, _, _} = EngineNode.start(project)
     EngineApi.register_listener(project, self(), [:all])
@@ -75,9 +80,7 @@ defmodule Engine.BuildTest do
       {:ok, project} = with_project(:project_metadata)
       EngineApi.schedule_compile(project, true)
 
-      assert_receive project_compiled(status: :success)
-      assert_receive project_progress(label: "Building " <> project_name)
-      assert project_name == "project_metadata"
+      assert_receive project_compiled(status: :success), :timer.seconds(5)
     end
 
     test "receives metadata about the defined modules" do
@@ -111,9 +114,6 @@ defmodule Engine.BuildTest do
       assert {:arity_0, 0} in functions
       assert {:arity_1, 1} in functions
       assert {:arity_2, 2} in functions
-
-      assert_receive project_progress(label: "Building " <> project_name)
-      assert project_name == "umbrella"
     end
   end
 
@@ -122,7 +122,7 @@ defmodule Engine.BuildTest do
       {:ok, project} = with_project(:compilation_errors)
       EngineApi.schedule_compile(project, true)
 
-      assert_receive project_compiled(status: :error)
+      assert_receive project_compiled(status: :error), :timer.seconds(5)
       assert_receive project_diagnostics(diagnostics: [%Diagnostic.Result{}])
     end
   end
@@ -147,7 +147,7 @@ defmodule Engine.BuildTest do
     test "stuff when #{inspect(@feature_condition)}", %{project: project} do
       EngineApi.schedule_compile(project, true)
 
-      assert_receive project_compiled(status: :error)
+      assert_receive project_compiled(status: :error), :timer.seconds(5)
       assert_receive project_diagnostics(diagnostics: [%Diagnostic.Result{} = diagnostic])
 
       assert diagnostic.uri
@@ -163,7 +163,7 @@ defmodule Engine.BuildTest do
       {:ok, project} = with_project(:compilation_warnings)
       EngineApi.schedule_compile(project, true)
 
-      assert_receive project_compiled(status: :success)
+      assert_receive project_compiled(status: :success), :timer.seconds(5)
       assert_receive project_diagnostics(diagnostics: diagnostics)
 
       assert [%Diagnostic.Result{}, %Diagnostic.Result{}] = diagnostics
@@ -650,6 +650,7 @@ defmodule Engine.BuildTest do
 
   describe ".exs files" do
     setup do
+      start_supervised!({Forge.NodePortMapper, []})
       start_supervised!(Engine.Dispatch)
       start_supervised!(Engine.ModuleMappings)
       start_supervised!(Build.CaptureServer)

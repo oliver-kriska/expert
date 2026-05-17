@@ -8,6 +8,7 @@ defmodule Engine do
   alias Engine.Api.Proxy
   alias Engine.CodeAction
   alias Engine.CodeIntelligence
+  alias Engine.Progress
   alias Forge.Project
 
   require Logger
@@ -27,6 +28,8 @@ defmodule Engine do
 
   defdelegate broadcast(message), to: Proxy
 
+  defdelegate clean_and_fetch_deps, to: Proxy
+
   defdelegate expand_alias(segments_or_module, analysis, position), to: Engine.Analyzer
 
   defdelegate list_modules, to: :code, as: :all_available
@@ -42,6 +45,8 @@ defmodule Engine do
     as: :struct_fields
 
   defdelegate definition(document, position), to: CodeIntelligence.Definition
+
+  defdelegate hover(document, position), to: CodeIntelligence.Hover
 
   defdelegate references(analysis, position, include_definitions?),
     to: CodeIntelligence.References
@@ -68,10 +73,12 @@ defmodule Engine do
         do: app
   end
 
-  def ensure_apps_started do
+  def ensure_apps_started(token \\ Progress.noop_token()) do
     apps_to_start = [:elixir, :runtime_tools | @allowed_apps]
 
     Enum.reduce_while(apps_to_start, :ok, fn app_name, _ ->
+      Progress.report(token, message: "Starting #{app_name}...")
+
       case :application.ensure_all_started(app_name) do
         {:ok, _} -> {:cont, :ok}
         error -> {:halt, error}
@@ -80,10 +87,15 @@ defmodule Engine do
   end
 
   def deps_paths do
+    deps_paths(get_project())
+  end
+
+  defp deps_paths(%Project{kind: :mix}) do
     case :persistent_term.get({__MODULE__, :deps_paths}, :error) do
       :error ->
         {:ok, deps_paths} =
           Engine.Mix.in_project(fn _ ->
+            Project.ensure_hex_and_rebar()
             Mix.Task.run("loadpaths")
             Mix.Project.deps_paths()
           end)
@@ -94,6 +106,10 @@ defmodule Engine do
       deps_paths ->
         deps_paths
     end
+  end
+
+  defp deps_paths(%Project{}) do
+    []
   end
 
   def with_lock(lock_type, func) do
@@ -110,5 +126,13 @@ defmodule Engine do
 
   def set_project(%Project{} = project) do
     :persistent_term.put({__MODULE__, :project}, project)
+  end
+
+  def get_manager_node do
+    :persistent_term.get({__MODULE__, :manager_node}, nil)
+  end
+
+  def set_manager_node(node) when is_atom(node) do
+    :persistent_term.put({__MODULE__, :manager_node}, node)
   end
 end

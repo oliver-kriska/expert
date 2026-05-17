@@ -1,17 +1,25 @@
 defmodule Engine.Search.Store.Backends.Ets.SchemaTest do
+  use ExUnit.Case
+  use Patch
+
+  import Engine.Search.Store.Backends.Ets.Wal, only: :macros
+  import Forge.Test.Fixtures
+
+  alias Engine.Dispatch
   alias Engine.Search.Store.Backends.Ets.Schema
   alias Engine.Search.Store.Backends.Ets.Wal
   alias Forge.Project
-
-  import Forge.Test.Fixtures
-  import Wal, only: :macros
-
-  use ExUnit.Case
 
   setup do
     project = project()
 
     destroy_index_path(project)
+
+    patch(Dispatch, :erpc_call, fn Expert.Progress, :begin, [_title, _opts] ->
+      {:ok, System.unique_integer([:positive])}
+    end)
+
+    patch(Dispatch, :erpc_cast, fn Expert.Progress, _function, _args -> true end)
 
     on_exit(fn ->
       destroy_index_path(project)
@@ -22,6 +30,7 @@ defmodule Engine.Search.Store.Backends.Ets.SchemaTest do
 
   defmodule First do
     use Schema, version: 1
+
     def to_rows(_), do: []
   end
 

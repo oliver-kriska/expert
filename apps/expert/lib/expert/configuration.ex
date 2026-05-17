@@ -4,38 +4,94 @@ defmodule Expert.Configuration do
   """
 
   alias Expert.Configuration.Support
-  alias Expert.Dialyzer
+  alias Expert.Configuration.WorkspaceSymbols
   alias Expert.Protocol.Id
-  alias Forge.Project
   alias GenLSP.Notifications.WorkspaceDidChangeConfiguration
   alias GenLSP.Requests
   alias GenLSP.Structures
 
-  defstruct project: nil,
-            support: nil,
+  @default_lsp_log_level :info
+  @default_file_log_level :debug
+
+  @lsp_log_levels %{
+    "error" => :error,
+    "warning" => :warning,
+    "info" => :info,
+    "log" => :log
+  }
+
+  @file_log_levels %{
+    "debug" => :debug,
+    "info" => :info,
+    "warning" => :warning,
+    "error" => :error
+  }
+
+  @settings %{
+    log_level: %{
+      key: "logLevel",
+      parser: {:enum, @lsp_log_levels, @default_lsp_log_level},
+      missing: :default
+    },
+    file_log_level: %{
+      key: "fileLogLevel",
+      parser: {:enum, @file_log_levels, @default_file_log_level},
+      missing: :preserve
+    },
+    elixir_source_path: %{
+      key: "elixirSourcePath",
+      parser: {:string, nil},
+      missing: :preserve
+    },
+    elixir_executable_path: %{
+      key: "elixirExecutablePath",
+      parser: {:string, nil},
+      missing: :preserve
+    },
+    erlang_executable_path: %{
+      key: "erlangExecutablePath",
+      parser: {:string, nil},
+      missing: :preserve
+    },
+    workspace_symbols: %{
+      key: "workspaceSymbols",
+      parser: :workspace_symbols,
+      missing: :preserve
+    }
+  }
+
+  @type lsp_level :: :error | :warning | :info | :log
+  @type file_level :: :debug | :info | :warning | :error
+
+  defstruct support: nil,
             client_name: nil,
             additional_watched_extensions: nil,
-            dialyzer_enabled?: false
+            workspace_symbols: %WorkspaceSymbols{},
+            log_level: @default_lsp_log_level,
+            file_log_level: @default_file_log_level,
+            elixir_source_path: nil,
+            elixir_executable_path: nil,
+            erlang_executable_path: nil
 
   @type t :: %__MODULE__{
-          project: Project.t() | nil,
           support: support | nil,
           client_name: String.t() | nil,
           additional_watched_extensions: [String.t()] | nil,
-          dialyzer_enabled?: boolean()
+          workspace_symbols: WorkspaceSymbols.t(),
+          log_level: lsp_level(),
+          file_log_level: file_level(),
+          elixir_source_path: String.t() | nil,
+          elixir_executable_path: String.t() | nil,
+          erlang_executable_path: String.t() | nil
         }
 
   @opaque support :: Support.t()
 
-  @dialyzer {:nowarn_function, set_dialyzer_enabled: 2}
-
-  @spec new(Forge.uri(), map(), String.t() | nil) :: t
-  def new(root_uri, %Structures.ClientCapabilities{} = client_capabilities, client_name) do
+  @spec new(Structures.ClientCapabilities.t(), String.t() | nil) :: t
+  def new(%Structures.ClientCapabilities{} = client_capabilities, client_name) do
     support = Support.new(client_capabilities)
-    project = Project.new(root_uri)
 
-    %__MODULE__{support: support, project: project, client_name: client_name}
-    |> tap(&set/1)
+    %__MODULE__{support: support, client_name: client_name}
   end
 
   @spec new(keyword()) :: t
@@ -43,80 +99,151 @@ defmodule Expert.Configuration do
     struct!(__MODULE__, [support: Support.new()] ++ attrs)
   end
 
-  defp set(%__MODULE__{} = config) do
-    # FIXME(mhanberg): I don't think this will work once we have workspace support
+  @spec set(t) :: t
+  def set(%__MODULE__{} = config) do
     :persistent_term.put(__MODULE__, config)
+    config
   end
 
   @spec get() :: t
   def get do
-    :persistent_term.get(__MODULE__, false) || new()
+    :persistent_term.get(__MODULE__, nil) || struct!(__MODULE__, support: Support.new())
   end
 
-  @spec client_supports?(atom()) :: boolean()
-  def client_supports?(key) when is_atom(key) do
-    client_supports?(get().support, key)
+  @spec client_support(atom()) :: term()
+  def client_support(key) when is_atom(key) do
+    client_support(get().support, key)
   end
 
-  defp client_supports?(%Support{} = client_support, key) do
+  @spec log_level() :: lsp_level()
+  def log_level do
+    get().log_level
+  end
+
+  @spec file_log_level() :: file_level()
+  def file_log_level do
+    get().file_log_level
+  end
+
+  @spec window_log_message_enabled?() :: boolean()
+  def window_log_message_enabled? do
+    case get().client_name do
+      nil ->
+        true
+
+      client_name ->
+        # Workaround for Eglot/Emacs behavior discussed in:
+        # https://github.com/expert-lsp/expert/issues/382
+        client_name
+        |> String.trim()
+        |> String.downcase()
+        |> then(&(&1 not in ["emacs", "eglot"]))
+    end
+  end
+
+  defp client_support(%Support{} = client_support, key) do
     case Map.fetch(client_support, key) do
       {:ok, value} -> value
       :error -> raise ArgumentError, "unknown key: #{inspect(key)}"
     end
   end
 
-  @spec default(t | nil) ::
+  @spec default() :: {:ok, t} | {:ok, t, Requests.ClientRegisterCapability.t()}
+  def default do
+    apply_config_change(get(), %{})
+  end
+
+  @spec on_change(WorkspaceDidChangeConfiguration.t() | :defaults) ::
           {:ok, t}
           | {:ok, t, Requests.ClientRegisterCapability.t()}
-  def default(nil) do
-    {:ok, default_config()}
+  def on_change(:defaults) do
+    apply_config_change(get(), %{})
   end
 
-  def default(%__MODULE__{} = config) do
-    apply_config_change(config, default_config())
-  end
-
-  @spec on_change(t, WorkspaceDidChangeConfiguration.t()) ::
-          {:ok, t}
-          | {:ok, t, Requests.ClientRegisterCapability.t()}
-  def on_change(%__MODULE__{} = old_config, :defaults) do
-    apply_config_change(old_config, default_config())
-  end
-
-  def on_change(%__MODULE__{} = old_config, %WorkspaceDidChangeConfiguration{} = change) do
-    apply_config_change(old_config, change.params.settings)
-  end
-
-  defp default_config do
-    %{}
+  def on_change(%WorkspaceDidChangeConfiguration{} = change) do
+    apply_config_change(get(), change.params.settings)
   end
 
   defp apply_config_change(%__MODULE__{} = old_config, %{} = settings) do
-    old_config
-    |> set_dialyzer_enabled(settings)
-    |> maybe_add_watched_extensions(settings)
+    new_config =
+      old_config
+      |> apply_settings(settings)
+      |> set()
+
+    apply_file_log_level(new_config)
+    maybe_watched_extensions_request(new_config, settings)
   end
 
-  defp set_dialyzer_enabled(%__MODULE__{} = old_config, settings) do
-    enabled? =
-      if Dialyzer.check_support() == :ok do
-        Map.get(settings, "dialyzerEnabled", true)
-      else
-        false
-      end
-
-    %__MODULE__{old_config | dialyzer_enabled?: enabled?}
-  end
-
-  defp maybe_add_watched_extensions(
-         %__MODULE__{} = old_config,
-         %{"additionalWatchedExtensions" => []}
-       ) do
+  defp apply_config_change(%__MODULE__{} = old_config, _settings) do
     {:ok, old_config}
   end
 
-  defp maybe_add_watched_extensions(
-         %__MODULE__{} = old_config,
+  defp apply_file_log_level(%__MODULE__{file_log_level: level}) do
+    handler_name = Expert.Logging.ProjectLogFile.handler_name()
+
+    case :logger.set_handler_config(handler_name, :level, level) do
+      :ok -> :ok
+      {:error, _} -> :ok
+    end
+  end
+
+  defp apply_settings(%__MODULE__{} = config, settings) do
+    Enum.reduce(@settings, config, fn {field, setting}, config ->
+      apply_setting(config, settings, field, setting)
+    end)
+  end
+
+  defp apply_setting(%__MODULE__{} = config, settings, field, %{
+         key: key,
+         parser: parser,
+         missing: on_missing
+       }) do
+    case Map.fetch(settings, key) do
+      {:ok, value} -> put_setting(config, field, parse_setting(value, parser))
+      :error -> apply_missing_setting(config, field, parser, on_missing)
+    end
+  end
+
+  defp apply_missing_setting(%__MODULE__{} = config, field, parser, :default) do
+    put_setting(config, field, default_setting(parser))
+  end
+
+  defp apply_missing_setting(%__MODULE__{} = config, _field, _parser, :preserve) do
+    config
+  end
+
+  defp parse_setting(value, {:enum, values, default}) do
+    Map.get(values, value, default)
+  end
+
+  defp parse_setting(value, {:string, _default}) when is_binary(value) do
+    value
+  end
+
+  defp parse_setting(_value, {:string, default}) do
+    default
+  end
+
+  defp parse_setting(settings, :workspace_symbols) do
+    WorkspaceSymbols.new(%{"workspaceSymbols" => settings})
+  end
+
+  defp default_setting({:enum, _values, default}), do: default
+  defp default_setting({:string, default}), do: default
+
+  defp put_setting(%__MODULE__{} = config, field, value) do
+    struct!(config, [{field, value}])
+  end
+
+  defp maybe_watched_extensions_request(
+         %__MODULE__{} = config,
+         %{"additionalWatchedExtensions" => []}
+       ) do
+    {:ok, config}
+  end
+
+  defp maybe_watched_extensions_request(
+         %__MODULE__{} = config,
          %{"additionalWatchedExtensions" => extensions}
        )
        when is_list(extensions) do
@@ -137,10 +264,10 @@ defmodule Expert.Configuration do
       params: %Structures.RegistrationParams{registrations: [registration]}
     }
 
-    {:ok, old_config, request}
+    {:ok, config, request}
   end
 
-  defp maybe_add_watched_extensions(%__MODULE__{} = old_config, _) do
-    {:ok, old_config}
+  defp maybe_watched_extensions_request(%__MODULE__{} = config, _settings) do
+    {:ok, config}
   end
 end

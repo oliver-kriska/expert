@@ -1,9 +1,5 @@
 defmodule Expert.Engine.CodeIntelligence.DefinitionTest do
-  alias Engine.Search
-  alias Expert.EngineApi
-  alias Expert.EngineNode
-  alias Expert.EngineSupervisor
-  alias Forge.Document
+  use ExUnit.Case, async: false
 
   import Forge.EngineApi.Messages
   import Forge.Test.CodeSigil
@@ -11,7 +7,11 @@ defmodule Expert.Engine.CodeIntelligence.DefinitionTest do
   import Forge.Test.Fixtures
   import Forge.Test.RangeSupport
 
-  use ExUnit.Case, async: false
+  alias Engine.Search
+  alias Expert.EngineApi
+  alias Expert.EngineNode
+  alias Expert.EngineSupervisor
+  alias Forge.Document
 
   defp with_referenced_file(%{project: project}) do
     uri =
@@ -43,6 +43,11 @@ defmodule Expert.Engine.CodeIntelligence.DefinitionTest do
   end
 
   setup_all do
+    {:ok, _} =
+      start_supervised({DynamicSupervisor, Expert.EngineBuild.DynamicSupervisor.options()})
+
+    {:ok, _} = start_supervised(Expert.EngineBuilds)
+    {:ok, _} = start_supervised({Forge.NodePortMapper, []})
     project = project(:navigations)
     start_supervised!({Document.Store, derive: [analysis: &Forge.Ast.analyze/1]})
     {:ok, _} = start_supervised({EngineSupervisor, project})
@@ -58,6 +63,8 @@ defmodule Expert.Engine.CodeIntelligence.DefinitionTest do
   end
 
   setup %{project: project} do
+    start_supervised!(Engine.ApplicationCache)
+
     uri = subject_module_uri(project)
 
     # NOTE: We need to make sure every tests start with fresh caller content file
@@ -335,6 +342,50 @@ defmodule Expert.Engine.CodeIntelligence.DefinitionTest do
       assert referenced_uri == subject_uri
     end
 
+    test "find the function definition when referenced via __MODULE__", %{
+      project: project,
+      subject_uri: subject_uri
+    } do
+      subject_module = ~q[
+        defmodule UsesOwnFunction do
+          def greet do
+          end
+
+          def uses_greet do
+            __MODULE__.gree|t()
+          end
+        end
+      ]
+
+      {:ok, referenced_uri, definition_line} = definition(project, subject_module, subject_uri)
+
+      assert definition_line == ~S[  def «greet» do]
+      assert referenced_uri =~ "navigations/lib/my_module.ex"
+    end
+
+    test "find the function definition when alias __MODULE__ is used", %{
+      project: project,
+      subject_uri: subject_uri
+    } do
+      subject_module = ~q[
+        defmodule MyApp.UsesOwnFunction do
+          alias __MODULE__
+
+          def greet do
+          end
+
+          def uses_greet do
+            UsesOwnFunction.gree|t()
+          end
+        end
+      ]
+
+      {:ok, referenced_uri, definition_line} = definition(project, subject_module, subject_uri)
+
+      assert definition_line == ~S[  def «greet» do]
+      assert referenced_uri =~ "navigations/lib/my_module.ex"
+    end
+
     test "find the attribute", %{project: project, subject_uri: subject_uri} do
       subject_module = ~q[
         defmodule UsesAttribute do
@@ -431,6 +482,122 @@ defmodule Expert.Engine.CodeIntelligence.DefinitionTest do
       {referenced_uri, definition_line} = location2
       assert definition_line == ~S[  defdelegate «greet(name)», to: MyDefinition]
       assert referenced_uri == subject_uri
+    end
+  end
+
+  describe "definition/2 within LiveView's ~H sigil" do
+    setup [:with_referenced_file]
+
+    test "find the definition when full module specified", %{
+      project: project,
+      uri: uri,
+      subject_uri: subject_uri
+    } do
+      subject_module = ~q[
+        defmodule MyLiveView do
+          use Phoenix.Component
+
+          def render(assigns) do
+            ~H"""
+            <MyDefinition.but|ton navigate="/home">Home</MyDefinition.button>
+            """
+          end
+        end
+      ]
+
+      assert {:ok, ^uri, definition} = definition(project, subject_module, [uri, subject_uri])
+      assert definition == "  def «button(_assigns)» do"
+    end
+
+    test "find the definition when shorthand notation for function from same module", %{
+      project: project,
+      uri: uri,
+      subject_uri: subject_uri
+    } do
+      subject_module = ~q[
+        defmodule MyLiveView do
+          use Phoenix.Component
+
+          def render(assigns) do
+            ~H"""
+            <.but|ton navigate="/home">Home</.button>
+            """
+          end
+
+          def button(_assigns), do: nil
+        end
+      ]
+
+      assert {:ok, ^subject_uri, fragment} =
+               definition(project, subject_module, [uri, subject_uri])
+
+      assert fragment == "  def «button(_assigns)», do: nil"
+    end
+
+    test "find the definition when shorthand notation used and imported function", %{
+      project: project,
+      uri: uri,
+      subject_uri: subject_uri
+    } do
+      subject_module = ~q[
+        defmodule MyLiveView do
+          use Phoenix.Component
+          import MyDefinition
+
+          def render(assigns) do
+            ~H"""
+            <.but|ton navigate="/home">Home</.button>
+            """
+          end
+        end
+      ]
+
+      assert {:ok, ^uri, fragment} = definition(project, subject_module, [uri, subject_uri])
+      assert fragment == "  def «button(_assigns)» do"
+    end
+
+    test "find the definition when shorthand notation used on closing tag", %{
+      project: project,
+      uri: uri,
+      subject_uri: subject_uri
+    } do
+      subject_module = ~q[
+        defmodule MyLiveView do
+          use Phoenix.Component
+          import MyDefinition
+
+          def render(assigns) do
+            ~H"""
+            <.button navigate="/home">Home</.but|ton>
+            """
+          end
+        end
+      ]
+
+      assert {:ok, ^uri, fragment} = definition(project, subject_module, [uri, subject_uri])
+      assert fragment == "  def «button(_assigns)» do"
+    end
+
+    test "find the definition when shorthand notation used on self-closing tag", %{
+      project: project,
+      uri: uri,
+      subject_uri: subject_uri
+    } do
+      subject_module = ~q[
+        defmodule MyLiveView do
+          use Phoenix.Component
+          import MyDefinition
+
+          def render(assigns) do
+            ~H"""
+            <.but|ton />
+            """
+          end
+        end
+      ]
+
+      assert {:ok, ^uri, fragment} = definition(project, subject_module, [uri, subject_uri])
+      assert fragment == "  def «button(_assigns)» do"
     end
   end
 

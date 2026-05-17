@@ -1,20 +1,23 @@
 defmodule Expert.Provider.Handlers.CodeAction do
-  alias Expert.Configuration
+  @behaviour Expert.Provider.Handler
+
+  alias Expert.Document.Context
   alias Expert.EngineApi
   alias Forge.CodeAction
   alias GenLSP.Requests
   alias GenLSP.Structures
 
+  @impl Expert.Provider.Handler
   def handle(
         %Requests.TextDocumentCodeAction{params: %Structures.CodeActionParams{} = params},
-        %Configuration{} = config
+        %Context{} = context
       ) do
-    document = Forge.Document.Container.context_document(params, nil)
+    %Context{document: document, project: project} = context
     diagnostics = Enum.map(params.context.diagnostics, &to_code_action_diagnostic/1)
 
     code_actions =
       EngineApi.code_actions(
-        config.project,
+        project,
         document,
         params.range,
         diagnostics,

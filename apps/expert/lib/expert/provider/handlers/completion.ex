@@ -1,6 +1,8 @@
 defmodule Expert.Provider.Handlers.Completion do
+  @behaviour Expert.Provider.Handler
+
   alias Expert.CodeIntelligence
-  alias Expert.Configuration
+  alias Expert.Document.Context
   alias Forge.Ast
   alias Forge.Document
   alias Forge.Document.Position
@@ -9,17 +11,16 @@ defmodule Expert.Provider.Handlers.Completion do
   alias GenLSP.Structures
   alias GenLSP.Structures.CompletionContext
 
+  @impl Expert.Provider.Handler
   def handle(
-        %Requests.TextDocumentCompletion{
-          params: %Structures.CompletionParams{} = params
-        },
-        %Configuration{} = config
+        %Requests.TextDocumentCompletion{params: %Structures.CompletionParams{} = params},
+        %Context{} = context
       ) do
-    document = Document.Container.context_document(params, nil)
+    %Context{document: document, project: project} = context
 
     completions =
       CodeIntelligence.Completion.complete(
-        config.project,
+        project,
         document_analysis(document, params.position),
         params.position,
         params.context || %CompletionContext{trigger_kind: CompletionTriggerKind.invoked()}

@@ -1,18 +1,17 @@
 defmodule Engine.Search.StoreTest do
+  use ExUnit.Case, async: false
+
+  import Engine.Test.Entry.Builder
+  import Forge.EngineApi.Messages
+  import Forge.Test.CodeSigil
+  import Forge.Test.EventualAssertions
+  import Forge.Test.Fixtures
+
   alias Engine.Dispatch
   alias Engine.Search.Indexer
   alias Engine.Search.Store
   alias Engine.Search.Store.Backends.Ets
   alias Forge.Search.Indexer.Entry
-  alias Forge.Test.EventualAssertions
-  alias Forge.Test.Fixtures
-
-  use ExUnit.Case, async: false
-
-  import Engine.Test.Entry.Builder
-  import EventualAssertions
-  import Fixtures
-  import Forge.Test.CodeSigil
 
   @backends [Ets]
 
@@ -32,6 +31,11 @@ defmodule Engine.Search.StoreTest do
     end)
 
     {:ok, project: project}
+  end
+
+  setup do
+    start_supervised!(Engine.ApplicationCache)
+    :ok
   end
 
   def all_entries(backend) do
@@ -392,6 +396,69 @@ defmodule Engine.Search.StoreTest do
     case Process.whereis(Store) do
       nil -> false
       pid -> Process.alive?(pid)
+    end
+  end
+
+  describe "broadcasting search_store_loading when queries arrive during loading" do
+    setup %{project: project} do
+      destroy_backend(Ets, project)
+
+      start_supervised!(Dispatch)
+      start_supervised!(Ets)
+
+      blocking_create = fn _project ->
+        Process.sleep(:infinity)
+      end
+
+      start_supervised!({Store, [project, blocking_create, &default_update/2, Ets]})
+
+      assert_eventually alive?()
+
+      Dispatch.register_listener(self(), [search_store_loading()])
+      Store.enable()
+      Process.sleep(10)
+
+      on_exit(fn ->
+        after_each_test(Ets, project)
+      end)
+
+      {:ok, project: project}
+    end
+
+    test "exact/2 broadcasts search_store_loading when loading", %{project: project} do
+      assert {:error, :loading} = Store.exact("SomeModule", [])
+      assert_receive search_store_loading(project: received_project)
+      assert received_project == project
+    end
+
+    test "prefix/2 broadcasts search_store_loading when loading", %{project: project} do
+      assert {:error, :loading} = Store.prefix("Some", [])
+      assert_receive search_store_loading(project: received_project)
+      assert received_project == project
+    end
+
+    test "fuzzy/2 broadcasts search_store_loading when loading", %{project: project} do
+      assert {:error, :loading} = Store.fuzzy("Some", [])
+      assert_receive search_store_loading(project: received_project)
+      assert received_project == project
+    end
+
+    test "all/1 broadcasts search_store_loading when loading", %{project: project} do
+      assert {:error, :loading} = Store.all([])
+      assert_receive search_store_loading(project: received_project)
+      assert received_project == project
+    end
+
+    test "parent/1 broadcasts search_store_loading when loading", %{project: project} do
+      assert {:error, :loading} = Store.parent(%Entry{})
+      assert_receive search_store_loading(project: received_project)
+      assert received_project == project
+    end
+
+    test "siblings/1 broadcasts search_store_loading when loading", %{project: project} do
+      assert {:error, :loading} = Store.siblings(%Entry{})
+      assert_receive search_store_loading(project: received_project)
+      assert received_project == project
     end
   end
 end

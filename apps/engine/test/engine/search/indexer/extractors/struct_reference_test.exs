@@ -1,6 +1,12 @@
 defmodule Engine.Search.Indexer.Extractors.StructReferenceTest do
-  alias Engine.Search.Subject
   use Engine.Test.ExtractorCase
+
+  import ExUnit.CaptureLog
+
+  alias Engine.Search.Indexer.Extractors.StructReference
+  alias Engine.Search.Subject
+
+  require Logger
 
   def index(source) do
     do_index(source, fn entry ->
@@ -55,6 +61,38 @@ defmodule Engine.Search.Indexer.Extractors.StructReferenceTest do
       assert decorate(doc, struct.range) == "variable = «%MyStruct{}»"
     end
 
+    test "in an any-struct pattern" do
+      Logger.put_module_level(StructReference, :error)
+      on_exit(fn -> Logger.put_module_level(StructReference, Logger.level()) end)
+
+      assert {{:ok, [], _}, ""} = with_log(fn -> ~q[%_{}] |> index() end)
+    end
+
+    test "in an any-struct pattern with binding" do
+      Logger.put_module_level(StructReference, :error)
+      on_exit(fn -> Logger.put_module_level(StructReference, Logger.level()) end)
+
+      assert {{:ok, [], _}, ""} = with_log(fn -> ~q[%str_name{}] |> index() end)
+    end
+
+    test "in an any-struct match on the left side and struct on the right" do
+      {:ok, [struct], doc} = ~q[%_{} = %MyStruct{}] |> index()
+
+      assert struct.type == :struct
+      assert struct.subtype == :reference
+      assert struct.subject == Subject.module(MyStruct)
+      assert decorate(doc, struct.range) == "%_{} = «%MyStruct{}»"
+    end
+
+    test "in an any-struct match with binding on the left side and struct on the right" do
+      {:ok, [struct], doc} = ~q[%str_name{} = %MyStruct{}] |> index()
+
+      assert struct.type == :struct
+      assert struct.subtype == :reference
+      assert struct.subject == Subject.module(MyStruct)
+      assert decorate(doc, struct.range) == "%str_name{} = «%MyStruct{}»"
+    end
+
     test "in a struct reference in params" do
       {:ok, [struct], doc} =
         ~q[
@@ -67,6 +105,24 @@ defmodule Engine.Search.Indexer.Extractors.StructReferenceTest do
       assert struct.subtype == :reference
       assert struct.subject == Subject.module(MyStruct)
       assert decorate(doc, struct.range) == ~S[def my_fn(«%MyStruct{}» = first) do]
+    end
+
+    test "in an any-struct pattern in params" do
+      assert {:ok, [], _doc} =
+               ~q[
+        def my_fn(%_{} = first) do
+        end
+        ]
+               |> index()
+    end
+
+    test "in an any-struct pattern with binding in params" do
+      assert {:ok, [], _doc} =
+               ~q[
+        def my_fn(%struct_name{} = first) do
+        end
+        ]
+               |> index()
     end
 
     test "in nested struct references" do

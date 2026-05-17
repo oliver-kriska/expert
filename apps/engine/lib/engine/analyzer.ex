@@ -13,6 +13,7 @@ defmodule Engine.Analyzer do
 
   defdelegate aliases_at(analysis, position), to: Aliases, as: :at
   defdelegate imports_at(analysis, position), to: Imports, as: :at
+  defdelegate import_module_for(analysis, position, fun, arity), to: Imports, as: :module_for
 
   @spec requires_at(Analysis.t(), Position.t()) :: [module()]
   def requires_at(%Analysis{} = analysis, %Position{} = position) do
@@ -39,20 +40,14 @@ defmodule Engine.Analyzer do
   end
 
   def resolve_local_call(%Analysis{} = analysis, %Position{} = position, function_name, arity) do
-    maybe_imported_mfa =
-      analysis
-      |> imports_at(position)
-      |> Enum.find(fn
-        {_, ^function_name, ^arity} -> true
-        _ -> false
-      end)
+    case import_module_for(analysis, position, function_name, arity) do
+      {:ok, module} ->
+        {module, function_name, arity}
 
-    if is_nil(maybe_imported_mfa) do
-      aliases = aliases_at(analysis, position)
-      current_module = aliases[:__MODULE__]
-      {current_module, function_name, arity}
-    else
-      maybe_imported_mfa
+      :error ->
+        aliases = aliases_at(analysis, position)
+        current_module = aliases[[:__MODULE__]]
+        {current_module, function_name, arity}
     end
   end
 
@@ -115,7 +110,7 @@ defmodule Engine.Analyzer do
           {:ok, module()} | :error
   def expand_alias([_ | _] = segments, %Analysis{} = analysis, %Position{} = position) do
     with %Analysis{valid?: true} = analysis <- Forge.Ast.reanalyze_to(analysis, position),
-         aliases <- aliases_at(analysis, position),
+         aliases = aliases_at(analysis, position),
          {:ok, resolved} <- resolve_alias(segments, aliases) do
       {:ok, Module.concat(resolved)}
     else
@@ -156,7 +151,7 @@ defmodule Engine.Analyzer do
   end
 
   defp resolve_alias([{:@, _, [{:protocol, _, _}]} | rest], alias_mapping) do
-    with {:ok, protocol} <- Map.fetch(alias_mapping, :"@protocol") do
+    with {:ok, protocol} <- Map.fetch(alias_mapping, [:"@protocol"]) do
       Ast.reify_alias(protocol, rest)
     end
   end
@@ -169,7 +164,7 @@ defmodule Engine.Analyzer do
   end
 
   defp resolve_alias([{:@, _, [{:for, _, _} | _]} | rest], alias_mapping) do
-    with {:ok, protocol_for} <- Map.fetch(alias_mapping, :"@for") do
+    with {:ok, protocol_for} <- Map.fetch(alias_mapping, [:"@for"]) do
       Ast.reify_alias(protocol_for, rest)
     end
   end
@@ -182,7 +177,7 @@ defmodule Engine.Analyzer do
   end
 
   defp resolve_alias([first | _] = segments, aliases_mapping) when is_tuple(first) do
-    with {:ok, current_module} <- Map.fetch(aliases_mapping, :__MODULE__) do
+    with {:ok, current_module} <- Map.fetch(aliases_mapping, [:__MODULE__]) do
       Ast.reify_alias(current_module, segments)
     end
   end
@@ -196,7 +191,7 @@ defmodule Engine.Analyzer do
   defp resolve_alias(_, _), do: :error
 
   defp fetch_leading_alias([first | rest], aliases_mapping) do
-    with {:ok, resolved} <- Map.fetch(aliases_mapping, first) do
+    with {:ok, resolved} <- Map.fetch(aliases_mapping, [first]) do
       {:ok, [resolved | rest]}
     end
   end
@@ -206,7 +201,7 @@ defmodule Engine.Analyzer do
     # in one go, like Foo.{First, Second.Third, Fourth}
     # Our alias mapping will have Third mapped to Foo.Second.Third, so we need to look
     # for Third, whereas the leading alias will look for Second in the mappings.
-    with {:ok, resolved} <- Map.fetch(aliases_mapping, List.last(segments)) do
+    with {:ok, resolved} <- Map.fetch(aliases_mapping, [List.last(segments)]) do
       {:ok, List.wrap(resolved)}
     end
   end

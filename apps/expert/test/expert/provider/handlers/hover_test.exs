@@ -1,4 +1,12 @@
 defmodule Expert.Provider.Handlers.HoverTest do
+  use ExUnit.Case, async: false
+
+  import Forge.Test.CodeSigil
+  import Forge.Test.CursorSupport
+  import Forge.Test.RangeSupport
+
+  alias Engine.Search
+  alias Expert.Document.Context
   alias Expert.EngineApi
   alias Expert.Protocol.Convert
   alias Expert.Provider.Handlers
@@ -9,25 +17,37 @@ defmodule Expert.Provider.Handlers.HoverTest do
   alias GenLSP.Requests
   alias GenLSP.Structures
 
-  import Forge.Test.CodeSigil
-  import Forge.Test.CursorSupport
-  import Forge.Test.RangeSupport
-
   require Messages
-
-  use ExUnit.Case, async: false
 
   setup_all do
     project = Fixtures.project()
 
+    start_supervised!({DynamicSupervisor, Expert.EngineBuild.DynamicSupervisor.options()})
+    start_supervised!(Expert.EngineBuilds)
+    start_supervised!({Forge.NodePortMapper, []})
     start_supervised!(Expert.Application.document_store_child_spec())
+    start_supervised!({Expert.Project.Store, []})
     start_supervised!({DynamicSupervisor, Expert.Project.DynamicSupervisor.options()})
     start_supervised!({Expert.Project.Supervisor, project})
 
-    :ok = EngineApi.register_listener(project, self(), [Messages.project_compiled()])
+    Expert.Configuration.new() |> Expert.Configuration.set()
+
+    :ok =
+      EngineApi.register_listener(project, self(), [
+        Messages.project_compiled(),
+        Messages.project_index_ready()
+      ])
+
     assert_receive Messages.project_compiled(), 5000
+    assert_receive Messages.project_index_ready(), 5000
 
     {:ok, project: project}
+  end
+
+  setup do
+    start_supervised!(Engine.ApplicationCache)
+    :persistent_term.erase(Expert.Configuration)
+    :ok
   end
 
   # compiles and writes beam files in the given project
@@ -475,8 +495,18 @@ defmodule Expert.Provider.Handlers.HoverTest do
 
       hovered = "CallHover.|my_fun(1)"
 
+      expected = """
+      ```elixir
+      CallHover.my_fun(arg1)
+
+      @spec my_fun(integer()) :: integer()
+      ```
+      """
+
       with_compiled_in(project, code, fn ->
-        assert {:ok, nil} = hover(project, hovered)
+        assert {:ok, %Structures.Hover{} = result} = hover(project, hovered)
+        assert result.contents.kind == "markdown"
+        assert result.contents.value == expected
       end)
     end
 
@@ -555,6 +585,72 @@ defmodule Expert.Provider.Handlers.HoverTest do
       """
 
       with_compiled_in(project, code, fn ->
+        assert {:ok, %Structures.Hover{} = result} = hover(project, hovered)
+        assert result.contents.kind == "markdown"
+        assert result.contents.value == expected
+      end)
+    end
+
+    test "delegated function shows docs from original module", %{project: project} do
+      code = ~q[
+        defmodule DelegateHover.MyDefinition do
+          @doc "Greets the given name."
+          def greet(name), do: "Hello, \#{name}!"
+        end
+
+        defmodule DelegateHover.UsesDelegation do
+          defdelegate greet(name), to: DelegateHover.MyDefinition
+        end
+      ]
+
+      hovered = "DelegateHover.UsesDelegation.|greet(\"world\")"
+
+      expected = """
+      ```elixir
+      DelegateHover.MyDefinition.greet(name)
+      ```
+
+      Greets the given name.
+      """
+
+      with_compiled_and_indexed(project, code, fn ->
+        assert {:ok, %Structures.Hover{} = result} = hover(project, hovered)
+        assert result.contents.kind == "markdown"
+        assert result.contents.value == expected
+      end)
+    end
+
+    test "delegated function to unloaded module does not crash", %{project: project} do
+      code = ~q[
+        defmodule ModA do
+          def test do
+            ModB.func1()
+          end
+        end
+
+        defmodule ModB do
+          defdelegate func1, to: ModC
+        end
+
+        defmodule ModC do
+          @doc """
+          This is the original implementation
+          """
+          def func1, do: :ok
+        end
+      ]
+
+      hovered = "ModB.|func1()"
+
+      expected = """
+      ```elixir
+      ModC.func1()
+      ```
+
+      This is the original implementation
+      """
+
+      with_compiled_and_indexed(project, code, fn ->
         assert {:ok, %Structures.Hover{} = result} = hover(project, hovered)
         assert result.contents.kind == "markdown"
         assert result.contents.value == expected
@@ -718,12 +814,174 @@ defmodule Expert.Provider.Handlers.HoverTest do
     end
   end
 
+  describe "module attribute hover" do
+    test "shows attribute definition", %{project: project} do
+      code = ~q[
+        defmodule AttrHover do
+          @my_attr "hello"
+
+          def foo, do: @my_attr
+        end
+      ]
+
+      hovered = ~q[
+        defmodule AttrHover do
+          @my_attr "hello"
+
+          def foo, do: |@my_attr
+        end
+      ]
+
+      with_indexed(project, code, fn ->
+        assert {:ok, %Structures.Hover{} = result} = hover(project, hovered)
+        assert result.contents.kind == "markdown"
+        assert String.contains?(result.contents.value, "@my_attr")
+        assert String.contains?(result.contents.value, ~s[@my_attr "hello"])
+      end)
+    end
+
+    test "shows multiline attribute definition", %{project: project} do
+      code = """
+      defmodule AttrHover do
+        @config [
+          name: "test",
+          value: 42
+        ]
+
+        def get_config, do: @config
+      end
+      """
+
+      hovered = """
+      defmodule AttrHover do
+        @config [
+          name: "test",
+          value: 42
+        ]
+
+        def get_config, do: |@config
+      end
+      """
+
+      with_indexed(project, code, fn ->
+        assert {:ok, %Structures.Hover{} = result} = hover(project, hovered)
+        assert result.contents.kind == "markdown"
+        assert String.contains?(result.contents.value, "@config")
+        assert String.contains?(result.contents.value, "name:")
+      end)
+    end
+
+    test "shows fallback when no definition found", %{project: project} do
+      hovered = ~q[
+        defmodule AttrHoverFallback do
+          def foo, do: |@unknown_attr
+        end
+      ]
+
+      assert {:ok, %Structures.Hover{} = result} = hover(project, hovered)
+      assert result.contents.kind == "markdown"
+      assert String.contains?(result.contents.value, "@unknown_attr")
+    end
+  end
+
+  describe "hover inside strings" do
+    test "returns nil inside a plain string (not interpolation)", %{project: project} do
+      hovered = ~q[
+        defmodule StringHover do
+          def foo do
+            "hello {Str|ing}"
+          end
+        end
+      ]
+
+      assert {:ok, nil} = hover(project, hovered)
+    end
+
+    test "returns a result inside string interpolation", %{project: project} do
+      hovered = ~S[
+        defmodule StringHover do
+          def foo do
+            "hello #{Str|ing}"
+          end
+        end
+      ]
+
+      assert {:ok, %Structures.Hover{}} = hover(project, hovered)
+    end
+  end
+
+  defp with_indexed(project, code, fun) do
+    tmp_dir = Fixtures.file_path(project, "lib/tmp")
+
+    tmp_path =
+      tmp_dir
+      |> Path.join("tmp_indexed_#{rand_hex(10)}.ex")
+
+    File.mkdir_p!(tmp_dir)
+
+    with_tmp_file(tmp_path, code, fn ->
+      uri = Document.Path.ensure_uri(tmp_path)
+      {:ok, _document} = Document.Store.open_temporary(uri)
+
+      {:ok, entries} = Search.Indexer.Source.index(tmp_path, code)
+      :ok = EngineApi.call(project, Search.Store, :replace, [entries])
+
+      try do
+        fun.()
+      after
+        Document.Store.close(uri)
+      end
+    end)
+  end
+
+  # combine compilation (for docs) and indexing (for delegate detection)
+  defp with_compiled_and_indexed(project, code, fun) do
+    tmp_dir = Fixtures.file_path(project, "lib/tmp")
+
+    tmp_path =
+      tmp_dir
+      |> Path.join("tmp_#{rand_hex(10)}.ex")
+
+    File.mkdir_p!(tmp_dir)
+
+    with_tmp_file(tmp_path, code, fn ->
+      # compile the code so docs are available
+      {:ok, compile_path} =
+        Engine.Mix.in_project(project, fn _ ->
+          Mix.Project.compile_path()
+        end)
+
+      {:ok, modules, _} =
+        EngineApi.call(project, Kernel.ParallelCompiler, :compile_to_path, [
+          [tmp_path],
+          compile_path
+        ])
+
+      # index the code so delegate metadata is available
+      {:ok, entries} = Search.Indexer.Source.index(tmp_path, code)
+      :ok = EngineApi.call(project, Search.Store, :replace, [entries])
+
+      try do
+        fun.()
+      after
+        for module <- modules do
+          path = EngineApi.call(project, :code, :which, [module])
+          EngineApi.call(project, :code, :delete, [module])
+          # only delete the .beam file, not the source file (which with_tmp_file handles)
+          if is_binary(path), do: File.rm(path)
+        end
+      end
+    end)
+  end
+
   defp hover(project, hovered) do
+    Expert.Project.Store.add_projects([project])
+
     with {position, hovered} <- pop_cursor(hovered),
          {:ok, document} <- document_with_content(project, hovered),
          {:ok, request} <- hover_request(document.uri, position) do
-      config = Expert.Configuration.new(project: project)
-      Handlers.Hover.handle(request, config)
+      context = Context.new(document.uri, document, project)
+      Handlers.Hover.handle(request, context)
     end
   end
 

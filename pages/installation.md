@@ -12,6 +12,7 @@ Caveats with the following versions of Elixir and Erlang are documented below:
 
 | Elixir   | Version Range  | Notes    |
 | -------- | -------------- | -------- |
+| 1.19     | `>= 1.19.0`    |          |
 | 1.18     | `>= 1.18.0`    |          |
 | 1.17     | `>= 1.17.0`    |          |
 | 1.16     | `>= 1.16.0`    |          |
@@ -23,60 +24,78 @@ Caveats with the following versions of Elixir and Erlang are documented below:
 |  26         | `>= 26.0.2`      |        |
 |  25         | `>= 25.0`        |        |
 
-## Prerequisites
-First, Install git LFS by [following these instructions](https://docs.github.com/en/repositories/working-with-files/managing-large-files/installing-git-large-file-storage).
+## Building a release
 
-Next, [install `just`](https://github.com/casey/just?tab=readme-ov-file#cross-platform)
+If you see errors while building a release, please file a bug.
 
-Next, [install `zig`](https://ziglang.org/learn/getting-started/) if not already installed. **Important:** version 0.14.1 is required, which is currently _not_ the latest version.
+### Prerequisites
+
+- Install Git LFS by [following these instructions](https://docs.github.com/en/repositories/working-with-files/managing-large-files/installing-git-large-file-storage)
+- Install [`just`](https://github.com/casey/just?tab=readme-ov-file#cross-platform)
+- (Burrito only) Install [Zig `0.15.2`](https://ziglang.org/learn/getting-started/)
+
+> [!IMPORTANT]
+> Later versions of Zig will not work. If you are on macOS,
+> this version will only work with Xcode 26.3 **at most**.
 
 Then, clone the git repository. Do this with
 
-```elixir
-git clone git@github.com:elixir-lang/expert.git
+```sh
+git clone git@github.com:expert-lsp/expert.git
 ```
 
-Then change to the expert directory
+Then, change to the expert directory
 
-```shell
+```sh
 cd expert
 ```
 
-Then fetch expert's dependencies
+### Plain release
 
-```shell
-just deps forge
-just deps engine
-just deps expert
+Build the project as a plain release with
+
+```sh
+just release
 ```
 
-...and build the project
+If things complete successfully, you will then find the generated `start_expert`
+executable in your `apps/expert/_build/prod/rel/plain/bin` directory.
 
-```shell
-just release-local
+In case you want to build and install it locally, you can run `just install`,
+which will install the release to `~/.local/libexec/expert` and symlink `start_expert`
+to `~/.local/bin/expert`. You can install it somewhere other than `~/.local` with the
+`--prefix` flag.
+
+### Burrito release
+
+Build the project as a burrito release with
+
+```sh
+just burrito-local
 ```
 
-If things complete successfully, you will then have a release in your
-`apps/expert/burrito_out` directory. If you see errors, please file a
-bug.
+If things complete successfully, you will then have a binary with the name
+`expert_<os>_<arch>` in your `apps/expert/burrito_out` directory. You will need
+to run `chmod +x expert_<os>_<arch>` to be able to use it.
 
-In case you want to build and install it locally you can run `just install`,
-which will install the generated binary inside `~/.local/bin`.
+## Editor-specific setup
 
-For the following examples, assume the absolute path to your Expert
-source code is `/my/home/projects/expert` and that you are running an amd64
+To launch expert, you need to specify `--stdio` or `--port <port>`.
+
+The examples below assume you want to use `--stdio`, that the absolute path to your
+Expert source code is `/my/home/projects/expert`, and that you are running an amd64
 Linux system. For other systems, replace the `expert_linux_amd64` with the
 appropriate binary name.
 
-## Editor-specific setup
 1. [Vanilla Emacs with lsp-mode](#vanilla-emacs-with-lsp-mode)
 2. [Vanilla Emacs with eglot](#vanilla-emacs-with-eglot)
-3. [Visual Studio Code](#visual-studio-code)
-4. [neovim](#neovim)
-7. [Vim + Vim-LSP](#vim--vim-lsp)
-8. [Helix](#helix)
-9. [Sublime Text](#sublime-text)
-10. [Zed](#zed)
+3. [Doom Emacs with lsp-mode](#doom-emacs-with-lsp-mode)
+4. [Visual Studio Code](#visual-studio-code)
+5. [neovim](#neovim)
+6. [Vim + Vim-LSP](#vim--vim-lsp)
+7. [Helix](#helix)
+8. [Sublime Text](#sublime-text)
+9. [Zed](#zed)
 
 ### Vanilla Emacs with lsp-mode
 The emacs instructions assume you're using `use-package`, which you
@@ -96,12 +115,11 @@ emacs configuration), insert the following code:
 (use-package elixir-mode
   :ensure t
   :custom
-  (lsp-elixir-server-command '("/my/home/projects/expert/apps/expert/burrito_out/expert_linux_amd64")))
+  (lsp-elixir-server-command '("expert_linux_amd64" "--stdio")))
 ```
 
 Restart emacs, and Expert should start when you open a file with a
 `.ex` extension.
-
 
 ### Vanilla Emacs with eglot
 
@@ -114,9 +132,9 @@ You can add Expert support in the following way:
                    nil nil #'equal)
         (if (and (fboundp 'w32-shell-dos-semantics)
                  (w32-shell-dos-semantics))
-            '("expert_windows_amd64")
+            '(("expert_windows_amd64" "--stdio"))
           (eglot-alternatives
-           '("expert_linux_amd64" "start_lexical.sh")))))
+           '(("expert_linux_amd64" "--stdio"))))))
 ```
 
 For versions before 30, you can add Eglot support for Expert in the
@@ -127,9 +145,9 @@ following way:
   (setf (alist-get 'elixir-mode eglot-server-programs)
         (if (and (fboundp 'w32-shell-dos-semantics)
                  (w32-shell-dos-semantics))
-            '("expert_windows_amd64")
+            '(("expert_windows_amd64" "--stdio"))
           (eglot-alternatives
-           '("expert_linux_amd64" "start_lexical.sh")))))
+           '(("expert_linux_amd64" "--stdio"))))))
 ```
 
 If you're using `elixir-ts-mode` on Emacs 29, you can add a new entry
@@ -141,22 +159,76 @@ for Eglot:
                `((elixir-ts-mode heex-ts-mode) .
                  ,(if (and (fboundp 'w32-shell-dos-semantics)
                            (w32-shell-dos-semantics))
-                      '("expert_windows_amd64")
+                      '(("expert_windows_amd64" "--stdio"))
                     (eglot-alternatives
-                     '("expert_linux_amd64" "start_lexical.sh"))))))
+                     '(("expert_linux_amd64" "--stdio")))))))
 ```
+
+### Doom Emacs with lsp-mode
+Go to your `~/.config/doom/init.el` and change the following lines:
+
+```emacs-lisp
+(doom!
+       :tools
+       ; (lsp +eglot)
+       (lsp)
+       
+       :lang
+       (elixir)
+```
+
+Then run `~/.config/emacs/bin/doom sync`.
+
+Then add this to your `~/.config/doom/config.el`
+
+```emacs-lisp
+(with-eval-after-load 'lsp-mode
+  (add-to-list 'lsp-language-id-configuration
+               '(elixir-mode . "elixir"))
+
+  (lsp-register-client
+   (make-lsp-client
+    :new-connection (lsp-stdio-connection '("expert" "--stdio"))
+    ; :major-modes '(elixir-mode)
+    :priority -1
+    :activation-fn (lsp-activate-on "elixir")
+    :server-id 'expert))
+  )
+
+(add-hook 'elixir-mode-hook #'lsp)
+```
+
+Restart emacs, and Expert should start when you open a file with a
+`.ex` extension.
 
 ### Visual Studio Code
 
-Click on the extensions button on the sidebar, then search for
-`lexical`, then click `install`.
+> [!NOTE]
+> Support for VS Code is a work in progress.
 
-This is a stop gap until we create a dedicated Expert extension, so you'll need to configure it to
-use the Expert executable instead. 
+Clone and build the [Expert VS Code extension](https://github.com/expert-lsp/vscode-expert).
+Once you have the `.vsix` file, you can install it by using the `Extensions: Install from VSIX...` command in the command palette.
 
-To change to a local executable, go to `Settings -> Extensions -> Lexical` and
+
+To change to a local executable, go to `Settings -> Extensions -> Expert` and
 type `/my/home/projects/expert/apps/expert/burrito_out/expert_linux_amd64` into the text box in
 the `Server: Release path override` section.
+
+To run in TCP mode, you can add `--port PORT` in the `Server: Startup Flags Override` section.
+
+
+> [!TIP]
+> If you are using the Lexical extension for VS Code, you will need to wrap the
+> expert executable with a script that passes the `--stdio` flag, as Lexical
+> does not currently support passing additional arguments to language servers.
+>
+> For example, create a file called `expert_wrapper.sh` with the following content:
+> ```bash
+> #!/bin/bash
+> ~/.local/bin/expert_linux_amd64 --stdio
+> ```
+> Make the script executable with `chmod +x expert_wrapper.sh`, and then
+> set the `Server: Release path override` to the path of the script.
 
 ### Neovim
 
@@ -170,7 +242,7 @@ configuration below as a reference:
 
 ```lua
 require('lspconfig').lexical.setup {
-  cmd = { "my/home/projects/expert/apps/expert/burrito_out/expert_linux_amd64" },
+  cmd = { "my/home/projects/expert/apps/expert/burrito_out/expert_linux_amd64", "--stdio" },
   root_dir = function(fname)
     return require('lspconfig').util.root_pattern("mix.exs", ".git")(fname) or vim.loop.cwd()
   end,
@@ -183,7 +255,7 @@ require('lspconfig').lexical.setup {
 As of neovim `0.11.3`, you can use the built-in lsp config:
 ```lua
 vim.lsp.config('expert', {
-  cmd = { 'expert' },
+  cmd = { 'expert', '--stdio' },
   root_markers = { 'mix.exs', '.git' },
   filetypes = { 'elixir', 'eelixir', 'heex' },
 })
@@ -234,7 +306,8 @@ For more config, debugging help, or getting vim-lsp to work with ALE, see
 
 ### Helix
 
-*Note: This configuration is applicable for Helix version 23.09 and above.*
+> [!NOTE]
+> This co!nfiguration is applicable for Helix version 23.09 and above.*
 
 Add the language server to your `~/.config/helix/languages.toml` config.
 In the case that the file doesn't exist yet, you can create a new file at this location.
@@ -242,6 +315,7 @@ In the case that the file doesn't exist yet, you can create a new file at this l
 ```toml
 [language-server.expert]
 command = "/my/home/projects/expert/apps/expert/burrito_out/expert_linux_amd64"
+args = ["--stdio"]
 
 [[language]]
 name = "elixir"
@@ -271,7 +345,7 @@ You'll need to add a key called `"clients"` in the top-level `LSP.sublime-settin
 "clients": {
   "elixir-expert": {
     "enabled": true,
-    "command": ["/my/home/projects/expert/apps/expert/burrito_out/expert_linux_amd64", ""],
+    "command": ["/my/home/projects/expert/apps/expert/burrito_out/expert_linux_amd64", "--stdio"],
     "selector": "source.elixir"
   }
 }
@@ -288,6 +362,13 @@ So, first install the extension and then update your `settings.json` to use Expe
 
 ```json
 {
+  "lsp": {
+    "expert": {
+      "binary": {
+        "arguments": ["--stdio"]
+      }
+    }
+  },
   "languages": {
     "Elixir": {
       "language_servers": [

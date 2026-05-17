@@ -1,14 +1,13 @@
 defmodule Engine.CodeAction.Handlers.OrganizeAliasesTest do
-  alias Forge.Document
-  alias Forge.Document.Range
-
-  alias Engine.CodeAction.Handlers.OrganizeAliases
-
-  import Forge.Test.CursorSupport
-  import Forge.Test.CodeSigil
-
   use Forge.Test.CodeMod.Case, enable_ast_conversion: false
   use Patch
+
+  import Forge.Test.CodeSigil
+  import Forge.Test.CursorSupport
+
+  alias Engine.CodeAction.Handlers.OrganizeAliases
+  alias Forge.Document
+  alias Forge.Document.Range
 
   setup do
     start_supervised!({Document.Store, derive: [analysis: &Forge.Ast.analyze/1]})
@@ -127,6 +126,29 @@ defmodule Engine.CodeAction.Handlers.OrganizeAliasesTest do
         alias A.B.C
         alias V.W.X, as: Unk
         alias Z.X.Y
+      end
+    ]t
+      assert expected == organized
+    end
+
+    test "aliases are sorted alphabetically" do
+      {:ok, organized} =
+        ~q[
+          defmodule SortAliases do
+            alias A|
+            alias C
+            alias D
+            alias B
+          end
+        ]
+        |> organize_aliases()
+
+      expected = ~q[
+      defmodule SortAliases do
+        alias A
+        alias B
+        alias C
+        alias D
       end
     ]t
       assert expected == organized

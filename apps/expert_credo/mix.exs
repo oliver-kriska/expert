@@ -1,7 +1,8 @@
 defmodule ExpertCredo.MixProject do
   use Mix.Project
+
   Code.require_file("../../mix_dialyzer.exs")
-  @repo_url "https://github.com/elixir-lang/expert/"
+  @repo_url "https://github.com/expert-lsp/expert/"
   @version "0.1.0"
 
   def project do
@@ -29,9 +30,11 @@ defmodule ExpertCredo.MixProject do
     [
       {:forge, path: "../forge"},
       {:credo, "> 0.0.0", only: [:dev, :test]},
+      {:deps_nix, "~> 2.4", only: :dev},
       Mix.Dialyzer.dependency(),
       {:jason, "> 0.0.0", optional: true},
-      {:ex_doc, "~> 0.34", optional: true, only: [:dev, :hex]}
+      {:ex_doc, "~> 0.34", optional: true, only: [:dev, :hex]},
+      {:quokka, "~> 2.12", only: [:dev, :test], runtime: false}
     ]
   end
 

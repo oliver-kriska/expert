@@ -1,33 +1,52 @@
 defmodule Expert.Provider.Handlers.WorkspaceSymbol do
+  @behaviour Expert.Provider.Handler
+
   alias Expert.Configuration
+  alias Expert.Configuration.WorkspaceSymbols
   alias Expert.EngineApi
+  alias Expert.Project.Store
   alias Forge.CodeIntelligence.Symbols
+  alias Forge.Project
   alias GenLSP.Enumerations.SymbolKind
   alias GenLSP.Requests
   alias GenLSP.Structures
 
-  require Logger
-
+  @impl Expert.Provider.Handler
   def handle(
-        %Requests.WorkspaceSymbol{params: %Structures.WorkspaceSymbolParams{} = params},
-        %Configuration{} = config
+        %Requests.WorkspaceSymbol{params: %Structures.WorkspaceSymbolParams{} = params} = request,
+        _context
       ) do
+    config = Configuration.get()
+    projects = Store.projects()
+
     symbols =
-      if String.length(params.query) > 1 do
-        config.project
-        |> EngineApi.workspace_symbols(params.query)
-        |> tap(fn symbols -> Logger.info("syms #{inspect(Enum.take(symbols, 5))}") end)
-        |> Enum.map(&to_response/1)
+      if should_return_symbols?(params.query, config) do
+        Enum.flat_map(projects, &gather_symbols(&1, request))
       else
         []
       end
 
-    Logger.info("WorkspaceSymbol results: #{inspect(symbols, pretty: true)}")
-
     {:ok, symbols}
   end
 
-  def to_response(%Symbols.Workspace{} = root) do
+  defp should_return_symbols?(query, %Configuration{
+         workspace_symbols: %WorkspaceSymbols{min_query_length: min_length}
+       }) do
+    String.length(query) >= min_length
+  end
+
+  defp gather_symbols(
+         %Project{} = project,
+         %Requests.WorkspaceSymbol{
+           params: %Structures.WorkspaceSymbolParams{} = params
+         }
+       ) do
+    project
+    |> EngineApi.workspace_symbols(params.query)
+    |> Enum.map(&to_lsp_symbol/1)
+  end
+
+  def to_lsp_symbol(%Symbols.Workspace{} = root) do
     %Structures.WorkspaceSymbol{
       kind: to_kind(root.type),
       location: to_location(root.link),
@@ -46,6 +65,7 @@ defmodule Expert.Provider.Handlers.WorkspaceSymbol do
   defp to_kind({:xp_protocol, _}), do: SymbolKind.module()
   defp to_kind(:variable), do: SymbolKind.variable()
   defp to_kind({:function, _}), do: SymbolKind.function()
+  defp to_kind({:macro, _}), do: SymbolKind.function()
   defp to_kind(:module_attribute), do: SymbolKind.constant()
   defp to_kind(:ex_unit_test), do: SymbolKind.method()
   defp to_kind(:ex_unit_describe), do: SymbolKind.method()

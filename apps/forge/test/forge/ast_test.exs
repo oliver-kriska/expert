@@ -1,16 +1,19 @@
 defmodule Forge.AstTest do
-  alias Forge.Ast
-  alias Forge.Ast.Analysis
-  alias Forge.Document
-  alias Forge.Document.Position
-  alias Sourceror.Zipper
+  use ExUnit.Case, async: false
+  use Patch
 
+  import ExUnit.CaptureLog
   import Forge.Test.CodeSigil
   import Forge.Test.CursorSupport
   import Forge.Test.PositionSupport
   import Forge.Test.RangeSupport
 
-  use ExUnit.Case, async: true
+  alias Forge.Ast
+  alias Forge.Ast.Analysis
+  alias Forge.Ast.Parser.Spitfire
+  alias Forge.Document
+  alias Forge.Document.Position
+  alias Sourceror.Zipper
 
   describe "cursor_path/2" do
     defp cursor_path(text) do
@@ -44,13 +47,15 @@ defmodule Forge.AstTest do
       assert path == [{:__cursor__, [closing: [line: 1, column: 12], line: 1, column: 1], []}]
     end
 
-    test "returns [] when can't parse the AST" do
+    test "returns cursor path even for incomplete code" do
       text = ~q[
         foo(bar do baz, [bat|
       ]
 
       path = cursor_path(text)
-      assert path == []
+      # Spitfire's fault-tolerant parsing produces a cursor path
+      assert not Enum.empty?(path)
+      assert Enum.any?(path, &match?({:__cursor__, _, _}, &1))
     end
   end
 
@@ -58,20 +63,6 @@ defmodule Forge.AstTest do
     defp path_at(text) do
       {position, document} = pop_cursor(text, as: :document)
       Ast.path_at(document, position)
-    end
-
-    defp end_location({_, metadata, _}), do: end_location(metadata)
-
-    defp end_location(metadata) when is_list(metadata) do
-      case metadata do
-        [line: line, column: column] ->
-          {line, column}
-
-        metadata ->
-          [end_line: line, end_column: column] = Keyword.take(metadata, [:end_line, :end_column])
-
-          {line, column}
-      end
     end
 
     test "returns an error if the cursor cannot be found in any node" do
@@ -84,13 +75,13 @@ defmodule Forge.AstTest do
       assert {:error, :not_found} = path_at(code)
     end
 
-    test "returns an error if the AST cannot be parsed" do
+    test "returns a path from partial AST when code has syntax errors" do
       code = ~q[
         defmodule |Foo do
       ]
 
-      assert {:error, {metadata, "missing terminator: end" <> _, ""}} = path_at(code)
-      assert end_location(metadata) == {2, 1}
+      # With Spitfire's error recovery, we get a partial AST that can be traversed
+      assert {:ok, [{:__aliases__, _, [:Foo]} | _]} = path_at(code)
     end
 
     test "returns a path to the innermost leaf at position" do
@@ -226,7 +217,7 @@ defmodule Forge.AstTest do
     end
 
     test "within the node", %{ast: ast, range: range} do
-      position = %Position{range.start | character: range.start.character + 1}
+      position = %{range.start | character: range.start.character + 1}
       assert Ast.contains_position?(ast, position)
     end
 
@@ -308,8 +299,10 @@ defmodule Forge.AstTest do
       ]
 
       assert %Analysis{} = analysis = analyze(code)
-      refute analysis.ast
-      assert {:error, _} = analysis.parse_error
+      # With Spitfire's error recovery, we get a partial AST even for invalid code
+      assert {:defmodule, _, _} = analysis.ast
+      assert {:error, {_location, _message}, _comments} = analysis.parse_error
+      refute analysis.valid?
     end
 
     test "creates an analysis from a document with incomplete `as` section" do
@@ -330,6 +323,44 @@ defmodule Forge.AstTest do
         end
       ]
       assert %Analysis{} = analyze(code)
+    end
+  end
+
+  describe "parser crash logging" do
+    @tag :capture_log
+    test "from/1 with Document logs crash with path" do
+      patch(Spitfire, :string_to_quoted, fn _string ->
+        {:error, :crashed, %CaseClauseError{term: :"}"}, [{Spitfire, :parse, 2, []}]}
+      end)
+
+      document = Document.new("file:///path/to/file.ex", "some code", 1)
+
+      log =
+        capture_log(fn ->
+          assert {:error, {[line: 1, column: 1], message}} = Ast.from(document)
+          assert message =~ "parser crashed"
+        end)
+
+      assert log =~ "Spitfire crashed when parsing /path/to/file.ex"
+      assert log =~ "no case clause matching"
+    end
+
+    @tag :capture_log
+    test "fragment/2 with Document logs crash with path" do
+      patch(Spitfire, :container_cursor_to_quoted, fn _fragment ->
+        {:error, :crashed, %CaseClauseError{term: :"}"}, [{Spitfire, :parse, 2, []}]}
+      end)
+
+      document = Document.new("file:///path/to/file.ex", "some code\nmore", 1)
+      position = Position.new(document, 1, 5)
+
+      log =
+        capture_log(fn ->
+          assert {:error, {[line: 1, column: 1], message}} = Ast.fragment(document, position)
+          assert message =~ "parser crashed"
+        end)
+
+      assert log =~ "Spitfire crashed when parsing /path/to/file.ex"
     end
   end
 

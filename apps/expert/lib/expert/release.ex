@@ -1,6 +1,7 @@
 defmodule Expert.Release do
   def assemble(release) do
-    Mix.Task.run(:namespace, [release.path])
+    # In-place namespacing: both source and output are the same path
+    Mix.Task.run(:namespace, [release.path, release.path])
 
     expert_root = Path.expand("../../../..", __DIR__)
     engine_path = Path.join([expert_root, "apps", "engine"])
@@ -58,5 +59,42 @@ defmodule Expert.Release do
     File.cp!(version_file, Path.join([dest, "version.txt"]))
 
     release
+  end
+
+  def plain_assemble(release) do
+    executable = if windows?(), do: "start_expert.bat", else: "start_expert"
+    executable_path = Path.join([release.path, "bin", executable])
+
+    # Make the executable script runnable
+    File.chmod!(executable_path, 0o755)
+
+    if release.options[:quiet] do
+      release
+    else
+      Mix.shell().info("""
+
+      #{IO.ANSI.bright()}✨ Expert build created at:#{IO.ANSI.reset()} #{release.path}
+
+      To use it, point your editor LSP configuration to:
+
+          #{executable_path} --stdio
+
+      You can also run Expert in TCP mode by passing the `--port PORT` argument:
+
+          #{executable_path} --port 9000
+
+      To get a list of all available command line options, run:
+
+          #{executable_path} --help
+      """)
+
+      # Silence the release "announce" message
+      new_opts = Keyword.put(release.options, :quiet, true)
+      %{release | options: new_opts}
+    end
+  end
+
+  def windows? do
+    :os.type() |> elem(0) == :win32
   end
 end

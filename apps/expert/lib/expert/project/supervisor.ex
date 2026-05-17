@@ -1,23 +1,15 @@
 defmodule Expert.Project.Supervisor do
+  use Supervisor
+
   alias Expert.EngineSupervisor
   alias Expert.Project.Diagnostics
   alias Expert.Project.Intelligence
   alias Expert.Project.Node
-  alias Expert.Project.Progress
   alias Expert.Project.SearchListener
+  alias Expert.Project.Store
   alias Forge.Project
 
-  # TODO: this module is slightly weird
-  # it is a module based supervisor, but has lots of dynamic supervisor functions
-  # what I learned is that in Expert.Application, it is starting an ad hoc
-  # dynamic supervisor, calling a function from this module
-  # Later, when the server is initializing, it calls the start function in
-  # this module, which starts a normal supervisor, which the start_link and
-  # init callbacks will be called
-  # my suggestion is to separate the dynamic supervisor functionalities from
-  # this module into its own module
-
-  use Supervisor
+  require Logger
 
   def start_link(%Project{} = project) do
     Supervisor.start_link(__MODULE__, project, name: name(project))
@@ -25,7 +17,6 @@ defmodule Expert.Project.Supervisor do
 
   def init(%Project{} = project) do
     children = [
-      {Progress, project},
       {EngineSupervisor, project},
       {Node, project},
       {Diagnostics, project},
@@ -49,7 +40,53 @@ defmodule Expert.Project.Supervisor do
     DynamicSupervisor.terminate_child(Expert.Project.DynamicSupervisor.name(), pid)
   end
 
-  defp name(%Project{} = project) do
-    :"#{Project.name(project)}::supervisor"
+  def name(%Project{} = project) do
+    :"#{Project.unique_name(project)}::supervisor"
+  end
+
+  def ensure_node_started(%Project{} = project) do
+    ensure_node_started(project, blocked?: true)
+  end
+
+  def ensure_node_started(%Project{} = project, opts) when is_list(opts) do
+    blocked? = Keyword.get(opts, :blocked?, true)
+
+    if blocked? and Store.blocked?(project) do
+      Logger.info("Project node start blocked for #{Project.name(project)}")
+      {:error, :deps_error}
+    else
+      case start(project) do
+        {:ok, pid} ->
+          Store.transition(project, :ready)
+          Logger.info("Started project node for #{Project.name(project)}")
+          {:ok, pid}
+
+        {:error, {reason, pid}} when reason in [:already_started, :already_present] ->
+          Store.transition(project, :ready)
+          {:ok, pid}
+
+        {:error, reason} ->
+          Logger.error(
+            "Failed to start project node for #{Project.name(project)}: #{inspect(reason, pretty: true)}"
+          )
+
+          {:error, reason}
+      end
+    end
+  end
+
+  def stop_node(%Project{} = project) do
+    stop(project)
+    Store.transition(project, :pending)
+
+    Logger.info("Stopping project node for #{Project.name(project)}")
+  end
+
+  def restart_node(%Project{} = project, opts \\ []) when is_list(opts) do
+    if Process.whereis(name(project)) do
+      stop_node(project)
+    end
+
+    ensure_node_started(project, opts)
   end
 end

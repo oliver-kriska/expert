@@ -1,59 +1,65 @@
 {
   description = "Reimagined language server for Elixir";
 
-  inputs.nixpkgs.url = "flake:nixpkgs";
-  inputs.beam-flakes.url = "github:elixir-tools/nix-beam-flakes";
-  inputs.beam-flakes.inputs.flake-parts.follows = "flake-parts";
+  inputs = {
+    nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
 
-  inputs.flake-parts.url = "github:hercules-ci/flake-parts";
-  inputs.systems.url = "github:nix-systems/default";
+    beam-flakes.url = "github:elixir-tools/nix-beam-flakes";
+    beam-flakes.inputs.flake-parts.follows = "flake-parts";
+    beam-flakes.inputs.nixpkgs.follows = "nixpkgs";
 
-  outputs = {
-    self,
-    systems,
-    beam-flakes,
-    ...
-  } @ inputs:
+    flake-parts.url = "github:hercules-ci/flake-parts";
+  };
+
+  outputs = inputs:
     inputs.flake-parts.lib.mkFlake {inherit inputs;} {
-      imports = [beam-flakes.flakeModule];
-      flake = {
-        lib = {
-          mkExpert = {erlang}: erlang.callPackage ./nix/expert.nix {};
-        };
-      };
+      imports = [inputs.beam-flakes.flakeModule];
 
-      systems = import systems;
+      systems = [
+        "x86_64-darwin"
+        "aarch64-darwin"
+        "x86_64-linux"
+        "aarch64-linux"
+      ];
 
-      perSystem = {pkgs, ...}: let
-        erlang = pkgs.beam.packages.erlang_25;
-        expert = self.lib.mkExpert {inherit erlang;};
+      perSystem = {
+        lib,
+        pkgs,
+        ...
+      }: let
+        beamPackages = pkgs.beamMinimal27Packages.extend (
+          _: prev: {
+            elixir = prev.elixir_1_17;
+          }
+        );
       in {
-        formatter = pkgs.alejandra;
+        formatter = pkgs.nixfmt;
 
-        apps.update-hash = let
+        apps.update-deps = let
           script = pkgs.writeShellApplication {
-            name = "update-hash";
+            name = "update-deps";
 
-            runtimeInputs = [pkgs.nixFlakes pkgs.gawk];
+            runtimeInputs = [
+              beamPackages.elixir
+              pkgs.just
+            ];
 
             text = ''
-              nix --extra-experimental-features 'nix-command flakes' \
-                build --no-link "${self}#__fodHashGen" 2>&1 | gawk '/got:/ { print $2 }' || true
+              just mix all deps.get
+              just mix all deps.nix
             '';
           };
         in {
           type = "app";
-          program = "${script}/bin/update-hash";
+          program = lib.getExe script;
         };
 
-        packages = {
-          inherit expert;
+        packages = rec {
           default = expert;
 
-          __fodHashGen = expert.mixFodDeps.overrideAttrs (final: curr: {
-            outputHash = pkgs.lib.fakeSha256;
-          });
+          expert = pkgs.callPackage ./nix/expert.nix {inherit beamPackages;};
         };
+
         beamWorkspace = {
           enable = true;
           devShell.languageServers.elixir = false;
@@ -63,10 +69,13 @@
             erlang = "27.3.4.1";
           };
           devShell.extraPackages = with pkgs; [
-            zig
+            alejandra
+            zig_0_15
             xz
             just
             _7zz
+            git
+            zizmor
           ];
         };
       };

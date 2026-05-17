@@ -7,17 +7,16 @@ defmodule Expert.Protocol.Conversions do
   the line contains non-ascii characters. If it's a pure ascii line, then the positions
   are the same in both utf-8 and utf-16, since they reference characters and not bytes.
   """
+  import Forge.Document.Line
+
   alias Forge.CodeUnit
   alias Forge.Document
-  alias Forge.Document.Line
   alias Forge.Document.Lines
   alias Forge.Document.Position, as: ElixirPosition
   alias Forge.Document.Range, as: ElixirRange
   alias Forge.Math
   alias GenLSP.Structures.Position, as: LSPosition
   alias GenLSP.Structures.Range, as: LSRange
-
-  import Line
 
   def to_elixir(%LSRange{} = ls_range, %Document{} = doc) do
     with {:ok, start_pos} <- to_elixir(ls_range.start, doc.lines),
@@ -148,15 +147,15 @@ defmodule Expert.Protocol.Conversions do
     {:ok, character}
   end
 
-  defp extract_elixir_character(%LSPosition{} = position, line(ascii?: true, text: text)) do
-    character = min(position.character + 1, byte_size(text) + 1)
-    {:ok, character}
+  defp extract_elixir_character(%LSPosition{} = position, line(ascii?: true)) do
+    {:ok, position.character + 1}
   end
 
   defp extract_elixir_character(%LSPosition{} = position, line(text: utf8_text)) do
-    with {:ok, code_unit} <- CodeUnit.utf16_offset_to_utf8_offset(utf8_text, position.character) do
-      character = min(code_unit, byte_size(utf8_text) + 1)
-      {:ok, character}
+    case CodeUnit.utf16_offset_to_utf8_offset(utf8_text, position.character) do
+      {:ok, _code_unit} = result -> result
+      {:error, :out_of_bounds} -> {:ok, position.character + 1}
+      {:error, _reason} = result -> result
     end
   end
 end

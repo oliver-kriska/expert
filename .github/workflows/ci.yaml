@@ -1,0 +1,268 @@
+name: Elixir CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  static-analysis:
+    runs-on: ubuntu-latest
+    name: Static analysis - ${{ matrix.project }}
+
+    strategy:
+      matrix:
+        project:
+          - engine
+          - expert
+          - expert_credo
+          - forge
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+
+      - uses: extractions/setup-just@53165ef7e734c5c07cb06b3c8e7b647c5aa16db3 # v4.0.0
+      - name: Set up Elixir
+        id: setup-beam
+        uses: erlef/setup-beam@fc68ffb90438ef2936bbb3251622353b3dcb2f93 # v1.24.0
+        with:
+          version-file: ".tool-versions"
+          version-type: "strict"
+
+      - name: Cache deps
+        id: cache-deps
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        with:
+          path: |
+            apps/${{ matrix.project }}/deps
+            apps/${{ matrix.project }}/_build
+
+          key: ${{ runner.os }}-mix-${{ matrix.project }}-${{ steps.setup-beam.outputs.elixir-version }}-${{ steps.setup-beam.outputs.otp-version }}-${{ hashFiles(format('apps/{0}/mix.lock', matrix.project)) }}
+          restore-keys: |
+            ${{ runner.os }}-mix-${{ matrix.project }}-${{ steps.setup-beam.outputs.elixir-version }}-${{ steps.setup-beam.outputs.otp-version }}-
+
+      - name: Deps
+        env:
+          PROJECT: ${{ matrix.project }}
+        run: just deps "${PROJECT}"
+
+      - name: Compile
+        env:
+          PROJECT: ${{ matrix.project }}
+        run: just compile "${PROJECT}" --warnings-as-errors
+
+      - name: Formatter
+        env:
+          PROJECT: ${{ matrix.project }}
+        run: just mix "${PROJECT}" format --check-formatted
+
+      - name: Credo
+        env:
+          PROJECT: ${{ matrix.project }}
+        run: just mix "${PROJECT}" credo
+
+  dialyzer:
+    runs-on: ubuntu-latest
+    name: Dialyzer - ${{ matrix.project }}
+    strategy:
+      matrix:
+        project:
+          - engine
+          - expert
+          - expert_credo
+          - forge
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+
+      - uses: extractions/setup-just@53165ef7e734c5c07cb06b3c8e7b647c5aa16db3 # v4.0.0
+      - name: Set up Elixir
+        id: setup-beam
+        uses: erlef/setup-beam@fc68ffb90438ef2936bbb3251622353b3dcb2f93 # v1.24.0
+        with:
+          version-file: ".tool-versions"
+          version-type: "strict"
+
+      - name: Cache deps
+        id: cache-deps
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        with:
+          path: |
+            apps/${{ matrix.project }}/deps
+            apps/${{ matrix.project }}/_build
+
+          key: ${{ runner.os }}-mix-${{ matrix.project }}-${{ steps.setup-beam.outputs.elixir-version }}-${{ steps.setup-beam.outputs.otp-version }}-${{ hashFiles(format('apps/{0}/mix.lock', matrix.project)) }}
+          restore-keys: |
+            ${{ runner.os }}-mix-${{ matrix.project }}-${{ steps.setup-beam.outputs.elixir-version }}-${{ steps.setup-beam.outputs.otp-version }}-
+
+      - name: Cache dialyzer plt files
+        id: cache-plt
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        with:
+          key: expert-plts-${{ steps.setup-beam.outputs.otp-version }}-${{ steps.setup-beam.outputs.elixir-version }}-${{ hashFiles(format('apps/{0}/mix.lock', matrix.project)) }}
+          restore-keys: |
+            expert-plts-${{ steps.setup-beam.outputs.otp-version }}-${{ steps.setup-beam.outputs.elixir-version }}-${{ hashFiles(format('apps/{0}/mix.lock', matrix.project)) }}-
+            expert-plts-${{ steps.setup-beam.outputs.otp-version }}-${{ steps.setup-beam.outputs.elixir-version }}-
+          path: "priv/plts"
+
+      - name: Deps
+        env:
+          PROJECT: ${{ matrix.project }}
+        run: just deps "${PROJECT}"
+
+      - name: Compile
+        env:
+          PROJECT: ${{ matrix.project }}
+        run: just compile "${PROJECT}" --warnings-as-errors
+
+      - name: Create PLT
+        if: steps.cache-plt.outputs.cache-hit != 'true'
+        env:
+          PROJECT: ${{ matrix.project }}
+        run: |
+          mkdir -p priv/plts
+          just mix "${PROJECT}" dialyzer --plt
+
+      - name: Dialyzer
+        env:
+          PROJECT: ${{ matrix.project }}
+        run: |
+          just mix "${PROJECT}" compile.protocols --warnings-as-errors
+          just mix "${PROJECT}" dialyzer --force-check
+
+  release-test:
+    runs-on: ${{matrix.os.name}}
+    name: Release test (${{matrix.os.name}})
+    strategy:
+      matrix:
+        os:
+          - name: ubuntu-latest
+            target: linux_amd64
+          - name: macos-15
+            target: darwin_arm64
+          - name: macos-14
+            target: darwin_amd64
+
+        include:
+          - elixir: "1.17.3"
+            otp: "27.3.4.1"
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+
+      - uses: extractions/setup-just@53165ef7e734c5c07cb06b3c8e7b647c5aa16db3 # v4.0.0
+      - name: Set up Elixir
+        uses: erlef/setup-beam@fc68ffb90438ef2936bbb3251622353b3dcb2f93 # v1.24.0
+        with:
+          otp-version: ${{matrix.otp}}
+          elixir-version: ${{matrix.elixir}}
+
+      - uses: mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29 # v2.2.1
+        with:
+          version: "0.15.2"
+
+      - name: Cache deps
+        id: cache-deps
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        with:
+          path: |
+            apps/**/deps
+            apps/**/_build
+
+          key: ${{ runner.os }}-mix-${{ matrix.elixir }}-${{ matrix.otp }}-${{ hashFiles('apps/**/mix.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-mix-${{ matrix.elixir }}-${{ matrix.otp }}-
+
+      - name: Build and release
+        run: just burrito-local
+
+  prep-matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+     - name: Checkout to repository
+       uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+       with:
+         persist-credentials: false
+     - name: Set matrix data
+       id: set-matrix
+       run: echo "matrix=$(jq -c . < .github/matrix.json)" >> "$GITHUB_OUTPUT"
+
+  test:
+    runs-on: ${{matrix.os}}
+    name: Test ${{ matrix.project }} on OTP ${{matrix.otp}} / Elixir ${{matrix.elixir}} / ${{matrix.os}}
+    needs: prep-matrix
+    strategy:
+      matrix: ${{ fromJson(needs.prep-matrix.outputs.matrix) }}
+    steps:
+      - name: Disable Windows Defender real-time scanning
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          Set-MpPreference -DisableRealtimeMonitoring $true
+          Set-MpPreference -DisableScriptScanning $true
+          Set-MpPreference -DisableArchiveScanning $true
+      - name: Set git to use original line ending (Windows)
+        if: runner.os == 'Windows'
+        run: git config --global core.autocrlf false
+      - name: Checkout code
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+
+      - uses: extractions/setup-just@53165ef7e734c5c07cb06b3c8e7b647c5aa16db3 # v4.0.0
+      - name: Set up Elixir
+        uses: erlef/setup-beam@fc68ffb90438ef2936bbb3251622353b3dcb2f93 # v1.24.0
+        with:
+          otp-version: ${{matrix.otp}}
+          elixir-version: ${{matrix.elixir}}
+
+      - name: Cache deps
+        id: cache-deps
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        with:
+          path: |
+            apps/${{ matrix.project }}/deps
+            apps/${{ matrix.project }}/_build
+
+          key: ${{ runner.os }}-mix-${{ matrix.project }}-${{ matrix.elixir }}-${{ matrix.otp }}-${{ hashFiles(format('apps/{0}/mix.lock', matrix.project)) }}
+          restore-keys: |
+            ${{ runner.os }}-mix-${{ matrix.project }}-${{ matrix.elixir }}-${{ matrix.otp }}-
+
+      - name: Deps
+        env:
+          PROJECT: ${{ matrix.project }}
+        run: just deps "${PROJECT}"
+
+      - name: Run tests
+        env:
+          PROJECT: ${{ matrix.project }}
+        run: just test "${PROJECT}" --warnings-as-errors
+
+  run-tests-failure-alert:
+    runs-on: ubuntu-latest
+    needs: [static-analysis, dialyzer, release-test, test]
+    if: ${{ cancelled() || contains(needs.*.result, 'cancelled') || contains(needs.*.result, 'failure') }}
+    steps:
+      - name: Conditionally Fail Required Check
+        shell: bash
+        run: |
+          echo "::error Some required job has failed!"
+          exit 1
+

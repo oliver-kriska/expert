@@ -1,4 +1,10 @@
 defmodule Expert.Provider.Handlers.GoToDefinitionTest do
+  use ExUnit.Case, async: false
+
+  import Forge.EngineApi.Messages
+  import Forge.Test.Fixtures
+
+  alias Expert.Document.Context
   alias Expert.EngineApi
   alias Expert.Protocol.Convert
   alias Expert.Provider.Handlers
@@ -7,17 +13,18 @@ defmodule Expert.Provider.Handlers.GoToDefinitionTest do
   alias GenLSP.Requests.TextDocumentDefinition
   alias GenLSP.Structures
 
-  import Forge.EngineApi.Messages
-  import Forge.Test.Fixtures
-
-  use ExUnit.Case, async: false
-
   setup_all do
     project = project(:navigations)
 
+    start_supervised!({DynamicSupervisor, Expert.EngineBuild.DynamicSupervisor.options()})
+    start_supervised!(Expert.EngineBuilds)
+    start_supervised!({Forge.NodePortMapper, []})
     start_supervised!(Expert.Application.document_store_child_spec())
+    start_supervised!({Expert.Project.Store, []})
     start_supervised!({DynamicSupervisor, Expert.Project.DynamicSupervisor.options()})
     start_supervised!({Expert.Project.Supervisor, project})
+
+    Expert.Configuration.new() |> Expert.Configuration.set()
 
     EngineApi.register_listener(project, self(), [
       project_compiled(),
@@ -29,6 +36,11 @@ defmodule Expert.Provider.Handlers.GoToDefinitionTest do
     assert_receive project_index_ready(), 5000
 
     {:ok, project: project}
+  end
+
+  setup do
+    :persistent_term.erase(Expert.Configuration)
+    :ok
   end
 
   defp with_referenced_file(%{project: project}) do
@@ -53,8 +65,10 @@ defmodule Expert.Provider.Handlers.GoToDefinitionTest do
   end
 
   def handle(request, project) do
-    config = Expert.Configuration.new(project: project)
-    Handlers.GoToDefinition.handle(request, config)
+    Expert.Project.Store.add_projects([project])
+    document = Document.Container.context_document(request, nil)
+    context = Context.new(document.uri, document, project)
+    Handlers.GoToDefinition.handle(request, context)
   end
 
   describe "go to definition" do

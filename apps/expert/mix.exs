@@ -1,5 +1,6 @@
 defmodule Expert.MixProject do
   use Mix.Project
+
   Code.require_file("../../mix_includes.exs")
 
   def project do
@@ -17,13 +18,13 @@ defmodule Expert.MixProject do
     ]
   end
 
-  def version() do
+  def version do
     "../../version.txt" |> File.read!() |> String.trim()
   end
 
   def application do
     [
-      extra_applications: [:logger, :runtime_tools, :kernel, :erts, :observer],
+      extra_applications: [:logger, :runtime_tools, :kernel, :wx, :observer, :telemetry],
       mod: {Expert.Application, []}
     ]
   end
@@ -44,7 +45,7 @@ defmodule Expert.MixProject do
     ["lib"]
   end
 
-  defp releases() do
+  defp releases do
     [
       expert: [
         strip_beams: false,
@@ -63,21 +64,36 @@ defmodule Expert.MixProject do
       plain: [
         strip_beams: false,
         cookie: "expert",
-        steps: release_steps()
+        steps: release_steps() ++ [&Expert.Release.plain_assemble/1],
+        include_executables_for: executables(),
+        overlays: overlays()
       ]
     ]
   end
 
-  defp release_steps() do
+  defp release_steps do
     [
       :assemble,
       &Expert.Release.assemble/1
     ]
   end
 
+  defp executables do
+    if windows?(), do: [:windows], else: [:unix]
+  end
+
+  defp overlays do
+    if windows?(), do: ["rel/windows"], else: ["rel/unix"]
+  end
+
+  defp windows? do
+    :os.type() |> elem(0) == :win32
+  end
+
   defp deps do
     [
-      {:burrito, "~> 1.4", only: [:dev, :prod]},
+      {:burrito, "~> 1.5"},
+      {:deps_nix, "~> 2.4", only: :dev},
       Mix.Credo.dependency(),
       Mix.Dialyzer.dependency(),
       # In practice Expert does not hardly depend on Engine, only on its compiled
@@ -85,13 +101,14 @@ defmodule Expert.MixProject do
       # assume a roundtrip to a project node is made.
       {:engine, path: "../engine", only: [:test]},
       {:forge, path: "../forge"},
-      {:gen_lsp, "~> 0.11"},
+      {:gen_lsp, "~> 0.11.3"},
       {:jason, "~> 1.4"},
-      {:logger_file_backend, "~> 0.0", only: [:dev, :prod]},
       {:patch, "~> 0.15", runtime: false, only: [:dev, :test]},
+      {:quokka, "~> 2.12", only: [:dev, :test], runtime: false},
       {:path_glob, "~> 0.2"},
+      {:phoenix_live_view, "~> 1.0", only: [:test], runtime: false},
       {:schematic, "~> 0.2"},
-      {:sourceror, "~> 1.9"}
+      {:sourceror, "~> 1.10.1"}
     ]
   end
 end

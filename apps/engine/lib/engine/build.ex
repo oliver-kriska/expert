@@ -1,12 +1,12 @@
 defmodule Engine.Build do
-  alias Forge.Document
-  alias Forge.Project
+  use GenServer
 
   alias Engine.Build.Document.Compilers.HEEx
   alias Engine.Build.State
+  alias Forge.Document
+  alias Forge.Project
 
   require Logger
-  use GenServer
 
   @timeout_interval_millis 50
 
@@ -35,9 +35,19 @@ defmodule Engine.Build do
     :ok
   end
 
-  def with_lock(func) do
-    Engine.with_lock(__MODULE__, func)
+  def clean_and_fetch_deps(%Project{} = project) do
+    GenServer.call(__MODULE__, {:clean_and_fetch_deps, project})
   end
+
+  def with_lock(func), do: Engine.with_lock(__MODULE__, func)
+
+  # can't pass work token to Tracer module, so store it in persistent term.
+
+  def set_progress_token(token), do: :persistent_term.put({__MODULE__, :progress_token}, token)
+
+  def get_progress_token, do: :persistent_term.get({__MODULE__, :progress_token}, nil)
+
+  def clear_progress_token, do: :persistent_term.erase({__MODULE__, :progress_token})
 
   # GenServer Callbacks
 
@@ -64,6 +74,13 @@ defmodule Engine.Build do
   def handle_call({:force_compile_file, %Document{} = document}, _from, %State{} = state) do
     State.compile_file(state, document)
     {:reply, :ok, state, @timeout_interval_millis}
+  end
+
+  @impl GenServer
+  def handle_call({:clean_and_fetch_deps, %Project{} = project}, _from, %State{} = state) do
+    state = State.fetch_deps(state, project)
+
+    {:reply, State.last_deps_fetch_result(state), state}
   end
 
   @impl GenServer

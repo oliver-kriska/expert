@@ -1,4 +1,10 @@
 defmodule Engine.Api.ProxyTest do
+  use ExUnit.Case
+  use Patch
+
+  import Forge.EngineApi.Messages
+  import Forge.Test.Fixtures
+
   alias Engine.Api.Proxy
   alias Engine.Api.Proxy.BufferingState
   alias Engine.Api.Proxy.DrainingState
@@ -6,15 +12,8 @@ defmodule Engine.Api.ProxyTest do
   alias Engine.CodeMod
   alias Engine.Commands
   alias Engine.Dispatch
-
   alias Forge.Document
   alias Forge.Document.Changes
-
-  use ExUnit.Case
-  use Patch
-
-  import Forge.EngineApi.Messages
-  import Forge.Test.Fixtures
 
   setup do
     start_supervised!(Proxy)
@@ -30,13 +29,6 @@ defmodule Engine.Api.ProxyTest do
       assert :ok = Proxy.broadcast(:hello)
 
       assert_called(Dispatch.broadcast(:hello))
-    end
-
-    test "proxies broadcasts of progress messages" do
-      patch(Dispatch, :broadcast, :ok)
-      assert :ok = Proxy.broadcast(percent_progress())
-
-      assert_called(Dispatch.broadcast(percent_progress()))
     end
 
     test "schedule compile is proxied", %{project: project} do
@@ -148,13 +140,6 @@ defmodule Engine.Api.ProxyTest do
 
     test "start_buffering can't be called twice" do
       assert {:error, {:already_buffering, _}} = Proxy.start_buffering()
-    end
-
-    test "proxies broadcasts of progress messages" do
-      patch(Dispatch, :broadcast, :ok)
-      assert :ok = Proxy.broadcast(percent_progress())
-
-      assert_called(Dispatch.broadcast(percent_progress()))
     end
 
     test "buffers broadcasts" do

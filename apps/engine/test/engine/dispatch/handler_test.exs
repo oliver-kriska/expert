@@ -1,9 +1,9 @@
 defmodule Engine.Dispatch.HandlerTest do
-  alias Engine.Dispatch
-  alias Forge.EngineApi.Messages
-
-  import Messages
   use ExUnit.Case
+
+  import Forge.EngineApi.Messages
+
+  alias Engine.Dispatch
 
   setup do
     start_supervised!(Dispatch)
@@ -69,7 +69,7 @@ defmodule Engine.Dispatch.HandlerTest do
       Dispatch.broadcast(file_changed())
       refute_receive {SelectiveForwarder, _}
 
-      Dispatch.broadcast(project_progress())
+      Dispatch.broadcast(project_compiled())
       refute_receive {SelectiveForwarder, _}
     end
   end

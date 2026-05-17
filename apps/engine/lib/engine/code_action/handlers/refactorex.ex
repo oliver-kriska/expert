@@ -1,4 +1,6 @@
 defmodule Engine.CodeAction.Handlers.Refactorex do
+  @behaviour Engine.CodeAction.Handler
+
   alias Engine.CodeAction
   alias Engine.CodeMod
   alias Forge.Document
@@ -6,8 +8,6 @@ defmodule Engine.CodeAction.Handlers.Refactorex do
   alias Forge.Document.Range
   alias GenLSP.Enumerations
   alias Refactorex.Refactor
-
-  @behaviour CodeAction.Handler
 
   @impl CodeAction.Handler
   def actions(%Document{} = doc, %Range{} = range, _diagnostics) do
@@ -33,9 +33,13 @@ defmodule Engine.CodeAction.Handlers.Refactorex do
   def kinds, do: [Enumerations.CodeActionKind.refactor()]
 
   @impl CodeAction.Handler
-  def trigger_kind, do: Enumerations.CodeActionTriggerKind.invoked()
+  def trigger_kind, do: :all
 
-  defp line_or_selection(_, %{start: start, end: start}), do: {:ok, start.line}
+  defp line_or_selection(_, %{
+         start: %{line: line, character: char},
+         end: %{line: line, character: char}
+       }),
+       do: {:ok, line}
 
   defp line_or_selection(doc, %{start: start} = range) do
     doc
@@ -46,11 +50,18 @@ defmodule Engine.CodeAction.Handlers.Refactorex do
   defp ast_to_changes(doc, ast) do
     {formatter, opts} = CodeMod.Format.formatter_for_file(Engine.get_project(), doc.uri)
 
+    sourceror_opts =
+      Keyword.reject(
+        [
+          formatter: formatter,
+          locals_without_parens: opts[:locals_without_parens] || [],
+          line_length: opts[:line_length]
+        ],
+        fn {_k, v} -> is_nil(v) end
+      )
+
     ast
-    |> Sourceror.to_string(
-      formatter: formatter,
-      locals_without_parens: opts[:locals_without_parens] || []
-    )
+    |> Sourceror.to_string(sourceror_opts)
     |> then(&CodeMod.Diff.diff(doc, &1))
     |> then(&Changes.new(doc, &1))
   end

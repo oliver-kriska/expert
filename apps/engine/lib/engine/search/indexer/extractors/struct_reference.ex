@@ -69,7 +69,7 @@ defmodule Engine.Search.Indexer.Extractors.StructReference do
       subject,
       :struct,
       Ast.Range.fetch!(reference, document),
-      Application.get_application(struct_module)
+      Engine.ApplicationCache.application(struct_module)
     )
   end
 
@@ -80,6 +80,9 @@ defmodule Engine.Search.Indexer.Extractors.StructReference do
   defp expand_alias({:__MODULE__, _, _}, %Reducer{} = reducer) do
     Analyzer.current_module(reducer.analysis, Reducer.position(reducer))
   end
+
+  # We ignore struct references with variable names, e.g. %_{}, %var_name{}
+  defp expand_alias({atom, _, ctx}, _reducer) when is_atom(atom) and is_atom(ctx), do: :ignored
 
   defp expand_alias(alias, %Reducer{} = reducer) do
     {line, column} = reducer.position

@@ -1,10 +1,10 @@
 defmodule Expert.Protocol.ConversionsTest do
+  use ExUnit.Case
+
   alias Expert.Protocol.Conversions
   alias Forge.Document
   alias Forge.Document.Position, as: ExPosition
   alias GenLSP.Structures.Position, as: LSPosition
-
-  use ExUnit.Case
 
   defp lsp_position(line, char) do
     %LSPosition{line: line, character: char}
@@ -54,7 +54,7 @@ defmodule Expert.Protocol.ConversionsTest do
 
     test "position > line length of a document with characters" do
       assert {:ok, pos} = Conversions.to_elixir(lsp_position(0, 15), doc("abcde"))
-      assert %ExPosition{line: 1, character: 6} = pos
+      assert %ExPosition{line: 1, character: 16} = pos
     end
 
     #  This is not specified in LSP but some clients fail to synchronize text properly

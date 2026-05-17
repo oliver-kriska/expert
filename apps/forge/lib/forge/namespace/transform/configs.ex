@@ -1,8 +1,11 @@
 defmodule Forge.Namespace.Transform.Configs do
   def apply_to_all(base_directory) do
+    base_directory = Forge.OS.normalize_path(base_directory)
+
     base_directory
     |> Path.join("**/runtime.exs")
     |> Path.wildcard()
+    |> Enum.filter(&File.regular?/1)
     |> Enum.map(&Path.absname/1)
     |> tap(fn paths ->
       Mix.Shell.IO.info("Rewriting #{length(paths)} config scripts.")

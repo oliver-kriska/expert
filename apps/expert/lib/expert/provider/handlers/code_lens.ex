@@ -1,5 +1,9 @@
 defmodule Expert.Provider.Handlers.CodeLens do
-  alias Expert.Configuration
+  @behaviour Expert.Provider.Handler
+
+  import Forge.Document.Line
+
+  alias Expert.Document.Context
   alias Expert.EngineApi
   alias Expert.Provider.Handlers
   alias Forge.Document
@@ -9,17 +13,17 @@ defmodule Expert.Provider.Handlers.CodeLens do
   alias GenLSP.Requests
   alias GenLSP.Structures
 
-  import Document.Line
   require Logger
 
+  @impl Expert.Provider.Handler
   def handle(
-        %Requests.TextDocumentCodeLens{params: %Structures.CodeLensParams{} = params},
-        %Configuration{} = config
+        %Requests.TextDocumentCodeLens{params: %Structures.CodeLensParams{}},
+        %Context{} = context
       ) do
-    document = Document.Container.context_document(params, nil)
+    %Context{document: document, project: project} = context
 
     lenses =
-      case reindex_lens(config.project, document) do
+      case reindex_lens(project, document) do
         nil -> []
         lens -> List.wrap(lens)
       end
@@ -53,9 +57,19 @@ defmodule Expert.Provider.Handlers.CodeLens do
   end
 
   defp show_reindex_lens?(%Project{} = project, %Document{} = document) do
-    document_path = Path.expand(document.path)
+    case Project.mix_exs_path(project) do
+      nil ->
+        false
 
-    document_path == Project.mix_exs_path(project) and
-      not EngineApi.index_running?(project)
+      mix_exs_path ->
+        normalize_path(document.path) == normalize_path(mix_exs_path) and
+          not EngineApi.index_running?(project)
+    end
+  end
+
+  defp normalize_path(path) do
+    path
+    |> Path.expand()
+    |> Forge.Path.normalize()
   end
 end

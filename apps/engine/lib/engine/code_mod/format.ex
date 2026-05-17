@@ -1,10 +1,9 @@
 defmodule Engine.CodeMod.Format do
+  alias Engine.Build
+  alias Engine.CodeMod.Diff
   alias Forge.Document
   alias Forge.Document.Changes
   alias Forge.Project
-
-  alias Engine.Build
-  alias Engine.CodeMod.Diff
 
   require Logger
 
@@ -243,21 +242,21 @@ defmodule Engine.CodeMod.Format do
   end
 
   defp mix_formatter_from_task(%Project{} = project, file_path) do
-    try do
-      root_path = Project.root_path(project)
-      deps_paths = Engine.deps_paths()
+    root_path = Project.root_path(project)
+    deps_paths = Engine.deps_paths()
 
-      formatter_and_opts =
+    formatter_and_opts =
+      Engine.with_lock(Engine.Mix.StackMutation, fn ->
         Mix.Tasks.Future.Format.formatter_for_file(file_path,
           root: root_path,
           deps_paths: deps_paths,
           plugin_loader: fn plugins -> Enum.filter(plugins, &Code.ensure_loaded?/1) end
         )
+      end)
 
-      {:ok, formatter_and_opts}
-    rescue
-      _ ->
-        :error
-    end
+    {:ok, formatter_and_opts}
+  rescue
+    _ ->
+      :error
   end
 end

@@ -6,10 +6,13 @@ defmodule Forge.Project do
   as well as business logic for how to change its attributes.
   """
   alias Forge.Document
+  alias Forge.Internet
+
+  require Logger
 
   defstruct root_uri: nil,
             mix_exs_uri: nil,
-            mix_project?: false,
+            kind: :bare,
             mix_env: nil,
             mix_target: nil,
             env_variables: %{},
@@ -21,6 +24,7 @@ defmodule Forge.Project do
   @type t :: %__MODULE__{
           root_uri: Forge.uri() | nil,
           mix_exs_uri: Forge.uri() | nil,
+          kind: :mix | :bare,
           entropy: non_neg_integer(),
           mix_env: atom(),
           mix_target: atom(),
@@ -37,6 +41,21 @@ defmodule Forge.Project do
     %__MODULE__{entropy: entropy}
     |> maybe_set_root_uri(root_uri)
     |> maybe_set_mix_exs_uri()
+    |> set_kind()
+  end
+
+  @spec from_folders([%{uri: Forge.uri()}]) :: [t()]
+  def from_folders(folders) do
+    folders
+    |> Enum.flat_map(fn %{uri: uri} ->
+      project = new(uri)
+
+      if project.kind == :mix or elixir_project?(project), do: [project], else: []
+    end)
+  end
+
+  def bare(root_uri) do
+    %__MODULE__{new(root_uri) | kind: :bare, mix_exs_uri: nil}
   end
 
   @spec set_project_module(t(), module() | nil) :: t()
@@ -54,29 +73,27 @@ defmodule Forge.Project do
   @spec name(t) :: String.t()
 
   def name(%__MODULE__{} = project) do
-    sanitized =
-      project
-      |> folder_name()
-      |> String.replace(~r/[^a-zA-Z0-9_]/, "_")
+    folder_name(project)
+  end
 
-    # This might be a little verbose, but this code is hot.
-    case sanitized do
-      <<c::utf8, _rest::binary>> when c in ?a..?z ->
-        sanitized
+  @doc """
+  Returns a unique name for the project, suitable for process registration.
 
-      <<c::utf8, rest::binary>> when c in ?A..?Z ->
-        String.downcase("#{[c]}") <> rest
-
-      other ->
-        "p_#{other}"
-    end
+  Appends a hash of the full root path to disambiguate projects that share
+  the same folder name (e.g. an umbrella root and a sub-app within it).
+  """
+  @spec unique_name(t) :: String.t()
+  def unique_name(%__MODULE__{} = project) do
+    hash = :erlang.phash2(root_path(project))
+    "#{name(project)}::#{hash}"
   end
 
   @doc """
   The project node's name
   """
   def node_name(%__MODULE__{} = project) do
-    :"project-#{name(project)}-#{entropy(project)}@127.0.0.1"
+    sanitized = Forge.Node.sanitize(name(project))
+    :"expert-project-#{sanitized}-#{entropy(project)}@127.0.0.1"
   end
 
   def entropy(%__MODULE__{} = project) do
@@ -84,16 +101,22 @@ defmodule Forge.Project do
   end
 
   def config(%__MODULE__{} = project) do
-    config_key = {__MODULE__, name(project), :config}
+    case project.project_module do
+      nil ->
+        []
 
-    case :persistent_term.get(config_key, :not_found) do
-      :not_found ->
-        config = project.project_module.project()
-        :persistent_term.put(config_key, config)
-        config
+      project_module ->
+        config_key = {__MODULE__, project.root_uri, :config}
 
-      config ->
-        config
+        case :persistent_term.get(config_key, :not_found) do
+          :not_found ->
+            config = project_module.project()
+            :persistent_term.put(config_key, config)
+            config
+
+          config ->
+            config
+        end
     end
   end
 
@@ -163,10 +186,6 @@ defmodule Forge.Project do
     set_env_vars(project, environment_variables)
   end
 
-  def manager_node_name(%__MODULE__{} = project) do
-    :"manager-#{name(project)}-#{entropy(project)}@127.0.0.1"
-  end
-
   @doc """
   Returns the full path to the project's expert workspace directory
 
@@ -225,6 +244,8 @@ defmodule Forge.Project do
   @doc """
   Creates and initializes expert's workspace directory if it doesn't already exist
   """
+  @spec ensure_workspace(t()) ::
+          :ok | {:error, File.posix() | :badarg | :terminated | :system_limit}
   def ensure_workspace(%__MODULE__{} = project) do
     with :ok <- ensure_workspace_directory(project) do
       ensure_git_ignore(project)
@@ -240,10 +261,10 @@ defmodule Forge.Project do
 
       File.exists?(workspace_path) ->
         :ok = File.rm(workspace_path)
-        :ok = File.mkdir_p(workspace_path)
+        File.mkdir_p(workspace_path)
 
       true ->
-        :ok = File.mkdir(workspace_path)
+        File.mkdir(workspace_path)
     end
   end
 
@@ -287,12 +308,20 @@ defmodule Forge.Project do
     if mix_exs_exists?(possible_mix_exs_path) do
       %__MODULE__{
         project
-        | mix_exs_uri: Document.Path.to_uri(possible_mix_exs_path),
-          mix_project?: true
+        | mix_exs_uri: Document.Path.to_uri(possible_mix_exs_path)
       }
     else
       project
     end
+  end
+
+  defp set_kind(%__MODULE__{mix_exs_uri: mix_exs_uri} = project)
+       when is_binary(mix_exs_uri) do
+    %__MODULE__{project | kind: :mix}
+  end
+
+  defp set_kind(%__MODULE__{} = project) do
+    %__MODULE__{project | kind: :bare}
   end
 
   # Project Path
@@ -344,5 +373,34 @@ defmodule Forge.Project do
     project
     |> root_path()
     |> Path.basename()
+  end
+
+  @spec elixir_project?(t()) :: boolean()
+  def elixir_project?(%__MODULE__{} = project) do
+    case root_path(project) do
+      nil ->
+        false
+
+      root_path ->
+        ex_files = root_path |> Path.join("*.ex") |> Path.wildcard()
+        exs_files = root_path |> Path.join("*.exs") |> Path.wildcard()
+
+        ex_files != [] or exs_files != []
+    end
+  end
+
+  def kind(%__MODULE__{} = project) do
+    project.kind
+  end
+
+  def ensure_hex_and_rebar do
+    if Internet.connected_to_internet?() do
+      Mix.Task.run("local.hex", ~w(--force --if-missing))
+      Mix.Task.run("local.rebar", ~w(--force --if-missing))
+      :ok
+    else
+      Logger.warning("Could not connect to hex.pm, dependencies will not be fetched")
+      :ok
+    end
   end
 end

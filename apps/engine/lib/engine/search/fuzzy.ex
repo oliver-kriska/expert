@@ -11,10 +11,11 @@ defmodule Engine.Search.Fuzzy do
   returned.
   """
 
+  import Record
+
   alias Engine.Search.Fuzzy.Scorer
   alias Forge.Project
   alias Forge.Search.Indexer.Entry
-  import Record
 
   defstruct subject_to_values: %{},
             grouping_key_to_values: %{},
@@ -334,17 +335,7 @@ defmodule Engine.Search.Fuzzy do
   end
 
   defp build_filter_fn do
-    deps_directories =
-      if Mix.Project.get() do
-        deps_roots()
-      else
-        {:ok, deps_roots} =
-          Engine.Mix.in_project(fn _ ->
-            deps_roots()
-          end)
-
-        deps_roots
-      end
+    deps_directories = deps_roots()
 
     fn
       mapped(subtype: :definition, grouping_key: path) ->
@@ -361,7 +352,7 @@ defmodule Engine.Search.Fuzzy do
     deps_roots(Engine.get_project())
   end
 
-  defp deps_roots(%Project{mix_project?: true} = project) do
+  defp deps_roots(%Project{kind: :mix} = project) do
     # Note: This function assumes that the deps directories for all
     # found projects is `deps`. Projects may override this directory
     # and expert won't understand this. This was done because loading

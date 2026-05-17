@@ -2,12 +2,11 @@ defmodule Expert.EngineApi do
   alias Expert.EngineNode
   alias Forge.Ast.Analysis
   alias Forge.Ast.Env
+  alias Forge.CodeIntelligence
   alias Forge.Document
   alias Forge.Document.Position
   alias Forge.Document.Range
   alias Forge.Project
-
-  alias Forge.CodeIntelligence
 
   require Logger
 
@@ -19,6 +18,10 @@ defmodule Expert.EngineApi do
 
   def schedule_compile(%Project{} = project, force?) do
     call(project, Engine, :schedule_compile, [force?])
+  end
+
+  def clean_and_fetch_deps(%Project{} = project) do
+    call(project, Engine, :clean_and_fetch_deps, [])
   end
 
   def compile_document(%Project{} = project, %Document{} = document) do
@@ -81,6 +84,10 @@ defmodule Expert.EngineApi do
 
   def definition(%Project{} = project, %Document{} = document, %Position{} = position) do
     call(project, Engine, :definition, [document, position])
+  end
+
+  def hover(%Project{} = project, %Document{} = document, %Position{} = position) do
+    call(project, Engine, :hover, [document, position])
   end
 
   def references(

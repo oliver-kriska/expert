@@ -12,8 +12,7 @@ defmodule Engine.Api.Proxy do
 
   The logic follows below
     `broadcast` - Buffered - Though, those related to other events, like compilation are subject to
-                  the rules that govern their source events. Progress messages are sent regardless of
-                  buffering.
+                  the rules that govern their source events.
     `schedule_compile` - Buffered - Only one call is kept
     `compile_document` - Buffered, though only one call per URI is kept, and if a `schedule_compile` call
                          was buffered, all `compile_document` calls are dropped
@@ -30,22 +29,18 @@ defmodule Engine.Api.Proxy do
 
   """
 
-  alias Forge.Document
-  alias Forge.Document.Changes
+  @behaviour :gen_statem
+
+  import Engine.Api.Proxy.Records, only: :macros
+  import Record
 
   alias Engine.Api.Proxy.BufferingState
   alias Engine.Api.Proxy.DrainingState
   alias Engine.Api.Proxy.ProxyingState
-  alias Engine.Api.Proxy.Records
   alias Engine.CodeMod
   alias Engine.Commands
-  alias Forge.EngineApi.Messages
-
-  import Messages
-  import Record
-  import Records, only: :macros
-
-  @behaviour :gen_statem
+  alias Forge.Document
+  alias Forge.Document.Changes
 
   defrecord :buffer, contents: nil, return: :ok
   defrecord :drop, contents: nil, return: :ok
@@ -61,10 +56,6 @@ defmodule Engine.Api.Proxy do
   end
 
   # proxied functions
-
-  def broadcast(percent_progress() = message) do
-    Engine.Dispatch.broadcast(message)
-  end
 
   def broadcast(message) do
     mfa = to_mfa(Engine.Dispatch.broadcast(message))
@@ -100,6 +91,12 @@ defmodule Engine.Api.Proxy do
     mfa = to_mfa(CodeMod.Format.edits(document))
     drop = drop(contents: mfa, return: {:ok, Changes.new(document, [])})
     :gen_statem.call(__MODULE__, drop)
+  end
+
+  def clean_and_fetch_deps do
+    project = Engine.get_project()
+    mfa = to_mfa(Engine.Build.clean_and_fetch_deps(project))
+    :gen_statem.call(__MODULE__, buffer(contents: mfa))
   end
 
   # utility functions

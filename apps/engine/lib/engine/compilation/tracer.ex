@@ -1,8 +1,9 @@
 defmodule Engine.Compilation.Tracer do
+  import Forge.EngineApi.Messages
+
   alias Engine.Build
   alias Engine.Module.Loader
-
-  import Forge.EngineApi.Messages
+  alias Engine.Progress
 
   def trace({:on_module, module_binary, _filename}, %Macro.Env{} = env) do
     message = extract_module_updated(env.module, module_binary, env.file)
@@ -16,7 +17,7 @@ defmodule Engine.Compilation.Tracer do
   end
 
   def extract_module_updated(module, module_binary, filename) do
-    unless Loader.ensure_loaded?(module) do
+    if !Loader.ensure_loaded?(module) do
       erlang_filename =
         filename
         |> ensure_filename()
@@ -56,10 +57,9 @@ defmodule Engine.Compilation.Tracer do
   end
 
   defp maybe_report_progress(file) do
-    if Path.extname(file) == ".ex" do
-      file
-      |> progress_message()
-      |> Engine.broadcast()
+    with ".ex" <- Path.extname(file),
+         token when not is_nil(token) <- Build.get_progress_token() do
+      Progress.report(token, message: progress_message(file))
     end
   end
 
@@ -72,9 +72,6 @@ defmodule Engine.Compilation.Tracer do
     base_dir = List.first(relative_path_elements)
     file_name = List.last(relative_path_elements)
 
-    message = "compiling: " <> Path.join([base_dir, "...", file_name])
-
-    label = Build.State.building_label(Engine.get_project())
-    project_progress(label: label, message: message)
+    "compiling: " <> Path.join([base_dir, "...", file_name])
   end
 end

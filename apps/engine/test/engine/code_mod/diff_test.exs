@@ -1,11 +1,11 @@
 defmodule Engine.CodeMod.DiffTest do
+  use Forge.Test.CodeMod.Case
+  use Forge.Test.PositionSupport
+
   alias Engine.CodeMod.Diff
   alias Forge.Document
   alias Forge.Document.Edit
   alias Forge.Document.Range
-
-  use Forge.Test.CodeMod.Case
-  use Forge.Test.PositionSupport
 
   def edit(start_line, start_code_unit, end_line, end_code_unit, replacement) do
     Edit.new(
@@ -180,7 +180,7 @@ defmodule Engine.CodeMod.DiffTest do
       final = ~S[{"🎸", "after"}]
 
       assert [edit] = diff(orig, final)
-      assert_normalized(edit == edit(1, 10, 1, 12, ""))
+      assert_normalized(edit == edit(1, 8, 1, 10, ""))
       assert_edited(orig, final)
     end
 
@@ -189,7 +189,7 @@ defmodule Engine.CodeMod.DiffTest do
       final = ~S[🎸🎺🎸]
 
       assert [edit] = diff(orig, final)
-      assert_normalized(edit == edit(1, 5, 1, 5, "🎺"))
+      assert_normalized(edit == edit(1, 3, 1, 3, "🎺"))
       assert_edited(orig, final)
     end
 
@@ -198,7 +198,7 @@ defmodule Engine.CodeMod.DiffTest do
       final = ~S[🎸🎸]
 
       assert [edit] = diff(orig, final)
-      assert_normalized(edit == edit(1, 5, 1, 13, ""))
+      assert_normalized(edit == edit(1, 3, 1, 7, ""))
       assert_edited(orig, final)
     end
 

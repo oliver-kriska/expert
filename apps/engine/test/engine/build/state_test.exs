@@ -1,14 +1,14 @@
 defmodule Engine.Build.StateTest do
+  use ExUnit.Case, async: false
+  use Patch
+
+  import Forge.Test.Fixtures
+
   alias Engine.Build
   alias Engine.Build.State
   alias Engine.Plugin
   alias Forge.Document
   alias Forge.Project
-
-  import Forge.Test.Fixtures
-
-  use ExUnit.Case, async: false
-  use Patch
 
   setup do
     start_supervised!(Engine.Dispatch)
@@ -49,6 +49,19 @@ defmodule Engine.Build.StateTest do
 
   def with_metadata_project(_) do
     {:ok, state} = with_project_state(:project_metadata)
+    {:ok, state: state}
+  end
+
+  def with_bare_project_state(_) do
+    test = self()
+
+    patch(Engine.Dispatch, :broadcast, &send(test, &1))
+
+    fixture_dir = fixtures_path()
+    project = Project.bare("file://#{fixture_dir}")
+    state = State.new(project)
+
+    Engine.set_project(project)
     {:ok, state: state}
   end
 
@@ -147,6 +160,53 @@ defmodule Engine.Build.StateTest do
 
       assert_called(Build.Document.compile(_))
       assert_called(Build.Project.compile(_, _))
+    end
+  end
+
+  describe "bare project compilation" do
+    setup [:with_bare_project_state, :with_a_valid_document]
+
+    test "document compilation does not enter Mix project context", %{
+      state: state,
+      document: document
+    } do
+      patch(Engine.Mix, :in_project, fn _fun -> {:error, :should_not_be_called} end)
+
+      State.compile_file(state, document)
+
+      refute_called(Engine.Mix.in_project(_))
+    end
+
+    test "project compilation returns :ok without calling Mix", %{state: state} do
+      patch(Engine.Mix, :in_project, fn _project, _fun -> {:error, :should_not_be_called} end)
+
+      assert Engine.Build.Project.compile(state.project, true) == :ok
+
+      refute_called(Engine.Mix.in_project(_, _))
+    end
+  end
+
+  describe "fetching deps" do
+    test "stores :ok when deps fetch succeeds" do
+      {:ok, state} = with_project_state(:project_metadata)
+
+      patch(File, :rm_rf, fn _path -> {:ok, []} end)
+      patch(Build.Project, :fetch_deps, fn _project -> :ok end)
+
+      state = State.fetch_deps(state, state.project)
+
+      assert State.last_deps_fetch_result(state) == :ok
+    end
+
+    test "stores error when deps fetch fails" do
+      {:ok, state} = with_project_state(:project_metadata)
+
+      patch(File, :rm_rf, fn _path -> {:ok, []} end)
+      patch(Build.Project, :fetch_deps, fn _project -> {:error, "deps failed"} end)
+
+      state = State.fetch_deps(state, state.project)
+
+      assert State.last_deps_fetch_result(state) == {:error, "deps failed"}
     end
   end
 end

@@ -1,12 +1,17 @@
 defmodule Engine.CodeIntelligence.VariableTest do
-  alias Engine.CodeIntelligence.Variable
-  alias Forge.Ast
-
   use ExUnit.Case
 
   import Forge.Test.CodeSigil
   import Forge.Test.CursorSupport
   import Forge.Test.RangeSupport
+
+  alias Engine.CodeIntelligence.Variable
+  alias Forge.Ast
+
+  setup do
+    start_supervised!(Engine.ApplicationCache)
+    :ok
+  end
 
   def find_definition(code) do
     {position, document} = pop_cursor(code, as: :document)

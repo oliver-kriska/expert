@@ -1,13 +1,14 @@
 defmodule Expert.Project.SearchListener do
+  use GenServer
+
+  import Forge.EngineApi.Messages
+
   alias Expert.EngineApi
   alias Expert.Protocol.Id
   alias Forge.Formats
   alias Forge.Project
   alias GenLSP.Requests
 
-  import Forge.EngineApi.Messages
-
-  use GenServer
   require Logger
 
   def start_link(%Project{} = project) do
@@ -15,14 +16,15 @@ defmodule Expert.Project.SearchListener do
   end
 
   defp name(%Project{} = project) do
-    :"#{Project.name(project)}::search_listener"
+    :"#{Project.unique_name(project)}::search_listener"
   end
 
   @impl GenServer
   def init([%Project{} = project]) do
     EngineApi.register_listener(project, self(), [
       project_reindex_requested(),
-      project_reindexed()
+      project_reindexed(),
+      search_store_loading()
     ])
 
     {:ok, project}
@@ -40,6 +42,20 @@ defmodule Expert.Project.SearchListener do
     message = "Reindexed #{Project.name(project)} in #{Formats.time(elapsed, unit: :millisecond)}"
     Logger.info(message)
     GenLSP.request(Expert.get_lsp(), %Requests.WorkspaceCodeLensRefresh{id: Id.next()})
+
+    GenLSP.notify(Expert.get_lsp(), %GenLSP.Notifications.WindowShowMessage{
+      params: %GenLSP.Structures.ShowMessageParams{
+        type: GenLSP.Enumerations.MessageType.info(),
+        message: message
+      }
+    })
+
+    {:noreply, project}
+  end
+
+  def handle_info(search_store_loading(), %Project{} = project) do
+    message = "Search index is loading for #{Project.name(project)}..."
+    Logger.info(message)
 
     GenLSP.notify(Expert.get_lsp(), %GenLSP.Notifications.WindowShowMessage{
       params: %GenLSP.Structures.ShowMessageParams{

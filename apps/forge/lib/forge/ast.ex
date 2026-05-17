@@ -75,7 +75,11 @@ defmodule Forge.Ast do
   alias Sourceror.Zipper
 
   require Logger
-  require Sourceror
+
+  @parser (case Application.compile_env(:forge, :parser, :spitfire) do
+             :spitfire -> Forge.Ast.Parser.Spitfire
+             :elixir -> Forge.Ast.Parser.Elixir
+           end)
 
   @typedoc "Return value from `Code.Fragment.cursor_context/2`"
   @type cursor_context :: any()
@@ -83,8 +87,7 @@ defmodule Forge.Ast do
   @typedoc "Return value from `Code.Fragment.surround_context/3`"
   @type surround_context :: any()
 
-  @type parse_error ::
-          {location :: keyword(), String.t() | {String.t(), String.t()}, String.t()}
+  @type parse_error :: {location :: keyword(), String.t()}
 
   @type patch :: %{
           optional(:preserve_indentation) => boolean(),
@@ -154,13 +157,29 @@ defmodule Forge.Ast do
 
   @doc """
   Returns an AST generated from a valid document or string.
+
+  When parsing fails but a partial AST is recovered, returns
+  `{:error, ast, parse_error, comments}` where the AST may be useful
+  for features like document outline on syntactically invalid code.
   """
   @spec from(Document.t() | Analysis.t() | String.t()) ::
-          {:ok, Macro.t(), comment_metadata()} | {:error, parse_error()}
+          {:ok, Macro.t(), comment_metadata()}
+          | {:error, Macro.t(), parse_error(), comment_metadata()}
+          | {:error, parse_error()}
   def from(%Document{} = document) do
     document
     |> Document.to_string()
     |> from()
+    |> case do
+      {:error, :crashed, exception, stacktrace} ->
+        log_parser_crash(exception, stacktrace, document.path)
+
+        {:error,
+         {[line: 1, column: 1], "parser crashed: #{Exception.format_banner(:error, exception)}"}}
+
+      other ->
+        other
+    end
   end
 
   def from(%Analysis{valid?: true} = analysis) do
@@ -195,12 +214,29 @@ defmodule Forge.Ast do
       {:ok, quoted} ->
         {:ok, quoted}
 
+      {:error, :crashed, exception, stacktrace} ->
+        log_parser_crash(exception, stacktrace, document.path)
+
+        {:error,
+         {[line: 1, column: 1], "parser crashed: #{Exception.format_banner(:error, exception)}"}}
+
       _error ->
         # https://github.com/elixir-lang/elixir/issues/12673#issuecomment-1626932280
         # NOTE: Adding new line doesn't always work,
         # so we need to try again without adding new line
         document_fragment = Document.fragment(document, position)
-        do_container_cursor_to_quoted(document_fragment)
+
+        case do_container_cursor_to_quoted(document_fragment) do
+          {:error, :crashed, exception, stacktrace} ->
+            log_parser_crash(exception, stacktrace, document.path)
+
+            {:error,
+             {[line: 1, column: 1],
+              "parser crashed: #{Exception.format_banner(:error, exception)}"}}
+
+          other ->
+            other
+        end
     end
   end
 
@@ -256,8 +292,16 @@ defmodule Forge.Ast do
           {:ok, [Macro.t(), ...]} | {:error, :not_found | parse_error()}
   def path_at(%struct{} = document_or_analysis, %Position{} = position)
       when struct in [Document, Analysis] do
-    with {:ok, ast, _} <- from(document_or_analysis) do
-      path_at(ast, position)
+    case from(document_or_analysis) do
+      {:ok, ast, _comments} ->
+        path_at(ast, position)
+
+      # Try to use partial AST from syntax errors for features like document outline
+      {:error, ast, _error, _comments} ->
+        path_at(ast, position)
+
+      error ->
+        error
     end
   end
 
@@ -486,20 +530,19 @@ defmodule Forge.Ast do
   # private
 
   defp do_string_to_quoted(string) when is_binary(string) do
-    Code.string_to_quoted_with_comments(string,
-      literal_encoder: &{:ok, {:__block__, &2, [&1]}},
-      token_metadata: true,
-      columns: true,
-      unescape: false
-    )
+    @parser.string_to_quoted(string)
   end
 
   defp do_container_cursor_to_quoted(fragment) when is_binary(fragment) do
-    Code.Fragment.container_cursor_to_quoted(fragment,
-      literal_encoder: &{:ok, {:__block__, &2, [&1]}},
-      token_metadata: true,
-      columns: true,
-      unescape: false
+    @parser.container_cursor_to_quoted(fragment)
+  end
+
+  defp log_parser_crash(exception, stacktrace, path) do
+    path_info =
+      if path, do: " when parsing #{path}. This file will not be used in search index.", else: ""
+
+    Logger.warning(
+      "Spitfire crashed#{path_info}\n#{Exception.format(:error, exception, stacktrace)}"
     )
   end
 

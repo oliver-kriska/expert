@@ -1,7 +1,8 @@
 defmodule Forge.EngineApi.Messages do
+  import Record
+
   alias Forge.Project
 
-  import Record
   defrecord :project_compile_requested, project: nil, build_number: 0
 
   defrecord :project_compiled,
@@ -33,10 +34,6 @@ defmodule Forge.EngineApi.Messages do
 
   defrecord :file_diagnostics, project: nil, build_number: 0, uri: nil, diagnostics: []
 
-  defrecord :project_progress, label: nil, message: nil, stage: :report
-
-  defrecord :percent_progress, label: nil, message: nil, stage: :report, max: 0, delta: 0
-
   defrecord :struct_discovered, module: nil, fields: []
 
   defrecord :project_index_ready, project: nil
@@ -44,6 +41,8 @@ defmodule Forge.EngineApi.Messages do
   defrecord :project_reindex_requested, project: nil
 
   defrecord :project_reindexed, project: nil, elapsed_ms: 0, status: :success
+
+  defrecord :search_store_loading, project: nil
 
   @type compile_status :: :successful | :error
   @type name_and_arity :: {atom, non_neg_integer}
@@ -116,13 +115,6 @@ defmodule Forge.EngineApi.Messages do
             diagnostics: diagnostics()
           )
 
-  @type project_progress ::
-          record(:project_progress,
-            label: String.t(),
-            message: String.t() | integer(),
-            stage: :prepare | :begin | :report | :complete
-          )
-
   @type struct_discovered :: record(:struct_discovered, module: module(), fields: field_list())
 
   @type project_index_ready :: record(:project_index_ready, project: Forge.Project.t())
@@ -136,4 +128,7 @@ defmodule Forge.EngineApi.Messages do
             elapsed_ms: non_neg_integer(),
             status: :success | {:error, term()}
           )
+
+  @type search_store_loading ::
+          record(:search_store_loading, project: Forge.Project.t())
 end

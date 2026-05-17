@@ -1,7 +1,5 @@
-unless Elixir.Features.compile_keeps_current_directory?() do
+if !Elixir.Features.compile_keeps_current_directory?() do
   defmodule Mix.Tasks.Deps.SafeCompile do
-    use Mix.Task
-
     @shortdoc "Compiles dependencies"
 
     @moduledoc """
@@ -40,6 +38,10 @@ unless Elixir.Features.compile_keeps_current_directory?() do
 
     """
 
+    use Mix.Task
+
+    alias Forge.Project
+
     @switches [
       include_children: :boolean,
       force: :boolean,
@@ -52,7 +54,8 @@ unless Elixir.Features.compile_keeps_current_directory?() do
       if Elixir.Features.compile_keeps_current_directory?() do
         Mix.Tasks.Deps.Compile.run(args)
       else
-        unless "--no-archives-check" in args do
+        if "--no-archives-check" not in args do
+          Project.ensure_hex_and_rebar()
           Mix.Task.run("archive.check", args)
         end
 
@@ -176,6 +179,7 @@ unless Elixir.Features.compile_keeps_current_directory?() do
             "--no-warnings-as-errors"
           ]
 
+          Project.ensure_hex_and_rebar()
           res = Mix.Task.run("compile", options)
           match?({:ok, _}, res)
         catch
@@ -259,7 +263,7 @@ unless Elixir.Features.compile_keeps_current_directory?() do
         "Shall I install #{manager}? (if running non-interactively, " <>
           "use \"mix local.rebar --force\")"
 
-      unless shell.yes?(install_question) do
+      if !shell.yes?(install_question) do
         error_message =
           "Could not find \"#{manager}\" to compile " <>
             "dependency #{inspect(app)}, please ensure \"#{manager}\" is available"
@@ -282,7 +286,7 @@ unless Elixir.Features.compile_keeps_current_directory?() do
       makefile_win? = makefile_win?(dep)
 
       command =
-        case :os.type() do
+        case Forge.OS.type() do
           {:win32, _} when makefile_win? ->
             "nmake /F Makefile.win"
 

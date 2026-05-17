@@ -1,18 +1,17 @@
 defmodule Engine.CodeIntelligence.ReferencesTest do
-  alias Forge.Document
-  alias Forge.Document.Location
-
-  alias Engine.CodeIntelligence.References
-  alias Engine.Search
-  alias Engine.Search.Store.Backends
-
   use ExUnit.Case, async: false
 
   import Forge.Test.CodeSigil
   import Forge.Test.CursorSupport
+  import Forge.Test.EventualAssertions
   import Forge.Test.Fixtures
   import Forge.Test.RangeSupport
-  import Forge.Test.EventualAssertions
+
+  alias Engine.CodeIntelligence.References
+  alias Engine.Search
+  alias Engine.Search.Store.Backends
+  alias Forge.Document
+  alias Forge.Document.Location
 
   setup do
     project = project()
@@ -20,6 +19,7 @@ defmodule Engine.CodeIntelligence.ReferencesTest do
     Backends.Ets.destroy_all(project)
     Engine.set_project(project)
 
+    start_supervised!(Engine.ApplicationCache)
     start_supervised!(Document.Store)
     start_supervised!(Engine.Dispatch)
     start_supervised!(Backends.Ets)
@@ -308,6 +308,22 @@ defmodule Engine.CodeIntelligence.ReferencesTest do
 
       assert [definition, _ref_1, _ref_2] = references(project, query, code, true)
       assert decorate(code, definition.range) =~ "  «first» = 4"
+    end
+  end
+
+  describe "unsupported entities" do
+    test "returns an empty list for plain atoms", %{project: project} do
+      query = ~S[
+        defmodule MyModule do
+          def my_fun do
+            :stub_create_consent|
+          end
+        end
+      ]
+
+      {_, code} = pop_cursor(query)
+
+      assert [] == references(project, query, code)
     end
   end
 

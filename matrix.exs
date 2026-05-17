@@ -1,30 +1,26 @@
 Mix.install([:jason])
 
-projects = [
-  "engine",
-  "expert",
-  "expert_credo",
-  "forge"
+versions = [
+  %{elixir: "1.19", otp: "28", os: "ubuntu-latest"},
+  %{elixir: "1.18.4", otp: "28", os: "ubuntu-latest"},
+  %{elixir: "1.18", otp: "27", os: "ubuntu-latest"},
+  %{elixir: "1.18", otp: "26", os: "ubuntu-latest"},
+  %{elixir: "1.17", otp: "27", os: "ubuntu-latest"},
+  %{elixir: "1.17", otp: "26", os: "ubuntu-latest"},
+  %{elixir: "1.16", otp: "26", os: "ubuntu-latest"},
 ]
 
-# TODO(#44): renable these once we make the repo public
-versions = [
-  # %{elixir: "1.18.1", otp: "27"},
-  # %{elixir: "1.18.1", otp: "26"},
-  # %{elixir: "1.17", otp: "27"},
-  # %{elixir: "1.17", otp: "26"},
-  # %{elixir: "1.17", otp: "25"},
-  # %{elixir: "1.16", otp: "26"},
-  # %{elixir: "1.16", otp: "25"},
-  # %{elixir: "1.15.8", otp: "26"},
-  %{elixir: "1.15.8", otp: "25"}
-]
+expert_matrix =
+  [
+    %{elixir: "1.18.4", otp: "27.3.4.1", project: "expert", os: "ubuntu-latest"},
+    %{elixir: "1.18.4", otp: "27.3.4.1", project: "expert", os: "windows-2022"}
+  ]
 
 %{
   include:
-    for project <- projects, version <- versions do
+    for project <- ["engine", "expert_credo", "forge"], version <- versions do
       Map.put(version, :project, project)
-    end
+    end ++ expert_matrix
 }
 |> Jason.encode!(pretty: true)
 |> then(&File.write!(".github/matrix.json", &1))

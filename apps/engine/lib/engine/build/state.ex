@@ -1,22 +1,20 @@
 defmodule Engine.Build.State do
+  import Forge.EngineApi.Messages
+
   alias Elixir.Features
   alias Engine.Build
   alias Engine.Plugin
   alias Forge.Document
-  alias Forge.EngineApi.Messages
   alias Forge.Project
   alias Forge.VM.Versions
 
   require Logger
 
-  import Messages
-
-  use Engine.Progress
-
   defstruct project: nil,
             build_number: 0,
             uri_to_document: %{},
-            project_compile: :none
+            project_compile: :none,
+            last_deps_fetch_result: nil
 
   def new(%Project{} = project) do
     %__MODULE__{project: project}
@@ -38,7 +36,7 @@ defmodule Engine.Build.State do
         compile_file(state, document)
       end)
 
-    %__MODULE__{new_state | uri_to_document: %{}, project_compile: :none}
+    %{new_state | uri_to_document: %{}, project_compile: :none}
   end
 
   def on_file_compile(%__MODULE__{} = state, %Document{} = document) do
@@ -62,7 +60,7 @@ defmodule Engine.Build.State do
     project = state.project
     build_path = Project.versioned_build_path(project)
 
-    unless Versions.compatible?(build_path) do
+    if !Versions.compatible?(build_path) do
       Logger.info("Build path #{build_path} was compiled on a previous erlang version. Deleting")
 
       if File.exists?(build_path) do
@@ -72,11 +70,37 @@ defmodule Engine.Build.State do
 
     maybe_delete_old_builds(project)
 
-    unless File.exists?(build_path) do
+    if !File.exists?(build_path) do
       File.mkdir_p!(build_path)
       Versions.write(build_path)
     end
   end
+
+  def fetch_deps(%__MODULE__{} = state, project) do
+    build_path = Project.versioned_build_path(project)
+
+    Logger.info("Cleaning build directory: #{build_path}")
+
+    case File.rm_rf(build_path) do
+      {:ok, _} ->
+        :ok
+
+      {:error, reason, path} ->
+        Logger.warning("Failed to remove build path #{path}: #{inspect(reason)}")
+    end
+
+    result =
+      project
+      |> Engine.Build.Project.fetch_deps()
+      |> normalize_fetch_deps_result()
+
+    %{state | last_deps_fetch_result: result}
+  end
+
+  def last_deps_fetch_result(%__MODULE__{last_deps_fetch_result: result}), do: result
+
+  defp normalize_fetch_deps_result({:ok, :ok}), do: :ok
+  defp normalize_fetch_deps_result(result), do: result
 
   defp compile_project(%__MODULE__{} = state, initial?) do
     state = increment_build_number(state)
@@ -130,11 +154,7 @@ defmodule Engine.Build.State do
     Build.with_lock(fn ->
       Engine.broadcast(file_compile_requested(uri: document.uri))
 
-      safe_compile_func = fn ->
-        Engine.Mix.in_project(fn _ -> Build.Document.compile(document) end)
-      end
-
-      {elapsed_us, result} = :timer.tc(fn -> safe_compile_func.() end)
+      {elapsed_us, result} = :timer.tc(fn -> compile_document(project, document) end)
 
       elapsed_ms = to_ms(elapsed_us)
 
@@ -181,6 +201,14 @@ defmodule Engine.Build.State do
     state
   end
 
+  defp compile_document(%Project{kind: :mix}, document) do
+    Engine.Mix.in_project(fn _ -> Build.Document.compile(document) end)
+  end
+
+  defp compile_document(%Project{}, document) do
+    Build.Document.compile(document)
+  end
+
   def set_compiler_options do
     Code.compiler_options(
       parser_options: parser_options(),
@@ -205,10 +233,6 @@ defmodule Engine.Build.State do
     else
       opts
     end
-  end
-
-  def building_label(%Project{} = project) do
-    "Building #{Project.display_name(project)}"
   end
 
   defp to_ms(microseconds) do

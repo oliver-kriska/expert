@@ -2,19 +2,22 @@ defmodule Engine.Application do
   @moduledoc false
 
   use Application
-  require Logger
 
   @impl true
   def start(_type, _args) do
+    Forge.Identifier.start()
+
     children =
       if Engine.project_node?() do
         [
+          Engine.ApplicationCache,
           Engine.Api.Proxy,
           Engine.Commands.Reindex,
           Engine.Module.Loader,
-          {Engine.Dispatch, progress: true},
+          Engine.Dispatch,
           Engine.ModuleMappings,
           Engine.Build,
+          Engine.ModuleStore,
           Engine.Build.CaptureServer,
           Engine.Plugin.Runner.Supervisor,
           Engine.Plugin.Runner.Coordinator,

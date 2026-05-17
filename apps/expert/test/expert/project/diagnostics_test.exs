@@ -1,4 +1,12 @@
 defmodule Expert.Project.DiagnosticsTest do
+  use ExUnit.Case
+  use Patch
+  use Expert.Test.DispatchFake
+
+  import Expert.Test.Protocol.TransportSupport
+  import Forge.EngineApi.Messages
+  import Forge.Test.Fixtures
+
   alias Expert.EngineApi
   alias Expert.Test.DispatchFake
   alias Forge.Document
@@ -6,13 +14,6 @@ defmodule Expert.Project.DiagnosticsTest do
   alias GenLSP.Notifications.TextDocumentPublishDiagnostics
   alias GenLSP.Structures
   alias GenLSP.Structures.PublishDiagnosticsParams
-
-  use ExUnit.Case
-  use Patch
-  use DispatchFake
-
-  import Forge.EngineApi.Messages
-  import Forge.Test.Fixtures
 
   setup do
     project = project()
@@ -35,24 +36,6 @@ defmodule Expert.Project.DiagnosticsTest do
 
     values = Keyword.merge(defaults, opts)
     struct(Diagnostic.Result, values)
-  end
-
-  def with_patched_transport(_) do
-    test = self()
-
-    patch(GenLSP, :notify_server, fn _, message ->
-      send(test, {:transport, message})
-    end)
-
-    patch(GenLSP, :notify, fn _, message ->
-      send(test, {:transport, message})
-    end)
-
-    patch(GenLSP, :request, fn _, message ->
-      send(test, {:transport, message})
-    end)
-
-    :ok
   end
 
   defp open_file(project, contents) do

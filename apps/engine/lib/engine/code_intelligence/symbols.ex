@@ -2,6 +2,7 @@ defmodule Engine.CodeIntelligence.Symbols do
   alias Engine.Search
   alias Engine.Search.Indexer
   alias Engine.Search.Indexer.Extractors
+  alias Forge.Ast
   alias Forge.CodeIntelligence.Symbols
   alias Forge.Document
   alias Forge.Document.Range
@@ -24,10 +25,27 @@ defmodule Engine.CodeIntelligence.Symbols do
   ]
 
   def for_document(%Document{} = document) do
-    {:ok, entries} = Indexer.Source.index_document(document, @symbol_extractors)
+    analysis = Ast.analyze(document)
+
+    entries =
+      if analysis.ast == nil do
+        []
+      else
+        Indexer.Quoted.extract_entries(analysis, @symbol_extractors)
+      end
 
     definitions = Enum.filter(entries, &(&1.subtype == :definition))
     to_symbols(document, definitions)
+  end
+
+  def for_workspace("") do
+    case Search.Store.all(subtype: :definition) do
+      {:ok, entries} ->
+        Enum.map(entries, &Symbols.Workspace.from_entry/1)
+
+      _ ->
+        []
+    end
   end
 
   def for_workspace(query) do
@@ -106,11 +124,11 @@ defmodule Engine.CodeIntelligence.Symbols do
           children =
             Enum.map(defs, fn child ->
               [_, rest] = String.split(child.name, " ", parts: 2)
-              %Symbols.Document{child | name: rest}
+              %{child | name: rest}
             end)
 
           range = Range.new(first.range.start, last.range.end)
-          %Symbols.Document{first | name: name, range: range, children: children}
+          %{first | name: name, range: range, children: children}
       end)
 
     grouped_functions

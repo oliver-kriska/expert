@@ -21,6 +21,10 @@ defmodule Engine.CodeAction.Handlers.RemoveUnusedAlias do
   normalizer and possibly fix sourceror, so until then, this is what we have.
   """
 
+  @behaviour Engine.CodeAction.Handler
+
+  import Record
+
   alias Engine.Analyzer
   alias Engine.CodeAction
   alias Forge.Ast
@@ -34,8 +38,6 @@ defmodule Engine.CodeAction.Handlers.RemoveUnusedAlias do
   alias GenLSP.Enumerations
   alias Sourceror.Zipper
 
-  import Record
-
   defrecordp :multi_alias_metadata, [
     :document,
     :multi_alias_range,
@@ -44,8 +46,6 @@ defmodule Engine.CodeAction.Handlers.RemoveUnusedAlias do
   ]
 
   defrecordp :single_alias_metadata, [:document, :range]
-  @behaviour CodeAction.Handler
-
   @impl CodeAction.Handler
   def actions(%Document{} = document, %Range{} = range, diagnostics) do
     Enum.reduce(diagnostics, [], fn %Diagnostic{} = diagnostic, acc ->
@@ -184,7 +184,7 @@ defmodule Engine.CodeAction.Handlers.RemoveUnusedAlias do
   defp fetch_full_alias(%Analysis{} = analysis, %Position{} = position, last_segment) do
     aliases = Analyzer.aliases_at(analysis, position)
 
-    with {:ok, aliased_module} <- Map.fetch(aliases, last_segment),
+    with {:ok, aliased_module} <- Map.fetch(aliases, [last_segment]),
          {:elixir, full_alias} <- Ast.Module.safe_split(aliased_module, as: :atoms) do
       {:ok, full_alias}
     end
@@ -246,7 +246,7 @@ defmodule Engine.CodeAction.Handlers.RemoveUnusedAlias do
 
   defp include_next_line(%Range{} = range) do
     update_in(range.end, fn old_position ->
-      %Position{
+      %{
         old_position
         | line: old_position.line + 1,
           character: 1

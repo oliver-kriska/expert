@@ -1,4 +1,6 @@
 # Used by "mix format"
+Code.require_file("../../.formatter-config.exs", __DIR__)
+
 imported_deps =
   if Mix.env() == :test do
     [:patch, :forge]
@@ -6,10 +8,10 @@ imported_deps =
     [:forge]
   end
 
-locals_without_parens = [with_progress: 3]
-
 [
-  locals_without_parens: locals_without_parens,
+  plugins: [Quokka],
+  quokka: Formatter.Config.quokka(),
+  locals_without_parens: [],
   inputs: ["{mix,.formatter}.exs", "{config,lib,test}/**/*.{ex,exs}"],
   import_deps: imported_deps
 ]

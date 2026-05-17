@@ -5,8 +5,9 @@ defmodule Engine.Module.Loader do
   is that having a cache will improve performance
   """
 
-  alias Future.Code
   use Agent
+
+  alias Future.Code
 
   def start_link(_) do
     initialize = fn ->
@@ -16,6 +17,23 @@ defmodule Engine.Module.Loader do
     Agent.start_link(initialize, name: __MODULE__)
   end
 
+  def load_all(module_list) do
+    loaded_modules =
+      case Code.ensure_all_loaded(module_list) do
+        :ok ->
+          module_list
+
+        {:error, errors} ->
+          failed_modules = MapSet.new(errors, &elem(&1, 0))
+          Enum.reject(module_list, &MapSet.member?(failed_modules, &1))
+      end
+
+    newly_loaded =
+      Map.new(loaded_modules, fn module_name -> {module_name, {:module, module_name}} end)
+
+    Agent.update(__MODULE__, fn modules -> Map.merge(modules, newly_loaded) end)
+  end
+
   def ensure_loaded(module_name) do
     Agent.get_and_update(__MODULE__, fn
       %{^module_name => result} = state ->
@@ -23,7 +41,18 @@ defmodule Engine.Module.Loader do
 
       state ->
         result = Code.ensure_loaded(module_name)
-        {result, Map.put(state, module_name, result)}
+        # Note(doorgan): I'm not sure if it's just a timing issue, but on Windows it
+        # can sometimes take a little bit before this function returns {:module, name}
+        # so I figured not caching the error result here should work. This module is a
+        # cache and I think most of the time this is called the module will already
+        # have been loaded.
+        new_state =
+          case result do
+            {:module, ^module_name} -> Map.put(state, module_name, result)
+            _ -> state
+          end
+
+        {result, new_state}
     end)
   end
 
